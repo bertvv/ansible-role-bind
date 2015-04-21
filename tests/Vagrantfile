@@ -7,10 +7,11 @@ HOST_NAME = 'test' + ROLE_NAME
 VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = 'centos70-nocm'
+  config.vm.box = 'centos71-nocm'
   config.vm.define HOST_NAME do |node|
     node.vm.provision 'ansible' do |ansible|
       ansible.playbook = 'test.yml'
+      #ansible.verbose = 'vvvv'
     end
   end
 end
