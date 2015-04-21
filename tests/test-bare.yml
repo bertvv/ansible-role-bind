@@ -1,0 +1,5 @@
+---
+- hosts: all
+  sudo: true
+  roles:
+    - bind
