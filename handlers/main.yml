@@ -6,7 +6,7 @@
     name: named
     state: restarted
 
-- name: Restart firewall
+- name: restart firewalld
   service:
     name: firewalld
     state: restarted
