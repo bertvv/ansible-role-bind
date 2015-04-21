@@ -1,8 +1,8 @@
 ---
 galaxy_info:
   author: Bert Van Vreckem
-  description: PURPOSE
-  company:
+  description: Sets up ISC BIND as a master DNS server for a single domain.
+  company: University College Ghent
   license: BSD
   min_ansible_version: 1.7
   platforms:
