@@ -4,16 +4,24 @@
 $ORIGIN {{ bind_zone_name }}.
 $TTL {{ bind_zone_ttl }}
 
+{% if bind_zone_name_servers is defined %}
 @ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+{% else %}
+@ IN SOA {{ ansible_hostname }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+{% endif %}
   {{ timestamp.stdout }}
   {{ bind_zone_time_to_refresh }}
   {{ bind_zone_time_to_retry }}
   {{ bind_zone_time_to_expire }}
   {{ bind_zone_minimum_ttl }} )
 
+{% if bind_zone_name_servers is defined %}
 {% for ns in bind_zone_name_servers %}
                      IN  NS     {{ ns }}.{{ bind_zone_name }}.
 {% endfor %}
+{% else %}
+                     IN  NS     {{ ansible_hostname }}.{{ bind_zone_name }}.
+{% endif %}
 
 {% if bind_zone_mail_servers is defined %}
 {% for mail in bind_zone_mail_servers %}
@@ -21,6 +29,7 @@ $TTL {{ bind_zone_ttl }}
 {% endfor %}
 {% endif %}
 
+{% if bind_zone_hosts is defined %}
 {% for host in bind_zone_hosts %}
 {{ host.name.ljust(20) }} IN  A      {{ host.ip }}
 {% if host.aliases is defined %}
@@ -29,3 +38,6 @@ $TTL {{ bind_zone_ttl }}
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% else %}
+{{ ansible_hostname.ljust(20) }} IN A     {{ ansible_default_ipv4.address }}
+{% endif %}

@@ -59,10 +59,12 @@ zone "{{ bind_zone_name }}" IN {
   allow-update { none; };
 };
 
-{%for network in bind_zone_networks %}
+{% if bind_zone_networks is defined %}
+{% for network in bind_zone_networks %}
 zone "{{ network|reverse_lookup_zone }}" IN {
   type master;
   file "{{ network|reverse_lookup_zone }}";
   allow-update { none; };
 };
 {% endfor %}
+{% endif %}
