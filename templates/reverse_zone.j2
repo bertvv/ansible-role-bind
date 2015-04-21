@@ -1,0 +1,21 @@
+; Reverse zone file for {{ bind_zone_name }}
+; {{ ansible_managed }}
+; vi: ft=bindzone
+
+$TTL {{ bind_zone_ttl }}
+$ORIGIN {{ item|reverse_lookup_zone }}.
+
+@ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+  {{ timestamp.stdout }}
+  {{ bind_zone_time_to_refresh }}
+  {{ bind_zone_time_to_retry }}
+  {{ bind_zone_time_to_expire }}
+  {{ bind_zone_minimum_ttl }} )
+
+{% for ns in bind_zone_name_servers %}
+         IN  NS   {{ ns }}.{{ bind_zone_name }}.
+{% endfor %}
+
+{% for host in bind_zone_hosts if host.ip.startswith(item) %}
+{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endfor %}

@@ -1,0 +1,31 @@
+; Zone file for {{ bind_zone_name }}
+; {{ ansible_managed }}
+
+$ORIGIN {{ bind_zone_name }}.
+$TTL {{ bind_zone_ttl }}
+
+@ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+  {{ timestamp.stdout }}
+  {{ bind_zone_time_to_refresh }}
+  {{ bind_zone_time_to_retry }}
+  {{ bind_zone_time_to_expire }}
+  {{ bind_zone_minimum_ttl }} )
+
+{% for ns in bind_zone_name_servers %}
+                     IN  NS     {{ ns }}.{{ bind_zone_name }}.
+{% endfor %}
+
+{% if bind_zone_mail_servers is defined %}
+{% for mail in bind_zone_mail_servers %}
+{% if loop.first %}@{% else %} {% endif %}                    IN  MX     {{ mail.preference}}  {{ mail.name }}.{{ bind_zone_name }}.
+{% endfor %}
+{% endif %}
+
+{% for host in bind_zone_hosts %}
+{{ host.name.ljust(20) }} IN  A      {{ host.ip }}
+{% if host.aliases is defined %}
+{% for alias in host.aliases %}
+{{ alias.ljust(20) }} IN  CNAME  {{ host.name }}
+{% endfor %}
+{% endif %}
+{% endfor %}
