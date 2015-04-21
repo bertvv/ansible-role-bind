@@ -1,0 +1,7 @@
+# roles/bind/vars/main.yml
+---
+
+bind_packages:
+  - bind
+
+bind_service:

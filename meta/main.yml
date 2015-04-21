@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Bert Van Vreckem
+  description: PURPOSE
+  company:
+  license: BSD
+  min_ansible_version: 1.7
+  platforms:
+  - name: EL
+    versions:
+      - 7
+  categories:
+    - system
+dependencies: []
+

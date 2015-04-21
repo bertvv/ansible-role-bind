@@ -1,0 +1,16 @@
+# roles/bind/tasks/main.yml
+---
+
+- name: Install packages
+  yum:
+    pkg: "{{ item }}"
+    state: installed
+  with_items: bind_packages
+  tags: bind
+
+- name: Ensure service is started
+  service:
+    name: "{{ bind_service }}"
+    state: started
+    enabled: true
+  tags: bind
