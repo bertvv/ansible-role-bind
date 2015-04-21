@@ -3,18 +3,20 @@
 
 bind_zone_name: "example.com"
 bind_zone_networks:
-  - "192.0.2"
+  - "10.0.2"
 
-# IPv4 address of the network interface(s) to listen on, separated by
-# semicolons. The string should also end with a semicolon.
-# Set to "any;" to listen on all interfaces
-bind_listen_ipv4: "127.0.0.1;"
+# List of IPv4 address of the network interface(s) to listen on. Set to "any"
+# to listen on all interfaces
+bind_listen_ipv4:
+  - "127.0.0.1"
 
-# IPv6 address of the network interface(s) to listen on.
-bind_listen_ipv6: "::1;"
+# List of IPv6 address of the network interface(s) to listen on.
+bind_listen_ipv6:
+  - "::1"
 
-# Hosts that are allowed to query this DNS server.
-bind_allow_query: "localhost;"
+# List of hosts that are allowed to query this DNS server.
+bind_allow_query:
+  - "localhost"
 
 # Allow recursion (set to "no" for an authoritative DNS server).
 bind_recursion: "yes"
