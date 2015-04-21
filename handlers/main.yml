@@ -1,0 +1,12 @@
+# roles/bind/handlers/main.yml
+---
+
+- name: restart bind
+  service: 
+    name: named
+    state: restarted
+
+- name: Restart firewall
+  service:
+    name: firewalld
+    state: restarted
