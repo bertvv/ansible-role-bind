@@ -11,6 +11,7 @@ This role supports multiple reverse zones.
 
 ## Requirements
 
+- This role is written specifically for RHEL/CentOS 7.x
 - The `firewalld` service should be running
 - The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses
 
@@ -26,8 +27,8 @@ This role supports multiple reverse zones.
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                             |
-| `bind_zone_name`             | `example.com`                    | The domain name                                                                                                  |
 | `bind_zone_name_servers`     | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                       |
+| `bind_zone_name`             | `example.com`                    | The domain name                                                                                                  |
 | `bind_zone_networks`         | `['10.0.2']`                     | A list of the networks that are part of the domain                                                               |
 | `bind_zone_time_to_expire`   | `1W`                             | Time to expire field in the SOA record.                                                                          |
 | `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                         |
