@@ -18,7 +18,7 @@
     bind_zone_name_servers:
       - 'testbind'
     bind_zone_mail_servers:
-      - name: 'mail'
+      - name: 'pub0004'
         preference: '10'
     bind_zone_hosts:
       - name: 'testbind'
@@ -33,9 +33,13 @@
         ip: '10.0.2.20'
         aliases:
           - www
+      - name: 'pub0004'
+        ip: '10.0.2.21'
+        aliases:
+          - mail
       - name: 'priv0001'
         ip: '172.16.0.10'
-        aliases:
-          - file
+      - name: 'priv0002'
+        ip: '172.16.0.11'
   roles:
     - bind
