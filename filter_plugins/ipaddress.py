@@ -21,7 +21,7 @@ def reverse_lookup_zone(ipaddress):
         ipaddress -- The network part of an IP address in dotted decimal
         notation
     """
-    return reverse_dotted_decimals(ipaddress) + '.ip-addr.arpa'
+    return reverse_dotted_decimals(ipaddress) + '.in-addr.arpa'
 
 
 class FilterModule(object):
