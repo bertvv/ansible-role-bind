@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Bert Van Vreckem
-  description: Sets up ISC BIND as a master DNS server for a single domain.
+  description: Sets up ISC BIND on RHEL/CentOS 7.x as a master DNS server for a single domain.
   company: University College Ghent
   license: BSD
   min_ansible_version: 1.7
