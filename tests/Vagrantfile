@@ -11,8 +11,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define HOST_NAME do |node|
     node.vm.hostname = HOST_NAME
     node.vm.provision 'ansible' do |ansible|
-      ansible.playbook = 'test-bare.yml'
-      #ansible.verbose = 'vvvv'
+      ansible.playbook = 'test.yml'         # Elaborate test that shows all features
+      # ansible.playbook = 'test-bare.yml'  # Minimal test case
     end
   end
 end
