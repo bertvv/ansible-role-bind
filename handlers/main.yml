@@ -2,11 +2,6 @@
 ---
 
 - name: restart bind
-  service: 
-    name: named
-    state: restarted
-
-- name: restart firewalld
   service:
-    name: firewalld
+    name: named
     state: restarted

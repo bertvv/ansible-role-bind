@@ -3,7 +3,6 @@
 An Ansible role for setting up BIND ISC as a master DNS server for a single domain. Specifically, the responsibilities of this role are to:
 
 - install BIND
-- manage firewall rules
 - set up the main configuration file
 - set up forward and reverse lookup zone files
 
@@ -12,7 +11,6 @@ This role supports multiple reverse zones.
 ## Requirements
 
 - This role is written specifically for RHEL/CentOS 7.x
-- The `firewalld` service should be running
 - The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses
 
 ## Role Variables
@@ -66,7 +64,7 @@ Remark that only the network part should be specified here!
 
 ## Dependencies
 
-No dependencies.
+No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.el7](https://github.com/bertvv/ansible-role-el7)).
 
 ## Example Playbook
 

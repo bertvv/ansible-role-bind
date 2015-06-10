@@ -20,14 +20,6 @@
   notify: restart bind
   tags: bind
 
-- name: Set firewall rules
-  firewalld:
-    service: dns
-    state: enabled
-    permanent: yes
-  notify: restart firewalld
-  tags: bind
-
 - name: Create serial
   command: date +%y%m%d%H
   register: timestamp
