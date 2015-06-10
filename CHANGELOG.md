@@ -6,6 +6,10 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ## 2.0.0 - 2015-06-10
 
+### Added
+
+* Added EL6 to supported platforms. Thanks to @rilindo for verifying this.
+
 ### Changed
 
 * Recursion is turned off by default, which fits an authoritative name server. This change is not backwards compatible, as the behaviour of BIND is different from before when you do not set the variable `bind_recursion` explicitly.
