@@ -14,6 +14,7 @@
     bind_zone_networks:
       - '192.168.56'
       - '172.16'
+    bind_zone_master_server_ip: '192.168.56.53'
     bind_zone_name_servers:
       - 'testbindmaster'
       - 'testbindslave'
