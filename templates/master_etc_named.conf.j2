@@ -56,6 +56,7 @@ include "/etc/named.root.key";
 zone "{{ bind_zone_name }}" IN {
   type master;
   file "{{ bind_zone_name }}";
+  notify yes;
   allow-update { none; };
 };
 
@@ -64,6 +65,7 @@ zone "{{ bind_zone_name }}" IN {
 zone "{{ network|reverse_lookup_zone }}" IN {
   type master;
   file "{{ network|reverse_lookup_zone }}";
+  notify yes;
   allow-update { none; };
 };
 {% endfor %}
