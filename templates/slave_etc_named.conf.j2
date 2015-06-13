@@ -1,0 +1,70 @@
+//
+// named.conf 
+//
+// {{ ansible_managed }}
+//
+
+options {
+	listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
+	listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
+	directory 	"/var/named";
+	dump-file 	"/var/named/data/cache_dump.db";
+	statistics-file "/var/named/data/named_stats.txt";
+	memstatistics-file "/var/named/data/named_mem_stats.txt";
+	allow-query     { {{ bind_allow_query|join(';') }}; };
+
+	/* 
+	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+	 - If you are building a RECURSIVE (caching) DNS server, you need to enable 
+	   recursion. 
+	 - If your recursive DNS server has a public IP address, you MUST enable access 
+	   control to limit queries to your legitimate users. Failing to do so will
+	   cause your server to become part of large scale DNS amplification 
+	   attacks. Implementing BCP38 within your network would greatly
+	   reduce such attack surface 
+	*/
+	recursion {{ bind_recursion }};
+
+	dnssec-enable yes;
+	dnssec-validation yes;
+	dnssec-lookaside auto;
+
+	/* Path to ISC DLV key */
+	bindkeys-file "/etc/named.iscdlv.key";
+
+	managed-keys-directory "/var/named/dynamic";
+
+	pid-file "/run/named/named.pid";
+	session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone "." IN {
+	type hint;
+	file "named.ca";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+
+zone "{{ bind_zone_name }}" IN {
+  type slave;
+  masters { {{ bind_zone_master_server_ip }}; };
+  file "{{ bind_zone_name }}";
+};
+
+{% if bind_zone_networks is defined %}
+{% for network in bind_zone_networks %}
+zone "{{ network|reverse_lookup_zone }}" IN {
+  type slave;
+  masters { {{ bind_zone_master_server_ip }}; };
+  file "{{ network|reverse_lookup_zone }}";
+};
+{% endfor %}
+{% endif %}

@@ -1,0 +1,16 @@
+# roles/bind/tasks/master.yml
+# Set up a BIND slave server
+---
+
+- name: Main BIND config file (slave)
+  template:
+    src: slave_etc_named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: '0640'
+    setype: named_conf_t
+    validate: 'named-checkconf %s'
+  notify: restart bind
+  tags: bind
+

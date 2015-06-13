@@ -14,7 +14,10 @@
   tags: bind
 
 - include: master.yml
-  when: ansible_all_ipv4_addresses|last == bind_zone_name_servers|first
+  when: ansible_all_ipv4_addresses|last == bind_zone_master_server_ip
+
+- include: slave.yml
+  when: not ansible_all_ipv4_addresses|last == bind_zone_master_server_ip
 
 - name: Start BIND service
   service:
