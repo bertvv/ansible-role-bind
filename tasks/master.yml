@@ -2,7 +2,7 @@
 # Set up a BIND master server
 ---
 
-- name: Main BIND config file
+- name: Main BIND config file (master)
   template:
     src: master_etc_named.conf.j2
     dest: /etc/named.conf
