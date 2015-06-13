@@ -7,36 +7,37 @@
     bind_listen_ipv6:
       - 'any'
     bind_allow_query:
-      - '10.0.2.0/24'
+      - '192.168.56.0/24'
       - '127.0.0.0/8'
-    bind_recursion: 'no'
 
     bind_zone_name: 'example.com'
     bind_zone_networks:
-      - '10.0.2'
+      - '192.168.56'
       - '172.16'
     bind_zone_name_servers:
-      - 'testbind'
+      - 'testbindmaster'
+      - 'testbindslave'
     bind_zone_mail_servers:
-      - name: 'pub0004'
+      - name: 'mail'
         preference: '10'
     bind_zone_hosts:
-      - name: 'testbind'
-        ip: '10.0.2.15'
+      - name: 'testbindmaster'
+        ip: '192.168.56.53'
         aliases:
           - ns1
-      - name: 'pub0002'
-        ip: '10.0.2.16'
+      - name: 'testbindslave'
+        ip: '192.168.56.54'
         aliases:
           - ns2
-      - name: 'pub0003'
-        ip: '10.0.2.20'
+      - name: 'web'
+        ip: '192.168.56.20'
         aliases:
           - www
-      - name: 'pub0004'
-        ip: '10.0.2.21'
+      - name: 'mail'
+        ip: '192.168.56.21'
         aliases:
-          - mail
+          - smtp
+          - imap
       - name: 'priv0001'
         ip: '172.16.0.10'
       - name: 'priv0002'
