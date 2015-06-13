@@ -4,7 +4,7 @@
 
 - name: Main BIND config file
   template:
-    src: named.conf.j2
+    src: master_etc_named.conf.j2
     dest: /etc/named.conf
     owner: root
     group: named
