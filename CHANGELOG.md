@@ -4,6 +4,14 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).
 
+## 3.0.0 - 2015-06-14
+
+### Added
+
+* You can now set up a master and slave DNS server.
+* The variable `bind_zone_master_server_ip` was added. This is a **required** variable, which makes this release not backwards compatible.
+* Automated acceptance tests for the test playbook
+
 ## 2.0.0 - 2015-06-10
 
 ### Added

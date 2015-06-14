@@ -4,16 +4,20 @@ An Ansible role for setting up BIND ISC as a master DNS server for a single doma
 
 - install BIND
 - set up the main configuration file
+    - master server
+    - slave server
 - set up forward and reverse lookup zone files
 
 This role supports multiple reverse zones.
 
 ## Requirements
 
-- This role is written specifically for RHEL/CentOS 7.x
-- The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses
+- This role is written specifically for RHEL/CentOS and works on versions 6 and 7.
+- The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses.
 
 ## Role Variables
+
+Variables are not required, unless specified.
 
 | Variable                     | Default                          | Comments (type)                                                                                                  |
 | :---                         | :---                             | :---                                                                                                             |
@@ -24,6 +28,7 @@ This role supports multiple reverse zones.
 | `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
+| `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                          |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                             |
 | `bind_zone_name_servers`     | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                       |
 | `bind_zone_name`             | `example.com`                    | The domain name                                                                                                  |
@@ -72,7 +77,64 @@ See the [test playbook](tests/test.yml) for an elaborate example that shows all 
 
 ## Testing
 
-The `tests` directory contains tests for this role in the form of a Vagrant environment. The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. To create it, do
+The `tests` directory contains tests for this role in the form of a Vagrant environment. The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook [`test.yml`](tests/test.yml).
+
+| **Hostname**     | **ip**        |
+| :---             | :---          |
+| `testbindmaster` | 192.168.56.53 |
+| `testbindslave`  | 192.168.56.54 |
+
+IP addresses are in the subnet of the default VirtualBox Host Only network interface (192.168.56.0/24). You should be able to query the servers from your host system. For example, to verify if the slave is updated correctly, you can do the following:
+
+```ShellSession
+$ dig @192.168.56.54 ns1.example.com +short
+testbindmaster.example.com.
+192.168.56.53
+$ dig @192.168.56.54 example.com www.example.com +short
+web.example.com.
+192.168.56.20
+$ dig @192.168.56.54 MX example.com +short
+10 mail.example.com.
+
+```
+
+An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks all settings specified in [`test.yml`](tests/test.yml). You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script [`dns.bats`](tests/dns.bats) on both the master and the slave DNS server.
+
+```ShellSession
+$ ./tests/runtests.sh
+Testing 192.168.56.53
+✓ The `dig` command should be installed
+✓ It should return the NS record(s)
+✓ It should be able to resolve host names
+✓ It should be able to do reverse lookups
+✓ It should be able to resolve aliases
+✓ It should return the MX record(s)
+
+6 tests, 0 failures
+Testing 192.168.56.54
+✓ The `dig` command should be installed
+✓ It should return the NS record(s)
+✓ It should be able to resolve host names
+✓ It should be able to do reverse lookups
+✓ It should be able to resolve aliases
+✓ It should return the MX record(s)
+
+6 tests, 0 failures
+```
+
+Running from the VM:
+
+```ShellSession
+$ vagrant ssh testbindmaster
+Last login: Sun Jun 14 18:52:35 2015 from 10.0.2.2
+Welcome to your Packer-built virtual machine.
+[vagrant@testbindmaster ~]$ /vagrant/runtests.sh
+Testing 192.168.56.53
+ ✓ The `dig` command should be installed
+[...]
+```
+
+The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Also the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
 
 ```ShellSession
 $ cd tests/
@@ -82,21 +144,6 @@ $ ln -frs ../filter_plugins/ .
 ```
 
 You may want to change the base box into one that you like. The current one is based on Box-Cutter's [CentOS Packer template](https://github.com/boxcutter/centos).
-
-The playbook [`test.yml`](tests/test.yml) applies the role to a VM, setting role variables. After running it, you should be able to log in to the server and query the DNS:
-
-```ShellSession
-$ vagrant ssh
-$ dig www.example.com @10.0.2.15 +short
-pub0003.example.com.
-10.0.2.20
-$ dig -x 172.16.0.10 @10.0.2.15 +short
-priv0001.example.com.
-$ dig example.com -t MX @10.0.2.15 +short
-10 mail.example.com.
-$ dig example.com -t NS @10.0.2.15 +short
-testbind.example.com.
-```
 
 ## Contributing
 
