@@ -12,3 +12,6 @@
 # Python artefacts
 .ropeproject
 *.pyc
+
+# Ignore installation directory of BATS test framework
+tests/bats
