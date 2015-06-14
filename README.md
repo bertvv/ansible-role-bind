@@ -101,7 +101,10 @@ $ dig @192.168.56.54 MX example.com +short
 An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks all settings specified in [`test.yml`](tests/test.yml). You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script [`dns.bats`](tests/dns.bats) on both the master and the slave DNS server.
 
 ```ShellSession
-$ ./tests/runtests.sh
+$ cd tests
+$ vagrant up
+[...]
+$ ./runtests.sh
 Testing 192.168.56.53
 ✓ The `dig` command should be installed
 ✓ It should return the NS record(s)
