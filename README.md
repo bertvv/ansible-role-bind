@@ -13,7 +13,7 @@ This role supports multiple reverse zones.
 ## Requirements
 
 - This role is written specifically for RHEL/CentOS and works on versions 6 and 7.
-- The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses.
+- The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses. If you forget this step, you will get the error message "`no filter named 'reverse_lookup_zone'`" in the task 'Main BIND config file'. See Issue #5.
 
 ## Role Variables
 
