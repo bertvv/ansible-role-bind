@@ -5,6 +5,9 @@ bind_zone_name: "example.com"
 bind_zone_networks:
   - "10.0.2"
 
+# List of acls.
+bind_acls: []
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:

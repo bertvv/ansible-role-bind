@@ -3,6 +3,12 @@
 //
 // {{ ansible_managed }}
 //
+{% for acl in bind_acls %}
+acl "{{ acl.name }}" {
+{% for match in acl.match_list %}
+  {{ match }};
+{% endfor %}
+};
 
 options {
 	listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
@@ -12,6 +18,9 @@ options {
 	statistics-file "/var/named/data/named_stats.txt";
 	memstatistics-file "/var/named/data/named_mem_stats.txt";
 	allow-query     { {{ bind_allow_query|join(';') }}; };
+{% if bind_acls|length != 0 %}
+	allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+{% endif %}
 
 	/* 
 	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.

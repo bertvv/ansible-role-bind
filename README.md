@@ -1,6 +1,6 @@
 # Ansible role `bind`
 
-An Ansible role for setting up BIND ISC as a master DNS server for a single domain. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up BIND ISC as an authoritative DNS server for a single domain. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -21,6 +21,7 @@ Variables are not required, unless specified.
 
 | Variable                     | Default                          | Comments (type)                                                                                                  |
 | :---                         | :---                             | :---                                                                                                             |
+| `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.        |
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
@@ -66,6 +67,20 @@ bind_zone_networks:
 ```
 
 Remark that only the network part should be specified here!
+
+### ACLs
+
+ACLs can be defined like this:
+
+```Yaml
+bind_acls:
+  - name: acl1
+    match_list:
+      - 192.0.2.0/24
+      - 10.0.0.0/8
+```
+
+The names of the ACLs will be added to the `allow-transfer` clause in global options.
 
 ## Dependencies
 
