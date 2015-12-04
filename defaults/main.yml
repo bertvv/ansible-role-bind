@@ -21,10 +21,6 @@ bind_listen_ipv6:
 bind_allow_query:
   - "localhost"
 
-# By default, do not allow recursion, which is suitable for an authoritative
-# name server. (set to "yes" for an caching DNS server).
-bind_recursion: "no"
-
 # SOA information
 bind_zone_hostmaster_email: "hostmaster"
 bind_zone_ttl: "1W"

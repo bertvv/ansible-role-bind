@@ -25,7 +25,6 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
-| `bind_recursion`             | `no`                             | Allow recursion. Set to `yes` for a caching DNS server.                                                          |
 | `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
