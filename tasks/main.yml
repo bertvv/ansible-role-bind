@@ -1,6 +1,10 @@
 # roles/bind/tasks/main.yml
 ---
 
+- name: Check whether `bind_zone_master_server_ip` was set
+  assert:
+    that: bind_zone_master_server_ip is defined
+
 - name: Install BIND
   yum:
     pkg: "{{ item }}"

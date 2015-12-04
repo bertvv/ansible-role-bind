@@ -2,6 +2,14 @@
 - hosts: all
   sudo: true
   vars:
+    bind_acls:
+      - name: acl1
+        match_list:
+          - 192.168.56.0/24
+      - name: acl2
+        match_list:
+          - 192.168.56.0/24
+          - 172.16.0.0/16
     bind_listen_ipv4:
       - 'any'
     bind_listen_ipv6:

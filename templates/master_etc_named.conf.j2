@@ -1,9 +1,16 @@
 //
-// named.conf 
+// named.conf
 //
 // {{ ansible_managed }}
 //
+{% for acl in bind_acls %}
+acl "{{ acl.name }}" {
+{% for match in acl.match_list %}
+  {{ match }};
+{% endfor %}
+};
 
+{% endfor %}
 options {
 	listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
 	listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
@@ -12,18 +19,11 @@ options {
 	statistics-file "/var/named/data/named_stats.txt";
 	memstatistics-file "/var/named/data/named_mem_stats.txt";
 	allow-query     { {{ bind_allow_query|join(';') }}; };
-
-	/* 
-	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
-	 - If you are building a RECURSIVE (caching) DNS server, you need to enable 
-	   recursion. 
-	 - If your recursive DNS server has a public IP address, you MUST enable access 
-	   control to limit queries to your legitimate users. Failing to do so will
-	   cause your server to become part of large scale DNS amplification 
-	   attacks. Implementing BCP38 within your network would greatly
-	   reduce such attack surface 
-	*/
-	recursion {{ bind_recursion }};
+{% if bind_acls|length != 0 %}
+	allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+{% endif %}
+  
+	recursion no;
 
 	dnssec-enable yes;
 	dnssec-validation yes;

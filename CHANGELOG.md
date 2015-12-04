@@ -2,7 +2,18 @@
 
 This file contains al notable changes to the bind Ansible role.
 
-This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).
+This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
+
+## 3.1.0 - 2015-12-04
+
+### Added
+
+* Add support for zone transfers (GH-8)
+* Check whether `bind_zone_master_server_ip` was set (GH-7)
+
+### Removed
+
+* Role variable `bind_recursion` was removed. This role is explicitly only suitable for an authoritative DNS server, and in this case, recursion should be off.
 
 ## 3.0.0 - 2015-06-14
 
