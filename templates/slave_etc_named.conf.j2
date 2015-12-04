@@ -10,6 +10,7 @@ acl "{{ acl.name }}" {
 {% endfor %}
 };
 
+{% endfor %}
 options {
 	listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
 	listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
