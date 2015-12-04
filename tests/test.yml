@@ -39,11 +39,13 @@
         aliases:
           - ns2
       - name: 'web'
-        ip: '192.168.56.20'
+        ip:
+          - '192.168.56.20'
+          - '192.168.56.21'
         aliases:
           - www
       - name: 'mail'
-        ip: '192.168.56.21'
+        ip: '192.168.56.30'
         aliases:
           - smtp
           - imap
