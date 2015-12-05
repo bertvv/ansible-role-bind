@@ -11,47 +11,48 @@
           - 192.168.56.0/24
           - 172.16.0.0/16
     bind_listen_ipv4:
-      - 'any'
+      - any
     bind_listen_ipv6:
-      - 'any'
+      - any
     bind_allow_query:
-      - '192.168.56.0/24'
-      - '127.0.0.0/8'
+      - 192.168.56.0/24
+      - 127.0.0.0/8
+    bind_rrset_order: random
 
-    bind_zone_name: 'example.com'
+    bind_zone_name: example.com
     bind_zone_networks:
       - '192.168.56'
       - '172.16'
-    bind_zone_master_server_ip: '192.168.56.53'
+    bind_zone_master_server_ip: 192.168.56.53
     bind_zone_name_servers:
-      - 'testbindmaster'
-      - 'testbindslave'
+      - testbindmaster
+      - testbindslave
     bind_zone_mail_servers:
-      - name: 'mail'
-        preference: '10'
+      - name: mail
+        preference: 10
     bind_zone_hosts:
-      - name: 'testbindmaster'
-        ip: '192.168.56.53'
+      - name: testbindmaster
+        ip: 192.168.56.53
         aliases:
           - ns1
-      - name: 'testbindslave'
-        ip: '192.168.56.54'
+      - name: testbindslave
+        ip: 192.168.56.54
         aliases:
           - ns2
-      - name: 'web'
+      - name: web
         ip:
-          - '192.168.56.20'
-          - '192.168.56.21'
+          - 192.168.56.20
+          - 192.168.56.21
         aliases:
           - www
-      - name: 'mail'
-        ip: '192.168.56.30'
+      - name: mail
+        ip: 192.168.56.30
         aliases:
           - smtp
           - imap
-      - name: 'priv0001'
-        ip: '172.16.0.10'
-      - name: 'priv0002'
-        ip: '172.16.0.11'
+      - name: priv0001
+        ip: 172.16.0.10
+      - name: priv0002
+        ip: 172.16.0.11
   roles:
     - bind

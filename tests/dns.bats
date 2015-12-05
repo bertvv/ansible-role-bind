@@ -15,8 +15,8 @@ domain=example.com
 # Usage: forward_lookup HOSTNAME EXPECTED_IP
 forward_lookup() {
   result="$(dig @${ns_ip} $1.${domain} +short)"
-  expected=$2
-  [ "${expected}" = "${result}" ]
+  expected_ip="${2}"
+  echo "${result}" | grep "${expected_ip}"
 }
 
 # Perform a forward lookup with aliases
@@ -52,7 +52,8 @@ reverse_lookup() {
   forward_lookup testbindmaster 192.168.56.53
   forward_lookup testbindslave  192.168.56.54
   forward_lookup web            192.168.56.20
-  forward_lookup mail           192.168.56.21
+  forward_lookup web            192.168.56.21
+  forward_lookup mail           192.168.56.30
 
   forward_lookup priv0001       172.16.0.10
   forward_lookup priv0002       172.16.0.11
@@ -62,7 +63,8 @@ reverse_lookup() {
   reverse_lookup 192.168.56.53 testbindmaster
   reverse_lookup 192.168.56.54 testbindslave
   reverse_lookup 192.168.56.20 web
-  reverse_lookup 192.168.56.21 mail
+  reverse_lookup 192.168.56.21 web
+  reverse_lookup 192.168.56.30 mail
 
   reverse_lookup 172.16.0.10   priv0001
   reverse_lookup 172.16.0.11   priv0002
@@ -72,8 +74,9 @@ reverse_lookup() {
   alias_lookup ns1  testbindmaster 192.168.56.53
   alias_lookup ns2  testbindslave  192.168.56.54
   alias_lookup www  web            192.168.56.20
-  alias_lookup smtp mail           192.168.56.21
-  alias_lookup imap mail           192.168.56.21
+  alias_lookup www  web            192.168.56.21
+  alias_lookup smtp mail           192.168.56.30
+  alias_lookup imap mail           192.168.56.30
 }
 
 @test 'It should return the MX record(s)' {
