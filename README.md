@@ -25,6 +25,7 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
+| `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
 | `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
@@ -49,13 +50,17 @@ bind_zone_hosts:
     aliases:
       - ns
   - name: pub02
-    ip: 192.0.2.2
+    ip:
+      - 192.0.2.2
+      - 192.0.2.3
     aliases:
       - www
       - web
   - name: priv01
     ip: 10.0.0.1
 ```
+
+IP addresses can be specified as a string or as a list. This results in a single or multiple A records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with `bind_rrset_order`.
 
 As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `bind_zone_networks`, though, or the host will not get a PTR record for reverse lookup:
 
