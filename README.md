@@ -96,7 +96,20 @@ See the [test playbook](tests/test.yml) for an elaborate example that shows all 
 
 ## Testing
 
-The `tests` directory contains tests for this role in the form of a Vagrant environment. The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook [`test.yml`](tests/test.yml).
+### Setting up the test environment
+
+Tests for this role are provided in the form of a Vagrant environment that is kept in a separate branch, `tests`. I use [git-worktree(1)](https://git-scm.com/docs/git-worktree) to include the test code into the working directory. Instructions for running the tests:
+
+1. Fetch the tests branch: `git fetch origin tests`
+2. Create a Git worktree for the test code: `git worktree add tests tests` (remark: this requires at least Git v2.5.0). This will create a directory `tests/`.
+3. `cd tests/`
+4. `vagrant up` will then create a VM and apply a test playbook (`test.yml`).
+
+You may want to change the base box into one that you like. The current one, [bertvv/centos71](https://atlas.hashicorp.com/bertvv/boxes/centos71) was generated using a Packer template from the [Boxcutter project](https://github.com/boxcutter/centos) with a few modifications.
+
+### Tests for the bind role
+
+The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook `test.yml`.
 
 | **Hostname**     | **ip**        |
 | :---             | :---          |
@@ -112,12 +125,13 @@ testbindmaster.example.com.
 $ dig @192.168.56.54 example.com www.example.com +short
 web.example.com.
 192.168.56.20
+192.168.56.21
 $ dig @192.168.56.54 MX example.com +short
 10 mail.example.com.
 
 ```
 
-An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks all settings specified in [`test.yml`](tests/test.yml). You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script [`dns.bats`](tests/dns.bats) on both the master and the slave DNS server.
+An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `tests/test.yml`. You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `tests/dns.bats` on both the master and the slave DNS server.
 
 ```ShellSession
 $ cd tests
@@ -156,7 +170,9 @@ Testing 192.168.56.53
 [...]
 ```
 
-The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Also the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
+### Symbolic links in test code
+
+The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Additionally, the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
 
 ```ShellSession
 $ cd tests/
@@ -164,8 +180,6 @@ $ mkdir roles
 $ ln -frs ../../PROJECT_DIR roles/bind
 $ ln -frs ../filter_plugins/ .
 ```
-
-You may want to change the base box into one that you like. The current one is based on Box-Cutter's [CentOS Packer template](https://github.com/boxcutter/centos).
 
 ## Contributing
 
