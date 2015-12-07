@@ -8,7 +8,9 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones.
+This role supports multiple reverse zones. Forward IPv6 lookups are also supported.  [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not.
+
+Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.el7](https://galaxy.ansible.com/list#/roles/2305)).
 
 ## Requirements
 
@@ -47,12 +49,16 @@ Host names that this DNS server should resolve can be specified with the variabl
 bind_zone_hosts:
   - name: pub01
     ip: 192.0.2.1
+    ipv6: 2001:db8::1
     aliases:
       - ns
   - name: pub02
     ip:
       - 192.0.2.2
       - 192.0.2.3
+    ipv6:
+      - 2001:db8::2
+      - 2001:db8::3
     aliases:
       - www
       - web
@@ -60,7 +66,7 @@ bind_zone_hosts:
     ip: 10.0.0.1
 ```
 
-IP addresses can be specified as a string or as a list. This results in a single or multiple A records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with `bind_rrset_order`.
+IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
 As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `bind_zone_networks`, though, or the host will not get a PTR record for reverse lookup:
 
@@ -92,7 +98,7 @@ No dependencies. If you want to configure the firewall, do this through another 
 
 ## Example Playbook
 
-See the [test playbook](tests/test.yml) for an elaborate example that shows all features.
+See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/tests/test.yml) (in the [tests branch](https://github.com/bertvv/ansible-role-bind/tree/tests)) for an elaborate example that shows all features.
 
 ## Testing
 
@@ -142,6 +148,7 @@ Testing 192.168.56.53
 ✓ The `dig` command should be installed
 ✓ It should return the NS record(s)
 ✓ It should be able to resolve host names
+✓ It should be able to resolve IPv6 addresses
 ✓ It should be able to do reverse lookups
 ✓ It should be able to resolve aliases
 ✓ It should return the MX record(s)
@@ -151,6 +158,7 @@ Testing 192.168.56.54
 ✓ The `dig` command should be installed
 ✓ It should return the NS record(s)
 ✓ It should be able to resolve host names
+✓ It should be able to resolve IPv6 addresses
 ✓ It should be able to do reverse lookups
 ✓ It should be able to resolve aliases
 ✓ It should return the MX record(s)
