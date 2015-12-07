@@ -12,6 +12,10 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 * Allow setting `rrset-order` (for DNS round robin)
 * Add support for (multiple) IPv6 (AAAA) records (GH-2). For now, only forward lookups are supported.
 
+### Changed
+
+* Test code is put into a separate branch. This means that test code is no longer included when installing the role from Ansible Galaxy.
+
 ## 3.1.0 - 2015-12-04
 
 ### Added
