@@ -43,10 +43,14 @@
         ip:
           - 192.168.56.20
           - 192.168.56.21
+        ipv6:
+          - 2001:db8::20
+          - 2001:db8::21
         aliases:
           - www
       - name: mail
         ip: 192.168.56.30
+        ipv6: 2001:db8::30
         aliases:
           - smtp
           - imap

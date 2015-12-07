@@ -14,17 +14,25 @@ domain=example.com
 # Perform a forward lookup
 # Usage: forward_lookup HOSTNAME EXPECTED_IP
 forward_lookup() {
-  result="$(dig @${ns_ip} $1.${domain} +short)"
-  expected_ip="${2}"
+  local result="$(dig @${ns_ip} $1.${domain} +short)"
+  local expected_ip="${2}"
+  echo "${result}" | grep "${expected_ip}"
+}
+
+# Perform an IPv6 (AAAA) lookup
+# Usage: ipv6_lookup HOSTNAME EXPECTED_IPV6
+ipv6_lookup() {
+  local result="$(dig @${ns_ip} $1.${domain} AAAA +short)"
+  local expected_ip="${2}"
   echo "${result}" | grep "${expected_ip}"
 }
 
 # Perform a forward lookup with aliases
 # Usage: alias_lookup ALIAS EXPECTED_HOSTNAME EXPECTED_IP
 alias_lookup() {
-  result="$(dig @${ns_ip} $1.${domain} +short)"
-  expected_hostname="${2}.${domain}."
-  expected_ip=$3
+  local result="$(dig @${ns_ip} $1.${domain} +short)"
+  local expected_hostname="${2}.${domain}."
+  local expected_ip=$3
   echo ${result} | grep ${expected_ip}
   echo ${result} | grep ${expected_hostname}
 }
@@ -32,8 +40,8 @@ alias_lookup() {
 # Perform a reverse lookup
 # Usage: reverse_lookup IP EXPECTED_HOSTNAME
 reverse_lookup() {
-  result="$(dig @${ns_ip} -x ${1} +short)"
-  expected="${2}.${domain}."
+  local result="$(dig @${ns_ip} -x ${1} +short)"
+  local expected="${2}.${domain}."
   [ "${expected}" = "${result}" ]
 }
 
@@ -57,6 +65,12 @@ reverse_lookup() {
 
   forward_lookup priv0001       172.16.0.10
   forward_lookup priv0002       172.16.0.11
+}
+
+@test 'It should be able to resolve IPv6 addresses' {
+  ipv6_lookup web  2001:db8::20
+  ipv6_lookup web  2001:db8::21
+  ipv6_lookup mail 2001:db8::30
 }
 
 @test 'It should be able to do reverse lookups' {
