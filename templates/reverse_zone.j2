@@ -25,8 +25,16 @@ $ORIGIN {{ item|reverse_lookup_zone }}.
 {% endif %}
 
 {% if bind_zone_hosts is defined %}
-{% for host in bind_zone_hosts if host.ip.startswith(item) %}
+{% for host in bind_zone_hosts %}
+{% if host.ip is string and host.ip.startswith(item) %}
 {{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% else %}
+{% for ip in host.ip %}
+{% if ip.startswith(item) %}
+{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endif %}
+{% endfor %}
+{% endif %}
 {% endfor %}
 {% else %}
 {{ ('.'.join(ansible_default_ipv4.address.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ ansible_hostname }}.{{ bind_zone_name }}.

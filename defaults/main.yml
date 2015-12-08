@@ -21,6 +21,9 @@ bind_listen_ipv6:
 bind_allow_query:
   - "localhost"
 
+# DNS round robin order (random or cyclic)
+bind_rrset_order: "random"
+
 # SOA information
 bind_zone_hostmaster_email: "hostmaster"
 bind_zone_ttl: "1W"
