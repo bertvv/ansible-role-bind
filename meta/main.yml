@@ -8,9 +8,9 @@ galaxy_info:
   platforms:
   - name: EL
     versions:
-      - 6
-      - 7
+    - 6
+    - 7
   categories:
     - networking
-dependencies: []
-version: 3.1.0
+  dependencies: []
+  version: 3.1.0
