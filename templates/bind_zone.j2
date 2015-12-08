@@ -23,6 +23,10 @@ $TTL {{ bind_zone_ttl }}
                      IN  NS     {{ ansible_hostname }}.{{ bind_zone_name }}.
 {% endif %}
 
+{% if bind_zone_top_host is defined %}
+{{ bind_zone_name }}. IN  A   {{ bind_zone_top_host }}
+{% endif %}
+
 {% if bind_zone_mail_servers is defined %}
 {% for mail in bind_zone_mail_servers %}
 {% if loop.first %}@{% else %} {% endif %}                    IN  MX     {{ mail.preference}}  {{ mail.name }}.{{ bind_zone_name }}.
