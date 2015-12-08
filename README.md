@@ -8,7 +8,9 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones.
+This role supports multiple reverse zones. Forward IPv6 lookups are also supported.  [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not.
+
+Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.el7](https://galaxy.ansible.com/list#/roles/2305)).
 
 ## Requirements
 
@@ -25,6 +27,7 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
+| `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
 | `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
@@ -46,16 +49,24 @@ Host names that this DNS server should resolve can be specified with the variabl
 bind_zone_hosts:
   - name: pub01
     ip: 192.0.2.1
+    ipv6: 2001:db8::1
     aliases:
       - ns
   - name: pub02
-    ip: 192.0.2.2
+    ip:
+      - 192.0.2.2
+      - 192.0.2.3
+    ipv6:
+      - 2001:db8::2
+      - 2001:db8::3
     aliases:
       - www
       - web
   - name: priv01
     ip: 10.0.0.1
 ```
+
+IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
 As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `bind_zone_networks`, though, or the host will not get a PTR record for reverse lookup:
 
@@ -87,11 +98,24 @@ No dependencies. If you want to configure the firewall, do this through another 
 
 ## Example Playbook
 
-See the [test playbook](tests/test.yml) for an elaborate example that shows all features.
+See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/tests/test.yml) (in the [tests branch](https://github.com/bertvv/ansible-role-bind/tree/tests)) for an elaborate example that shows all features.
 
 ## Testing
 
-The `tests` directory contains tests for this role in the form of a Vagrant environment. The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook [`test.yml`](tests/test.yml).
+### Setting up the test environment
+
+Tests for this role are provided in the form of a Vagrant environment that is kept in a separate branch, `tests`. I use [git-worktree(1)](https://git-scm.com/docs/git-worktree) to include the test code into the working directory. Instructions for running the tests:
+
+1. Fetch the tests branch: `git fetch origin tests`
+2. Create a Git worktree for the test code: `git worktree add tests tests` (remark: this requires at least Git v2.5.0). This will create a directory `tests/`.
+3. `cd tests/`
+4. `vagrant up` will then create a VM and apply a test playbook (`test.yml`).
+
+You may want to change the base box into one that you like. The current one, [bertvv/centos71](https://atlas.hashicorp.com/bertvv/boxes/centos71) was generated using a Packer template from the [Boxcutter project](https://github.com/boxcutter/centos) with a few modifications.
+
+### Tests for the bind role
+
+The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook `test.yml`.
 
 | **Hostname**     | **ip**        |
 | :---             | :---          |
@@ -107,12 +131,13 @@ testbindmaster.example.com.
 $ dig @192.168.56.54 example.com www.example.com +short
 web.example.com.
 192.168.56.20
+192.168.56.21
 $ dig @192.168.56.54 MX example.com +short
 10 mail.example.com.
 
 ```
 
-An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks all settings specified in [`test.yml`](tests/test.yml). You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script [`dns.bats`](tests/dns.bats) on both the master and the slave DNS server.
+An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `tests/test.yml`. You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `tests/dns.bats` on both the master and the slave DNS server.
 
 ```ShellSession
 $ cd tests
@@ -123,6 +148,7 @@ Testing 192.168.56.53
 ✓ The `dig` command should be installed
 ✓ It should return the NS record(s)
 ✓ It should be able to resolve host names
+✓ It should be able to resolve IPv6 addresses
 ✓ It should be able to do reverse lookups
 ✓ It should be able to resolve aliases
 ✓ It should return the MX record(s)
@@ -132,6 +158,7 @@ Testing 192.168.56.54
 ✓ The `dig` command should be installed
 ✓ It should return the NS record(s)
 ✓ It should be able to resolve host names
+✓ It should be able to resolve IPv6 addresses
 ✓ It should be able to do reverse lookups
 ✓ It should be able to resolve aliases
 ✓ It should return the MX record(s)
@@ -151,7 +178,9 @@ Testing 192.168.56.53
 [...]
 ```
 
-The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Also the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
+### Symbolic links in test code
+
+The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Additionally, the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
 
 ```ShellSession
 $ cd tests/
@@ -159,8 +188,6 @@ $ mkdir roles
 $ ln -frs ../../PROJECT_DIR roles/bind
 $ ln -frs ../filter_plugins/ .
 ```
-
-You may want to change the base box into one that you like. The current one is based on Box-Cutter's [CentOS Packer template](https://github.com/boxcutter/centos).
 
 ## Contributing
 

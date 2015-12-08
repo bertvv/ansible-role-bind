@@ -35,7 +35,22 @@ $TTL {{ bind_zone_ttl }}
 
 {% if bind_zone_hosts is defined %}
 {% for host in bind_zone_hosts %}
+{% if host.ip is string %}
 {{ host.name.ljust(20) }} IN  A      {{ host.ip }}
+{% else %}
+{% for ip in host.ip %}
+{{ host.name.ljust(20) }} IN  A      {{ ip }}
+{% endfor %}
+{% endif %}
+{% if host.ipv6 is defined %}
+{% if host.ipv6 is string %}
+{{ host.name.ljust(20) }} IN  AAAA   {{ host.ipv6 }}
+{% else %}
+{% for ip6 in host.ipv6 %}
+{{ host.name.ljust(20) }} IN  AAAA   {{ ip6 }}
+{% endfor %}
+{% endif %}
+{% endif %}
 {% if host.aliases is defined %}
 {% for alias in host.aliases %}
 {{ alias.ljust(20) }} IN  CNAME  {{ host.name }}
