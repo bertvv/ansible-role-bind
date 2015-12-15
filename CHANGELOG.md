@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
 
+## 3.2.1 - 2015-12-15
+
+### Added
+
+* The domain name can now also point to an IP address, enabling e.g. "http://example.com/" (GH-11)
+
 ## 3.2.0 - 2015-12-07
 
 ### Added
