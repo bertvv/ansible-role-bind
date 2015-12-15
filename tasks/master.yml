@@ -27,7 +27,7 @@
     group: named
     mode: "0640"
     setype: named_zone_t
-    validate: '/sbin/named-checkzone -d {{ bind_zone_name }} %s'
+#    validate: '/sbin/named-checkzone -d {{ bind_zone_name }} %s'
   notify: restart bind
   tags: bind
 
