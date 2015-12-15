@@ -12,6 +12,8 @@ This role supports multiple reverse zones. Forward IPv6 lookups are also support
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.el7](https://galaxy.ansible.com/list#/roles/2305)).
 
+If you like/use this role, please consider giving it a star or reviewing it on Ansible Galaxy. Thanks!
+
 ## Requirements
 
 - This role is written specifically for RHEL/CentOS and works on versions 6 and 7.
