@@ -8,7 +8,7 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones. Forward IPv6 lookups are also supported.  [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not.
+This role supports multiple reverse zones. Forward IPv6 lookups are also supported.  [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not (See Issue #10).
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.el7](https://galaxy.ansible.com/list#/roles/2305)).
 
@@ -52,7 +52,7 @@ bind_zone_hosts:
     ipv6: 2001:db8::1
     aliases:
       - ns
-  - name: pub02
+  - name: '@'
     ip:
       - 192.0.2.2
       - 192.0.2.3
@@ -61,10 +61,11 @@ bind_zone_hosts:
       - 2001:db8::3
     aliases:
       - www
-      - web
   - name: priv01
     ip: 10.0.0.1
 ```
+
+To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
 IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
