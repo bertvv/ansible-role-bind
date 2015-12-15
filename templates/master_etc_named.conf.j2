@@ -22,9 +22,9 @@ options {
 {% if bind_acls|length != 0 %}
 	allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
-  
+
 	recursion no;
-  
+
 	rrset-order { order {{ bind_rrset_order }}; };
 
 	dnssec-enable yes;
