@@ -27,11 +27,19 @@ $ORIGIN {{ item|reverse_lookup_zone }}.
 {% if bind_zone_hosts is defined %}
 {% for host in bind_zone_hosts %}
 {% if host.ip is string and host.ip.startswith(item) %}
+{% if host.name == '@' %}
+{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ bind_zone_name }}.
+{% else %}
 {{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endif %}
 {% else %}
 {% for ip in host.ip %}
 {% if ip.startswith(item) %}
+{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ bind_zone_name }}.
+{% if host.name == '@' %}
+{% else %}
 {{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endif %}
 {% endif %}
 {% endfor %}
 {% endif %}
