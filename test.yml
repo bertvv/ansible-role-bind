@@ -27,6 +27,9 @@
     bind_zone_name_servers:
       - testbindmaster
       - testbindslave
+    bind_other_name_servers:
+      - ns1.isp.com
+      - ns2.isp.com
     bind_zone_mail_servers:
       - name: mail
         preference: 10
