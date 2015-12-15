@@ -13,6 +13,10 @@
     validate: 'named-checkconf %s'
   notify: restart bind
   tags: bind
+  register: namedout
+  ignore_errors: yes
+
+- debug: var=namedout
 
 - name: Create forward lookup zone file
   template:
