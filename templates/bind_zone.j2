@@ -22,6 +22,11 @@ $TTL {{ bind_zone_ttl }}
 {% else %}
                      IN  NS     {{ ansible_hostname }}.{{ bind_zone_name }}.
 {% endif %}
+{% if bind_other_name_servers is defined %}
+{% for ns in bind_other_name_servers %}
+                     IN  NS     {{ ns }}.
+{% endfor %}
+{% endif %}
 
 {% if bind_zone_mail_servers is defined %}
 {% for mail in bind_zone_mail_servers %}
@@ -56,3 +61,5 @@ $TTL {{ bind_zone_ttl }}
 {% else %}
 {{ ansible_hostname.ljust(20) }} IN A     {{ ansible_default_ipv4.address }}
 {% endif %}
+{# vim: ft=text
+#}
