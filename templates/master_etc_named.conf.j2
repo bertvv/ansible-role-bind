@@ -23,7 +23,7 @@ options {
 	allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
 
-	recursion no;
+	recursion yes;
 
 	rrset-order { order {{ bind_rrset_order }}; };
 
