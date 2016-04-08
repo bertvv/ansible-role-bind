@@ -4,6 +4,15 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
 
+## 3.3.0 - 2016-04-08
+
+### Added
+
+* Added role variable `bind_other_name_servers` for adding NS records for DNS servers outside of the domain. (GH-12)
+* Re-added `bind_recursion`, as it is needed in some cases. (GH-14)
+
+### Removed
+
 ## 3.2.1 - 2015-12-15
 
 ### Added
