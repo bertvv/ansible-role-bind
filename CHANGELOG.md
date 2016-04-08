@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
 
+## 3.3.1 - 2016-04-08
+
+### Removed
+
+* The `version:` field in `meta/main.yml`. This an unofficial field that is used by a third-party tool for managing role dependencies (librarian-ansible). Custom meta fields are no longer accepted in Ansible 2.0. See [ansible/ansible#13496](https://github.com/ansible/ansible/issues/13496) for more info. Unfortunately, this will break support for librarian-ansible. As a workaround, until this issue is resolved upstream, use version 3.3.0 of this role.
+
 ## 3.3.0 - 2016-04-08
 
 ### Added
