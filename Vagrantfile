@@ -11,8 +11,7 @@ hosts = [
 VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = 'centos71-nocm'
-  config.vm.box_url = 'https://tinfbo2.hogent.be/pub/vm/centos71-nocm-1.0.16.box'
+  config.vm.box = 'bertvv/centos72'
 
   hosts.each do |host|
     host_name = BASE_NAME + host[:name]
