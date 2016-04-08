@@ -29,6 +29,8 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
+| `bind_other_name_servers`    | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
+| `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
 | `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
 | `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
@@ -42,6 +44,8 @@ Variables are not required, unless specified.
 | `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                         |
 | `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                           |
 | `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                            |
+
+† Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
 ### Host definitions
 
