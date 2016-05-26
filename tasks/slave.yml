@@ -2,7 +2,7 @@
 # Set up a BIND slave server
 ---
 
-- name: Main BIND config file (slave)
+- name: Slave | Main BIND config file (slave)
   template:
     src: slave_etc_named.conf.j2
     dest: /etc/named.conf

@@ -9,7 +9,7 @@
   yum:
     pkg: "{{ item }}"
     state: installed
-  with_items: bind_packages
+  with_items: "{{ bind_packages }}"
   tags: bind
 
 - name: Create serial
