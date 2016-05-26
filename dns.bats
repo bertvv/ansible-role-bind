@@ -64,11 +64,52 @@ domain_alias_lookup() {
   echo ${result} | grep ${expected_hostname}
 }
 
+# Perform a SRV record lookup
+# usage: service_lookup SERVICE TARGET PORT [PRI [WEIGHT]]
+service_lookup() {
+  local service="$1"
+  local target="$2"
+  local port="$3"
+  if [ "$#" -ge "4" ]; then
+    local priority="$4"
+  else
+    local priority="0"
+  fi
+  if [ "$#" -ge "5" ]; then
+    local weight="$5"
+  else
+    local weight="0"
+  fi
+  local expected="${priority} ${weight} ${port} ${target}.${domain}."
+  local result=$(dig @${ns_ip} srv ${service}.${domain} +short)
+
+  echo "exp: ${expected}"
+  echo "res: ${result}"
+  [ "${expected}" = "${result}" ]
+}
+
+# Perform a TXT record lookup
+# Usage: text_lookup NAME TEXT
+text_lookup() {
+  local name="$1"
+  local text="$2"
+
+  local expected="\"${text}\""
+  local result=$(dig @${ns_ip} txt ${name}.${domain} +short)
+
+  echo "exp: ${expected}"
+  echo "res: ${result}"
+  [ "${expected}" = "${result}" ]
+}
+
 # Perform a reverse lookup
 # Usage: reverse_lookup IP EXPECTED_HOSTNAME
 reverse_lookup() {
   local result="$(dig @${ns_ip} -x ${1} +short)"
   local expected="${2}.${domain}."
+
+  echo "exp: ${expected}"
+  echo "res: ${result}"
   [ "${expected}" = "${result}" ]
 }
 
@@ -78,6 +119,9 @@ reverse_lookup() {
 reverse_domain_lookup() {
   local result="$(dig @${ns_ip} -x ${1} +short)"
   local expected="${domain}."
+
+  echo "exp: ${expected}"
+  echo "res: ${result}"
   [ "${expected}" = "${result}" ]
 }
 
@@ -138,4 +182,18 @@ reverse_domain_lookup() {
   expected="10 mail.${domain}."
 
   [ "${expected}" = "${result}" ]
+}
+
+@test 'It should return the SRV record(s)' {
+  service_lookup _ldap._tcp            dc001 88  0 100
+  service_lookup _kerberos._tcp        dc001 88  0 100
+  service_lookup _kerberos._udp        dc001 88  0 100
+  service_lookup _kerberos-master._tcp dc001 88  0 100
+  service_lookup _kerberos-master._udp dc001 88  0 100
+  service_lookup _kpasswd._tcp         dc001 464 0 100
+  service_lookup _kpasswd._udp         dc001 464 0 100
+}
+
+@test 'It should return the TXT record(s)' {
+  text_lookup _kerberos KERBEROS.EXAMPLE.COM
 }

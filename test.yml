@@ -1,6 +1,6 @@
 ---
 - hosts: all
-  sudo: true
+  become: true
   vars:
     bind_acls:
       - name: acl1
@@ -58,9 +58,44 @@
         aliases:
           - smtp
           - imap
+      - name: dc001
+        ip: 192.168.56.40
       - name: priv0001
         ip: 172.16.0.10
       - name: priv0002
         ip: 172.16.0.11
+    bind_zone_services:
+      - name: _ldap._tcp
+        weight: 100
+        port: 88
+        target: dc001
+      - name: _kerberos._tcp
+        weight: 100
+        port: 88
+        target: dc001
+      - name: _kerberos._udp
+        weight: 100
+        port: 88
+        target: dc001
+      - name: _kerberos-master._tcp
+        weight: 100
+        port: 88
+        target: dc001
+      - name: _kerberos-master._udp
+        weight: 100
+        port: 88
+        target: dc001
+      - name: _kpasswd._tcp
+        weight: 100
+        port: 464
+        target: dc001
+      - name: _kpasswd._udp
+        weight: 100
+        port: 464
+        target: dc001
+    bind_zone_text:
+      - name: _kerberos
+        text: KERBEROS.EXAMPLE.COM
+
   roles:
     - bind

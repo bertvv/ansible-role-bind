@@ -1,5 +1,7 @@
 ---
 - hosts: all
-  sudo: true
+  become: true
+  vars:
+    bind_zone_master_server_ip: 192.168.56.53
   roles:
     - bind
