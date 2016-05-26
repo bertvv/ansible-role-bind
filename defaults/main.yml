@@ -36,3 +36,9 @@ bind_zone_time_to_refresh: "1D"
 bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
+
+# Zone Resource Records
+bind_zone_name_servers: []
+bind_zone_other_name_servers: []
+bind_zone_hosts: []
+bind_zone_mail_servers: []
