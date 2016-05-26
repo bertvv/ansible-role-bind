@@ -15,6 +15,7 @@
 - name: Create serial
   command: date +%y%m%d%H
   register: timestamp
+  changed_when: false
   tags: bind
 
 - include: master.yml
