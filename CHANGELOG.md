@@ -4,6 +4,19 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
 
+## 3.4.0 - 2016-05-26
+
+### Added
+
+* (GH-16) Support for service record (SRV) lookups
+* Support for text record (TXT) lookups
+
+### Changed
+
+* Fixed Ansible 2.0 deprecation warnings
+* Generating a serial is no longer considered a change
+* Ensured that all role variables have a default value, e.g. empty list instead of undefined. This simplifies template logic (no `if defined` tests), and is considered [deprecated in playbooks within a *with_* loop](https://docs.ansible.com/ansible/porting_guide_2.0.html#deprecated).
+
 ## 3.3.1 - 2016-04-08
 
 ### Removed
