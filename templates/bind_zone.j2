@@ -57,5 +57,8 @@ $TTL {{ bind_zone_ttl }}
 {% else %}
 {{ ansible_hostname.ljust(20) }} IN A     {{ ansible_default_ipv4.address }}
 {% endif %}
+{% for service in bind_zone_services %}
+{{ service.name.ljust(20) }} IN  SRV    {{ service.priority|default('0') }} {{ service.weight|default('0') }} {{ service.port }} {{ service.target }}
+{% endfor %}
 {# vim: ft=text
 #}
