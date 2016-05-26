@@ -23,27 +23,28 @@ If you like/use this role, please consider giving it a star or reviewing it on A
 
 Variables are not required, unless specified.
 
-| Variable                     | Default                          | Comments (type)                                                                                                  |
-| :---                         | :---                             | :---                                                                                                             |
-| `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.        |
-| `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
-| `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
-| `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
-| `bind_other_name_servers`    | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
-| `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
-| `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
-| `bind_zone_hostmaster_email` | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
-| `bind_zone_hosts`            | -                                | Host definitions. See below this table for examples.                                                             |
-| `bind_zone_mail_servers`     | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
-| `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                          |
-| `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                             |
-| `bind_zone_name_servers`     | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                       |
-| `bind_zone_name`             | `example.com`                    | The domain name                                                                                                  |
-| `bind_zone_networks`         | `['10.0.2']`                     | A list of the networks that are part of the domain                                                               |
-| `bind_zone_time_to_expire`   | `1W`                             | Time to expire field in the SOA record.                                                                          |
-| `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                         |
-| `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                           |
-| `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                            |
+| Variable                       | Default                          | Comments (type)                                                                                                  |
+| :---                           | :---                             | :---                                                                                                             |
+| `bind_acls`                    | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.        |
+| `bind_allow_query`             | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
+| `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
+| `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
+| `bind_other_name_servers`      | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
+| `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
+| `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
+| `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
+| `bind_zone_hosts`              | []                               | Host definitions. See below this table for examples.                                                             |
+| `bind_zone_mail_servers`       | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
+| `bind_zone_master_server_ip`   | -                                | **(Required)** The IP address of the master DNS server.                                                          |
+| `bind_zone_minimum_ttl`        | `1D`                             | Minimum TTL field in the SOA record.                                                                             |
+| `bind_zone_name_servers`       | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                       |
+| `bind_zone_name`               | `example.com`                    | The domain name                                                                                                  |
+| `bind_zone_networks`           | `['10.0.2']`                     | A list of the networks that are part of the domain                                                               |
+| `bind_zone_other_name_servers` | `[]`                             | A list of the DNS servers outside of this domain.                                                                |
+| `bind_zone_time_to_expire`     | `1W`                             | Time to expire field in the SOA record.                                                                          |
+| `bind_zone_time_to_refresh`    | `1D`                             | Time to refresh field in the SOA record.                                                                         |
+| `bind_zone_time_to_retry`      | `1H`                             | Time to retry field in the SOA record.                                                                           |
+| `bind_zone_ttl`                | `1W`                             | Time to Live field in the SOA record.                                                                            |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
