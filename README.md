@@ -42,6 +42,7 @@ Variables are not required, unless specified.
 | `bind_zone_networks`           | `['10.0.2']`                     | A list of the networks that are part of the domain                                                               |
 | `bind_zone_other_name_servers` | `[]`                             | A list of the DNS servers outside of this domain.                                                                |
 | `bind_zone_services`           | `[]`                             | A list of services to be advertized by SRV records                                                               |
+| `bind_zone_text`               | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records                                            |
 | `bind_zone_time_to_expire`     | `1W`                             | Time to expire field in the SOA record.                                                                          |
 | `bind_zone_time_to_refresh`    | `1D`                             | Time to refresh field in the SOA record.                                                                         |
 | `bind_zone_time_to_retry`      | `1H`                             | Time to retry field in the SOA record.                                                                           |

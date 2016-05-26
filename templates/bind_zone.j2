@@ -60,5 +60,8 @@ $TTL {{ bind_zone_ttl }}
 {% for service in bind_zone_services %}
 {{ service.name.ljust(20) }} IN  SRV    {{ service.priority|default('0') }} {{ service.weight|default('0') }} {{ service.port }} {{ service.target }}
 {% endfor %}
+{% for text in bind_zone_text %}
+{{ text.name.ljust(20) }} IN  TXT    "{{ text.text }}"
+{% endfor %}
 {# vim: ft=text
 #}
