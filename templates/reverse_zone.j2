@@ -23,11 +23,9 @@ $ORIGIN {{ item|reverse_lookup_zone }}.
 {% else %}
                      IN  NS     {{ ansible_hostname }}.{{ bind_zone_name }}.
 {% endif %}
-{% if bind_other_name_servers|length > 1 %}
 {% for ns in bind_other_name_servers %}
                      IN  NS     {{ ns }}.
 {% endfor %}
-{% endif %}
 
 {% if bind_zone_hosts|length > 1 %}
 {% for host in bind_zone_hosts %}
