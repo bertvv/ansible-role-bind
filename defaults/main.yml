@@ -21,6 +21,11 @@ bind_listen_ipv6:
 bind_allow_query:
   - "localhost"
 
+# Determines whether recursion should be allowed. Typically, an authoritative
+# name server (= the target use case of this role) should have recursion turned
+# OFF.
+bind_recursion: false
+
 # DNS round robin order (random or cyclic)
 bind_rrset_order: "random"
 
@@ -31,3 +36,11 @@ bind_zone_time_to_refresh: "1D"
 bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
+
+# Zone Resource Records
+bind_other_name_servers: []
+bind_zone_hosts: []
+bind_zone_mail_servers: []
+bind_zone_name_servers: []
+bind_zone_services: []
+bind_zone_text: []

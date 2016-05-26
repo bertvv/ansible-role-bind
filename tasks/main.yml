@@ -9,12 +9,13 @@
   yum:
     pkg: "{{ item }}"
     state: installed
-  with_items: bind_packages
+  with_items: "{{ bind_packages }}"
   tags: bind
 
 - name: Create serial
   command: date +%y%m%d%H
   register: timestamp
+  changed_when: false
   tags: bind
 
 - include: master.yml

@@ -4,6 +4,34 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
 
+## 3.4.0 - 2016-05-26
+
+### Added
+
+* (GH-16) Support for service record (SRV) lookups
+* Support for text record (TXT) lookups
+
+### Changed
+
+* Fixed Ansible 2.0 deprecation warnings
+* Generating a serial is no longer considered a change
+* Ensured that all role variables have a default value, e.g. empty list instead of undefined. This simplifies template logic (no `if defined` tests), and is considered [deprecated in playbooks within a *with_* loop](https://docs.ansible.com/ansible/porting_guide_2.0.html#deprecated).
+
+## 3.3.1 - 2016-04-08
+
+### Removed
+
+* The `version:` field in `meta/main.yml`. This an unofficial field that is used by a third-party tool for managing role dependencies (librarian-ansible). Custom meta fields are no longer accepted in Ansible 2.0. See [ansible/ansible#13496](https://github.com/ansible/ansible/issues/13496) for more info. Unfortunately, this will break support for librarian-ansible. As a workaround, until this issue is resolved upstream, use version 3.3.0 of this role.
+
+## 3.3.0 - 2016-04-08
+
+### Added
+
+* Added role variable `bind_other_name_servers` for adding NS records for DNS servers outside of the domain. (GH-12)
+* Re-added `bind_recursion`, as it is needed in some cases. (GH-14)
+
+### Removed
+
 ## 3.2.1 - 2015-12-15
 
 ### Added
