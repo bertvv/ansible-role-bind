@@ -7,23 +7,17 @@
     src: master_etc_named.conf.j2
     dest: "/etc/named.conf"
     owner: root
-    backup: yes
     group: named
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
   notify: restart bind
   tags: bind
-  register: namedout
-  ignore_errors: yes
-
-- debug: var=namedout
 
 - name: Master | Create forward lookup zone file
   template:
     src: bind_zone.j2
     dest: "/var/named/{{ bind_zone_name }}"
-    backup: yes
     owner: root
     group: named
     mode: "0640"
