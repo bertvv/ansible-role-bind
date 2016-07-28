@@ -29,9 +29,11 @@ Variables are not required, unless specified.
 | `bind_allow_query`             | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
+| `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                             |
 | `bind_other_name_servers`      | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
 | `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
 | `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
+| `bind_zone_also_notify`        | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                        |
 | `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`              | `[]`                             | Host definitions. See below this table for examples.                                                             |
 | `bind_zone_mail_servers`       | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
@@ -215,13 +217,14 @@ $ ln -frs ../filter_plugins/ .
 
 ## Contributing
 
-Issues, feature requests, ideas are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Preferably, create a topic branch and when submitting, squash your commits into one (with a descriptive message).
 
 ## License
 
 BSD
 
-## Author Information
+## Contributors
 
-Bert Van Vreckem (bert.vanvreckem@gmail.com)
+Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Preferably, create a topic branch and when submitting, squash your commits into one (with a descriptive message).
 
+- [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
+- [Joanna Delaporte](https://github.com/jdelaporte)

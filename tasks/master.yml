@@ -5,7 +5,7 @@
 - name: Master | Main BIND config file (master)
   template:
     src: master_etc_named.conf.j2
-    dest: /etc/named.conf
+    dest: "/etc/named.conf"
     owner: root
     group: named
     mode: '0640'
@@ -22,7 +22,7 @@
     group: named
     mode: "0640"
     setype: named_zone_t
-    validate: "named-checkzone {{ bind_zone_name }} %s"
+    validate: '/sbin/named-checkzone -d {{ bind_zone_name }} %s'
   notify: restart bind
   tags: bind
 
