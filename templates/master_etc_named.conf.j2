@@ -42,9 +42,9 @@ options {
 
 logging {
         channel default_debug {
-                file "/var/log/named/named.log";
+                file "{{ bind_log }}";
                 severity dynamic;
-		print-time yes;
+                print-time yes;
         };
 };
 
@@ -60,7 +60,9 @@ zone "{{ bind_zone_name }}" IN {
   type master;
   file "{{ bind_zone_name }}";
   notify yes;
-  also-notify  { {{ also_notify|join(';') }}; };
+{% if bind_zone_also_notify|length > 0 %}
+  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% endif %}
   allow-update { none; };
 };
 
@@ -70,7 +72,9 @@ zone "{{ network|reverse_lookup_zone }}" IN {
   type master;
   file "{{ network|reverse_lookup_zone }}";
   notify yes;
-  also-notify  { {{ also_notify|join(';') }}; };
+{% if bind_zone_also_notify|length > 0 %}
+  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% endif %}
   allow-update { none; };
 };
 {% endfor %}

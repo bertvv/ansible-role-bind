@@ -2,7 +2,15 @@
 
 This file contains al notable changes to the bind Ansible role.
 
-This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue on the Github project.
+This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
+
+## 3.5.0 - 2016-07-28
+
+### Added
+
+* Introduced role variable `bind_log`, the path to the log file.
+* Introduced role variable `bind_zone_also_notify`, a list of servers that will receive a notification when the master zone file is reloaded (GH-18, credit: Joanna Delaporte)
+* Reverse zone files now handle the case with only a single host (GH-18, credit: Joanna Delaporte)
 
 ## 3.4.0 - 2016-05-26
 
