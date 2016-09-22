@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.5.1 - 2016-09-22
+
+### Changed
+
+* The check for master/slave server is improved (GH-19, credit @josetaas)
+
 ## 3.5.0 - 2016-07-28
 
 ### Added
