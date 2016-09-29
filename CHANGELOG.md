@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.5.2 - 2016-09-29
+
+### Changed
+
+* The call to `named-checkconf` was fixed. It had the full path to the binary, which is not the same on all distributions. (GH-20, credit @peterjanes)
+
 ## 3.5.1 - 2016-09-22
 
 ### Changed
