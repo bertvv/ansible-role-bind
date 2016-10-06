@@ -4,7 +4,7 @@ env:
   global:
     - container_id: $(mktemp)
     - role: /etc/ansible/roles/role_under_test
-    - test_playbook: ${role}/test.yml
+    - test_playbook: ${role}/tests/test.yml
 
   matrix:
     - distribution: centos
@@ -19,7 +19,8 @@ before_install:
   - sudo apt-get update
   - git --version
   - sudo apt-get install --only-upgrade git
-  - git worktree add tests tests
+  - git --version
+  - git worktree add tests origin/tests
   # Pull container
   - sudo docker pull bertvv/ansible-testing:${distribution}_${version}
 
