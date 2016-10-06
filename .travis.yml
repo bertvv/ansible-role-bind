@@ -17,6 +17,8 @@ services:
 
 before_install:
   - sudo apt-get update
+  - git --version
+  - sudo apt-tet upgrade -y git
   - git worktree add tests tests
   # Pull container
   - sudo docker pull bertvv/ansible-testing:${distribution}_${version}
