@@ -18,7 +18,7 @@ services:
 before_install:
   - sudo apt-get update
   - git --version
-  - sudo apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade -y git
+  - sudo apt-get install --only-upgrade git
   - git worktree add tests tests
   # Pull container
   - sudo docker pull bertvv/ansible-testing:${distribution}_${version}
