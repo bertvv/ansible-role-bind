@@ -19,6 +19,15 @@
   with_items: "{{ bind_packages }}"
   tags: bind
 
+- name: Ensure runtime directories referenced in config exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ bind_dir }}/dynamic"
+    - "{{ bind_dir }}/data"
+  tags: bind
+
 - name: Create serial
   command: date +%y%m%d%H
   register: timestamp
