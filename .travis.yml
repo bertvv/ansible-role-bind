@@ -1,16 +1,9 @@
 sudo: required
 
 env:
-  global:
-    - container_id: $(mktemp)
-    - role: /etc/ansible/roles/role_under_test
-    - test_playbook: ${role}/tests/test.yml
-
   matrix:
-    - distribution: centos
-      version: 7
-      init: /usr/lib/systemd/systemd
-      run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    - DISTRIBUTION: centos
+      VERSION: 7
 
 services:
   - docker
@@ -19,33 +12,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install --only-upgrade git
   - git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-  - git fetch origin tests
-  - git worktree add tests origin/tests
-  # Pull container
-  - sudo docker pull bertvv/ansible-testing:${distribution}_${version}
+  - git fetch origin docker-tests
+  - git worktree add tests origin/docker-tests
 
 script:
-    # Run container in detached state
-  - >
-    docker run --detach --volume="${PWD}:${role}:ro" ${run_opts}
-    bertvv/ansible-testing:${distribution}_${version} "${init}" > "${container_id}"
-
-  # Ansible syntax check.
-  - >
-    docker exec --tty "$(cat ${container_id})" env TERM=xterm
-    ansible-playbook ${test_playbook} --syntax-check
-
-  # Test role.
-  - >
-    docker exec --tty "$(cat ${container_id})" env TERM=xterm
-    ansible-playbook ${test_playbook}
-
-  # Test role idempotence.
-  - >
-    docker exec "$(cat ${container_id})" ansible-playbook ${test_playbook}
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Idempotence test: pass' && exit 0)
-    || (echo 'Idempotence test: fail' && exit 1)
-
-  # Clean up
-  - 'docker stop "$(cat ${container_id})"'
+  - tests/docker_tests.sh
