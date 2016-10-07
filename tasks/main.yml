@@ -23,6 +23,9 @@
   file:
     path: "{{ item }}"
     state: directory
+    owner: root
+    group: "{{ bind_group }}"
+    mode: 0770
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
