@@ -27,25 +27,25 @@ before_install:
 script:
     # Run container in detached state
   - >
-    sudo docker run --detach --volume="${PWD}:${role}:ro" ${run_opts}
+    docker run --detach --volume="${PWD}:${role}:ro" ${run_opts}
     bertvv/ansible-testing:${distribution}_${version} "${init}" > "${container_id}"
 
   # Ansible syntax check.
   - >
-    sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm
     ansible-playbook ${test_playbook} --syntax-check
 
   # Test role.
   - >
-    sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm
+    docker exec --tty "$(cat ${container_id})" env TERM=xterm
     ansible-playbook ${test_playbook}
 
   # Test role idempotence.
   - >
-    sudo docker exec "$(cat ${container_id})" ansible-playbook ${test_playbook}
+    docker exec "$(cat ${container_id})" ansible-playbook ${test_playbook}
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
 
   # Clean up
-  - 'sudo docker stop "$(cat ${container_id})"'
+  - 'docker stop "$(cat ${container_id})"'
