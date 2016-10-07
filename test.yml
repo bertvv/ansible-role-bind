@@ -1,0 +1,9 @@
+# Test playbook for Ansible role bertvv.bind
+---
+
+- hosts: all
+  become: true
+  vars:
+    bind_zone_master_server_ip: 172.17.0.2
+  roles:
+    - role_under_test
