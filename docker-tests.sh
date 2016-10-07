@@ -42,14 +42,22 @@ main() {
 #{{{ Helper functions
 
 configure_env() {
-  if [ "${DISTRIBUTION}" = "centos" -a "${VERSION}" = "7" ]; then
-    init=/usr/lib/systemd/systemd
-    run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
-  fi
 
-  if [ "${DISTRIBUTION}" = "ubuntu" ]; then
-    run_opts=("--privileged" "--volume=/sys/fs/selinux:/sys/fs/selinux:ro")
-  fi
+  case "${DISTRIBUTION}_${VERSION}" in
+    "centos_7")
+      init=/usr/lib/systemd/systemd
+      run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+      ;;
+    "ubuntu_14.04")
+      # Workaround for issue when the host operating system has SELinux
+      if [ -x "/usr/sbin/getenforce" ]; then
+        run_opts=("--privileged" "--volume=/sys/fs/selinux:/sys/fs/selinux:ro")
+      fi
+      ;;
+    "ubuntu_16.04")
+      run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+      ;;
+  esac
 }
 
 # Usage: build_container
