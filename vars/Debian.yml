@@ -7,5 +7,15 @@ bind_packages:
 
 bind_service: bind9
 
+# Main config file
 bind_config: /etc/bind/named.conf
 
+# Localhost zone
+bind_default_zone_files:
+  - /etc/bind/named.conf.default-zones
+
+# Directory with run-time stuff
+bind_dir: /var/cache/bind
+
+bind_owner: root
+bind_group: bind

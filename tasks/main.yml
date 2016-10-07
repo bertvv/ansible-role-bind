@@ -33,7 +33,7 @@
 
 - name: Start BIND service
   service:
-    name: named
+    name: "{{ bind_service }}"
     state: started
     enabled: yes
   tags: bind

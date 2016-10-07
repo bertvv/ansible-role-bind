@@ -6,8 +6,8 @@
   template:
     src: slave_etc_named.conf.j2
     dest: "{{ bind_config }}"
-    owner: root
-    group: named
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'

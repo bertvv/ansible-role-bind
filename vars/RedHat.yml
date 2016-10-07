@@ -7,4 +7,16 @@ bind_packages:
 
 bind_service: named
 
+# Main config file
 bind_config: /etc/named.conf
+
+# Zone files included in the installation
+bind_default_zone_files:
+  - /etc/named.root.key
+  - /etc/named.rfc1912.zones
+
+# Directory with run-time stuff
+bind_dir: /var/named
+
+bind_owner: root
+bind_group: named

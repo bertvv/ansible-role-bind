@@ -14,10 +14,10 @@ acl "{{ acl.name }}" {
 options {
 	listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
 	listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
-	directory 	"/var/named";
-	dump-file 	"/var/named/data/cache_dump.db";
-	statistics-file "/var/named/data/named_stats.txt";
-	memstatistics-file "/var/named/data/named_mem_stats.txt";
+	directory 	"{{ bind_dir }}";
+	dump-file 	"{{ bind_dir }}/data/cache_dump.db";
+	statistics-file "{{ bind_dir }}/data/named_stats.txt";
+	memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
 	allow-query     { {{ bind_allow_query|join(';') }}; };
 {% if bind_acls|length != 0 %}
 	allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
@@ -34,7 +34,7 @@ options {
 	/* Path to ISC DLV key */
 	bindkeys-file "/etc/named.iscdlv.key";
 
-	managed-keys-directory "/var/named/dynamic";
+	managed-keys-directory "{{ bind_dir }}/dynamic";
 
 	pid-file "/run/named/named.pid";
 	session-keyfile "/run/named/session.key";
@@ -48,13 +48,9 @@ logging {
         };
 };
 
-zone "." IN {
-	type hint;
-	file "named.ca";
-};
-
-include "/etc/named.rfc1912.zones";
-include "/etc/named.root.key";
+{% for file in bind_default_zone_files %}
+include "{{ file }}";
+{% endfor %}
 
 zone "{{ bind_zone_name }}" IN {
   type master;
