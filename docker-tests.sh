@@ -26,7 +26,7 @@ readonly docker_image="bertvv/ansible-testing"
 
 # Distribution specific settings
 init="/sbin/init"
-run_opts="--privileged"
+run_opts=("--privileged")
 #}}}
 
 main() {
@@ -44,7 +44,11 @@ main() {
 configure_env() {
   if [ "${DISTRIBUTION}" = "centos" -a "${VERSION}" = "7" ]; then
     init=/usr/lib/systemd/systemd
-    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+  fi
+
+  if [ "${DISTRIBUTION}" = "ubuntu" ]; then
+    run_opts=("--privileged" "--volume=/sys/fs/selinux:/sys/fs/selinux:ro")
   fi
 }
 
@@ -58,7 +62,7 @@ start_container() {
   set -x
   docker run --detach \
     --volume="${PWD}:${role_dir}:ro" \
-    ${run_opts} \
+    "${run_opts[@]}" \
     "${docker_image}:${DISTRIBUTION}_${VERSION}" \
     "${init}" \
     > "${container_id}"
