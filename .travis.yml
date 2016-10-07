@@ -16,4 +16,4 @@ before_install:
   - git worktree add tests origin/docker-tests
 
 script:
-  - ./tests/docker_tests.sh
+  - bash ./tests/docker_tests.sh
