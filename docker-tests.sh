@@ -25,8 +25,8 @@ readonly test_playbook="${role_dir}/tests/test.yml"
 readonly docker_image="bertvv/ansible-testing"
 
 # Distribution specific settings
-init=/sbin/init
-run_opts=""
+init="/sbin/init"
+run_opts="--privileged"
 #}}}
 
 main() {
@@ -44,7 +44,7 @@ main() {
 configure_env() {
   if [ "${DISTRIBUTION}" = "centos" -a "${VERSION}" = "7" ]; then
     init=/usr/lib/systemd/systemd
-    run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+    run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
   fi
 }
 
@@ -58,7 +58,7 @@ start_container() {
   set -x
   docker run --detach \
     --volume="${PWD}:${role_dir}:ro" \
-    "${run_opts[@]}" \
+    ${run_opts} \
     "${docker_image}:${DISTRIBUTION}_${VERSION}" \
     "${init}" \
     > "${container_id}"
@@ -161,4 +161,4 @@ log() {
 
 main "${@}"
 
-trap cleanup EXIT
+trap cleanup EXIT INT ERR HUP TERM
