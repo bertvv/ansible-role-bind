@@ -5,7 +5,7 @@
 - name: Master | Main BIND config file (master)
   template:
     src: master_etc_named.conf.j2
-    dest: "/etc/named.conf"
+    dest: "{{ bind_config }}"
     owner: root
     group: named
     mode: '0640'

@@ -4,6 +4,8 @@ env:
   matrix:
     - DISTRIBUTION: centos
       VERSION: 7
+    - DISTRIBUTION: ubuntu
+      VERSION: 16.04
 
 services:
   - docker

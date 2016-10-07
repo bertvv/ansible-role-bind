@@ -1,0 +1,11 @@
+# roles/bind/vars/Debian.yml
+---
+
+bind_packages:
+  - bind9
+  - bind9utils
+
+bind_service: bind9
+
+bind_config: /etc/bind/named.conf
+

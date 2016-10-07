@@ -13,7 +13,7 @@
     that: bind_zone_master_server_ip is defined
 
 - name: Install BIND
-  yum:
+  package:
     pkg: "{{ item }}"
     state: installed
   with_items: "{{ bind_packages }}"

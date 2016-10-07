@@ -5,7 +5,7 @@
 - name: Slave | Main BIND config file (slave)
   template:
     src: slave_etc_named.conf.j2
-    dest: /etc/named.conf
+    dest: "{{ bind_config }}"
     owner: root
     group: named
     mode: '0640'

@@ -1,4 +1,4 @@
-# roles/bind/vars/main.yml
+# roles/bind/vars/RedHat.yml
 ---
 
 bind_packages:
@@ -6,3 +6,5 @@ bind_packages:
   - bind-utils
 
 bind_service: named
+
+bind_config: /etc/named.conf
