@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#! /usr/bin/env bash
 #
 # Author: Bert Van Vreckem <bert.vanvreckem@gmail.com>
 #
