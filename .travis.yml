@@ -4,8 +4,8 @@ env:
   matrix:
     - DISTRIBUTION: centos
       VERSION: 7
-    - DISTRIBUTION: ubuntu
-      VERSION: 14.04
+#    - DISTRIBUTION: ubuntu
+#      VERSION: 14.04
     - DISTRIBUTION: ubuntu
       VERSION: 16.04
 
@@ -23,4 +23,15 @@ before_install:
   - git worktree add tests origin/docker-tests
 
 script:
+  # Running the test script the first time will set up the master DNS server
+  # with IP 172.17.0.2. Running it the second time sets up the slave DNS
+  # server with IP 172.17.0.3.
   - ./tests/docker-tests.sh
+  - ./tests/docker-tests.sh
+
+  # Run functional tests on both master and slave server
+  - SUT_IP=172.17.0.2 ./tests/functional-tests.sh
+  # Ensure the slave gets the chance to receive zone updates from the master
+  - sleep 6s
+  - SUT_IP=172.17.0.3 ./tests/functional-tests.sh
+
