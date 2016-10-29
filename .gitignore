@@ -14,4 +14,6 @@
 *.pyc
 
 # Ignore test directory
-tests
+tests/
+vagrant-tests/
+docker-tests/
