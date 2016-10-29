@@ -106,6 +106,21 @@ assert_srv_lookup() {
   [ "${result}" = "${expected}" ]
 }
 
+# Perform a TXT record lookup
+# Usage: text_lookup NAME TEXT
+assert_txt_lookup() {
+  local name="$1"
+  local text="$2"
+
+  local expected="\"${text}\""
+  local result=$(dig @${SUT_IP} TXT ${name}.${domain} +short)
+
+  echo "expected: ${expected}"
+  echo "actual  : ${result}"
+  [ "${expected}" = "${result}" ]
+}
+
+
 #}}}
 
 @test 'Forward lookups public servers' {
@@ -167,4 +182,8 @@ assert_srv_lookup() {
 
 @test 'Service record lookup' {
   assert_srv_lookup _ldap._tcp 0 100 88 srv010
+}
+
+@test 'TXT record lookup' {
+  assert_txt_lookup _kerberos KERBEROS.ACME-INC.COM
 }

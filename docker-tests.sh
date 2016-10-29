@@ -115,6 +115,7 @@ run_syntax_check() {
 run_playbook() {
   log "Running playbook"
   exec_container ansible-playbook "${test_playbook}"
+  log "Run finished"
 }
 
 run_idempotence_test() {
