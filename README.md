@@ -1,6 +1,6 @@
 # Ansible role `bind`
 
-![Travis-CI build status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)
+[![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
 
 An Ansible role for setting up BIND ISC as an authoritative DNS server for a single domain on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
