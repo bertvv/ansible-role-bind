@@ -3,6 +3,7 @@
 # Author: Bert Van Vreckem <bert.vanvreckem@gmail.com>
 #
 # Runs tests for this Ansible role on a Docker container
+# Environment variables DISTRIBUTION and VERSION must be set
 # See usage() for details.
 
 #{{{ Bash settings
@@ -37,6 +38,7 @@ main() {
   run_syntax_check
   run_playbook
   run_idempotence_test
+
 }
 
 #{{{ Helper functions
@@ -44,18 +46,22 @@ main() {
 configure_env() {
 
   case "${DISTRIBUTION}_${VERSION}" in
-    "centos_7")
+    'centos_7')
       init=/usr/lib/systemd/systemd
-      run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+      run_opts+=('--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro')
       ;;
-    "ubuntu_14.04")
+    'ubuntu_14.04')
       # Workaround for issue when the host operating system has SELinux
-      if [ -x "/usr/sbin/getenforce" ]; then
-        run_opts=("--privileged" "--volume=/sys/fs/selinux:/sys/fs/selinux:ro")
+      if [ -x '/usr/sbin/getenforce' ]; then
+        run_opts+=('--volume=/sys/fs/selinux:/sys/fs/selinux:ro')
       fi
       ;;
-    "ubuntu_16.04")
-      run_opts=("--privileged" "--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro")
+    'ubuntu_16.04')
+      run_opts=('--volume=/run' '--volume=/run/lock' '--volume=/tmp' '--volume=/sys/fs/cgroup:/sys/fs/cgroup:ro' '--cap-add=SYS_ADMIN' '--cap-add=SYS_RESOURCE')
+
+      if [ -x '/usr/sbin/getenforce' ]; then
+        run_opts+=('--volume=/sys/fs/selinux:/sys/fs/selinux:ro')
+      fi
       ;;
   esac
 }
@@ -173,4 +179,4 @@ log() {
 
 main "${@}"
 
-trap cleanup EXIT INT ERR HUP TERM
+#trap cleanup EXIT INT ERR HUP TERM
