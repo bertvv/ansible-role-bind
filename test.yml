@@ -10,6 +10,10 @@
       - any
     bind_listen_ipv6:
       - any
+    bind_acls:
+      - name: acl1
+        match_list:
+          - 172.17.0.0/16
     bind_zone_networks:
       - '172.17'
       - '10'
