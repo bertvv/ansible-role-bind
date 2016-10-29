@@ -1,6 +1,8 @@
 # Ansible role `bind`
 
-An Ansible role for setting up BIND ISC as an authoritative DNS server for a single domain. Specifically, the responsibilities of this role are to:
+![Travis-CI build status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)
+
+An Ansible role for setting up BIND ISC as an authoritative DNS server for a single domain on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -8,15 +10,14 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones. Forward IPv6 lookups are also supported.  [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not (See Issue #10).
+This role supports multiple reverse zones. Forward IPv6 lookups are also supported. [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not (See [Issue #10](https://github.com/bertvv/ansible-role-bind/issues/10)).
 
-Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.el7](https://galaxy.ansible.com/list#/roles/2305)).
+Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
 If you like/use this role, please consider giving it a star or reviewing it on Ansible Galaxy. Thanks!
 
 ## Requirements
 
-- This role is written specifically for RHEL/CentOS and works on versions 6 and 7.
 - The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses. If you forget this step, you will get the error message "`no filter named 'reverse_lookup_zone'`" in the task 'Main BIND config file'. See [~~Issue #5~~](https://github.com/bertvv/ansible-role-bind/issues/5).
 
 ## Role Variables
@@ -120,26 +121,71 @@ The names of the ACLs will be added to the `allow-transfer` clause in global opt
 
 ## Dependencies
 
-No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.el7](https://github.com/bertvv/ansible-role-el7)).
+No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base)).
 
 ## Example Playbook
 
-See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/tests/test.yml) (in the [tests branch](https://github.com/bertvv/ansible-role-bind/tree/tests)) for an elaborate example that shows all features.
+See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that shows all features.
 
 ## Testing
 
-### Setting up the test environment
+There are two test environments for this role, one based on Vagrant, the other on Docker. The latter powers the Travis-CI tests. The tests are kept in a separate (orphan) branch so as not to clutter the actual code of the role. [git-worktree(1)](https://git-scm.com/docs/git-worktree) is used to include the test code into the working directory. Remark that this requires at least Git v2.5.0.
 
-Tests for this role are provided in the form of a Vagrant environment that is kept in a separate branch, `tests`. I use [git-worktree(1)](https://git-scm.com/docs/git-worktree) to include the test code into the working directory. Instructions for running the tests:
+### Running Docker tests
 
-1. Fetch the tests branch: `git fetch origin tests`
-2. Create a Git worktree for the test code: `git worktree add tests tests` (remark: this requires at least Git v2.5.0). This will create a directory `tests/`.
-3. `cd tests/`
-4. `vagrant up` will then create a VM and apply a test playbook (`test.yml`).
+1. Fetch the test branch: `git fetch origin docker-tests`
+2. Create a Git worktree for the test code: `git worktree add tests docker-tests`. This will create a directory `tests/`
 
-You may want to change the base box into one that you like. The current one, [bertvv/centos71](https://atlas.hashicorp.com/bertvv/boxes/centos71) was generated using a Packer template from the [Boxcutter project](https://github.com/boxcutter/centos) with a few modifications.
+The script `docker-tests.sh` will create a Docker container, and apply this role from a playbook `test.yml`. The Docker images are configured for testing Ansible roles and are published at <https://hub.docker.com/r/bertvv/ansible-testing/>. There are images available for several distributions and versions. The distribution and version should be specified outside the script using environment variables:
 
-### Tests for the bind role
+```
+DISTRIBUTION=centos VERSION=7 ./tests/docker-tests.sh
+```
+
+The specific combinations of distributions and versions that are supported by this role are specified in `.travis.yml`.
+
+The first time the test script is run, a container will be created that is assigned the IP address 172.17.0.2. This will be the master DNS-server. The server is still running after the script finishes and can be queried from the command line, e.g.:
+
+```
+$ dig @172.17.0.2 www.acme-inc.com +short
+srv001.acme-inc.com.
+172.17.1.1
+```
+
+If you run the script again, a new container is launched with IP address 172.17.0.3 that will be set up as a slave DNS-server. After a few seconds, it will have received updates from the master server and can be queried as well.
+
+```
+$ dig @172.17.0.3 www.acme-inc.com +short
+srv001.acme-inc.com.
+172.17.1.1
+```
+
+The script `tests/functional-tests.sh` will run a [BATS](https://github.com/sstephenson/bats) test suite, `dns.bats` that performs a number of different queries. Specify the server IP address as the environment variable `${SUT_IP}` (short for System Under Test).
+
+```
+$ SUT_IP=172.17.0.2 ./tests/functional-tests.sh
+### Using BATS executable at: /usr/local/bin/bats
+### Running test /home/bert/CfgMgmt/roles/bind/tests/dns.bats
+ ✓ Forward lookups public servers
+ ✓ Reverse lookups
+ ✓ Alias lookups public servers
+ ✓ IPv6 forward lookups
+ ✓ NS record lookup
+ ✓ Mail server lookup
+ ✓ Service record lookup
+ ✓ TXT record lookup
+
+8 tests, 0 failures
+$ SUT_IP=172.17.0.3 ./tests/functional-tests.sh
+[...]
+```
+
+### Running Vagrant tests
+
+1. Fetch the tests branch: `git fetch origin vagrant-tests`
+2. Create a Git worktree for the test code: `git worktree add vagrant-tests vagrant-tests`. This will create a directory `vagrant-tests/`.
+3. `cd vagrant-tests/`
+4. `vagrant up` will then create two VMs and apply a test playbook (`test.yml`).
 
 The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook `test.yml`.
 
@@ -166,7 +212,7 @@ $ dig @192.168.56.54 MX example.com +short
 An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `tests/test.yml`. You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `tests/dns.bats` on both the master and the slave DNS server.
 
 ```ShellSession
-$ cd tests
+$ cd vagrant-tests
 $ vagrant up
 [...]
 $ ./runtests.sh
@@ -204,24 +250,13 @@ Testing 192.168.56.53
 [...]
 ```
 
-### Symbolic links in test code
-
-The directory `tests/roles/bind` is a symbolic link that should point to the root of this project in order to work. Additionally, the `filter_plugins` should be linked to the tests directory. To create these links if necessary, do
-
-```ShellSession
-$ cd tests/
-$ mkdir roles
-$ ln -frs ../../PROJECT_DIR roles/bind
-$ ln -frs ../filter_plugins/ .
-```
-
 ## License
 
 BSD
 
 ## Contributors
 
-Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Preferably, create a topic branch and when submitting, squash your commits into one (with a descriptive message).
+Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Please create a topic branch for your proposed changes, it's the easiest way to merge back into the project.
 
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [Joanna Delaporte](https://github.com/jdelaporte)
