@@ -54,7 +54,7 @@ include "{{ file }}";
 zone "{{ bind_zone_name }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "{{ bind_zone_name }}";
+  file "slaves/{{ bind_zone_name }}";
 };
 
 {% if bind_zone_networks is defined %}
@@ -62,7 +62,7 @@ zone "{{ bind_zone_name }}" IN {
 zone "{{ network|reverse_lookup_zone }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "{{ network|reverse_lookup_zone }}";
+  file "slaves/{{ network|reverse_lookup_zone }}";
 };
 {% endfor %}
 {% endif %}
