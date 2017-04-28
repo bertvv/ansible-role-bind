@@ -59,7 +59,7 @@ zone "{{ bind_zone_name }}" IN {
 {% if bind_zone_also_notify|length > 0 %}
   also-notify  { {{ bind_zone_also_notify|join(';') }}; };
 {% endif %}
-  allow-update { none; };
+  allow-update { {{ bind_allow_update|join(';') }}; };
 };
 
 {% if bind_zone_networks is defined %}
@@ -71,7 +71,7 @@ zone "{{ network|reverse_lookup_zone }}" IN {
 {% if bind_zone_also_notify|length > 0 %}
   also-notify  { {{ bind_zone_also_notify|join(';') }}; };
 {% endif %}
-  allow-update { none; };
+  allow-update { {{ bind_allow_update|join(';') }}; };
 };
 {% endfor %}
 {% endif %}
