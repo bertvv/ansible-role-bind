@@ -53,6 +53,19 @@ Variables are not required, unless specified.
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
+### Minimal variables for a working zone
+
+Even thoug only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+
+| Variable                 | Master | Slave |
+| :---                     | :---:  | :---: |
+| `bind_zone_name`         | V      | V     |
+| `bind_zone_networks`     | V      | V     |
+| `bind_zone_name_servers` | V      | V     |
+| `bind_zone_hosts`        | V      | --    |
+| `bind_listen_ipv4`       | V      | V     |
+| `bind_allow_query`       | V      | V     |
+
 ### Host definitions
 
 Host names that this DNS server should resolve can be specified with the variable `bind_zone_hosts` as a list of dicts with fields `name`, `ip` and `aliases`, e.g.:
