@@ -18,34 +18,34 @@ $ORIGIN {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') }}
 
 {% if bind_zone_name_servers|length > 0 %}
 {% for ns in bind_zone_name_servers %}
-         IN  NS   {{ ns }}.{{ bind_zone_name }}.
+                 IN  NS   {{ ns }}.{{ bind_zone_name }}.
 {% endfor %}
 {% else %}
-         IN  NS   {{ ansible_hostname }}.{{ bind_zone_name }}.
+                 IN  NS   {{ ansible_hostname }}.{{ bind_zone_name }}.
 {% endif %}
 {% for ns in bind_other_name_servers %}
-         IN  NS   {{ ns }}.
+                 IN  NS   {{ ns }}.
 {% endfor %}
 
 {% if bind_zone_hosts|length > 1 %}
 {% for host in bind_zone_hosts %}
 {% if host.ip is defined %}
 {% if host.ip == item %}
-@ IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+@                IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
 {% else %}
 {% if host.ip is string and host.ip.startswith(item) %}
 {% if host.name == '@' %}
-{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ bind_zone_name }}.
+{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ bind_zone_name }}.
 {% else %}
-{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
 {% endif %}
 {% else %}
 {% for ip in host.ip %}
 {% if ip.startswith(item) %}
-{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ bind_zone_name }}.
+{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ bind_zone_name }}.
 {% if host.name == '@' %}
 {% else %}
-{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -54,7 +54,7 @@ $ORIGIN {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') }}
 {% endif %}
 {% endfor %}
 {% else %}
-{{ ('.'.join(ansible_default_ipv4.address.replace(item+'.','').split('.')[::-1])).ljust(8) }} IN  PTR  {{ ansible_hostname }}.{{ bind_zone_name }}.
+{{ ('.'.join(ansible_default_ipv4.address.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ ansible_hostname }}.{{ bind_zone_name }}.
 {% endif %}
 {# vim: ft=text
 #}
