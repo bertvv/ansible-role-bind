@@ -4,11 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## 3.6.0 - 2017-06-XX
+## 3.6.0 - 2017-06-01
 
 ### Changed
 
 - (GH-25) Allow slave log file to be set with variable `bind_log` instead of a hard coded value (credit @kartone).
+- The alignment of columns in the reverse zone file are improved
 
 ### Added
 
@@ -17,7 +18,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ### Removed
 
-- The custom filter plugins were removed. The functionality has since been added to Ansible's built-in filter plugins.
+- The custom filter plugins were removed. The functionality has since been added to Ansible's built-in filter plugins. This does require `python-netaddr` to be installed on the management node.
 
 ## 3.5.2 - 2016-09-29
 
