@@ -8,6 +8,8 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ### Changed
 
+- (GH-25) Allow slave log file to be set with variable `bind_log` instead of a hard coded value (credit @kartone).
+
 ### Added
 
 - (GH-22, 23) Documentation improvements

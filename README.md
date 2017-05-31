@@ -276,3 +276,4 @@ Issues, feature requests, ideas, suggestions, etc. are appreciated and can be po
 - [Joanna Delaporte](https://github.com/jdelaporte)
 - [Jose Taas](https://github.com/josetaas)
 - [Peter Janes](https://github.com/peterjanes)
+- [Mario Ciccarelli](https://github.com/kartone)
