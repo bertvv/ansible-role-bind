@@ -13,5 +13,5 @@
 .ropeproject
 *.pyc
 
-# Ignore test directory
-
+# Ignore BATS install directory
+bats
