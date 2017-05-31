@@ -85,11 +85,12 @@ As you can see, not all hosts are in the same network. This is perfectly accepta
 
 ```Yaml
 bind_zone_networks:
-  - 192.0.2
-  - 10
+  - '192.0.2'
+  - '10'
+  - '172.16'
 ```
 
-Remark that only the network part should be specified here!
+Remark that only the network part should be specified here! When specifying a class B IP address (e.g. "172.16") in a variable file, it must be quoted. Otherwise, the Yaml parser will interpret it as a float.
 
 ### Service records
 
