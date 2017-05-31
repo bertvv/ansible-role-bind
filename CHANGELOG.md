@@ -10,6 +10,8 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ### Added
 
+- (GH-22, 23) Documentation improvements
+
 ### Removed
 
 - The custom filter plugins were removed. The functionality has since been added to Ansible's built-in filter plugins.
