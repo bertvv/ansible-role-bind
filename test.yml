@@ -99,3 +99,8 @@
 
   roles:
     - bind
+  tasks:
+    - name: Ensure firewall is not running
+      service:
+        name: firewalld
+        state: stopped
