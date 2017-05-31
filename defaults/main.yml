@@ -26,6 +26,10 @@ bind_listen_ipv6:
 bind_allow_query:
   - "localhost"
 
+# List of hosts that are allowed to dynamically update this DNS server
+bind_allow_update:
+  - "none"
+
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server (= the target use case of this role) should have recursion turned
 # OFF.
