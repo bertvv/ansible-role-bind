@@ -32,12 +32,14 @@ $TTL {{ bind_zone_ttl }}
 
 {% if bind_zone_hosts|length > 0 %}
 {% for host in bind_zone_hosts %}
+{% if host.ip is defined %}
 {% if host.ip is string %}
 {{ host.name.ljust(20) }} IN  A      {{ host.ip }}
 {% else %}
 {% for ip in host.ip %}
 {{ host.name.ljust(20) }} IN  A      {{ ip }}
 {% endfor %}
+{% endif %}
 {% endif %}
 {% if host.ipv6 is defined %}
 {% if host.ipv6 is string %}
