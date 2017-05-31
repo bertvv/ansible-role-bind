@@ -42,8 +42,9 @@ options {
 
 logging {
         channel default_debug {
-                file "data/named.run";
-                severity dynamic;
+                 file "{{ bind_log }}"; 
+		 severity dynamic;
+		 print-time yes;
         };
 };
 
