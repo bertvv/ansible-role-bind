@@ -4,7 +4,7 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## x.x.x - yyyy-mm-dd
+## 3.6.0 - 2017-06-XX
 
 ### Changed
 
@@ -13,6 +13,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 ### Added
 
 - (GH-22, 23) Documentation improvements
+- (GH-27) Allow dynamic updates (credit: @bverschueren)
 
 ### Removed
 
