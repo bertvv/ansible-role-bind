@@ -29,12 +29,12 @@
 - name: Master | Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_dir }}/{{ item|reverse_lookup_zone }}"
+    dest: "{{ bind_dir }}/{{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '') }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "0640"
     setype: named_zone_t
-    validate: "named-checkzone {{ item|reverse_lookup_zone }} %s"
+    #validate: "named-checkzone {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '') }} %s"
   with_items: "{{ bind_zone_networks }}"
   notify: restart bind
   tags: bind

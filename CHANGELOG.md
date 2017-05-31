@@ -4,6 +4,16 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## x.x.x - yyyy-mm-dd
+
+### Changed
+
+### Added
+
+### Removed
+
+- The custom filter plugins were removed. The functionality has since been added to Ansible's built-in filter plugins.
+
 ## 3.5.2 - 2016-09-29
 
 ### Changed

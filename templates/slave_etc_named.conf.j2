@@ -59,10 +59,10 @@ zone "{{ bind_zone_name }}" IN {
 
 {% if bind_zone_networks is defined %}
 {% for network in bind_zone_networks %}
-zone "{{ network|reverse_lookup_zone }}" IN {
+zone "{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '') }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "slaves/{{ network|reverse_lookup_zone }}";
+  file "slaves/{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$' ,'') }}";
 };
 {% endfor %}
 {% endif %}

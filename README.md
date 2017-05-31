@@ -14,11 +14,11 @@ This role supports multiple reverse zones. Forward IPv6 lookups are also support
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
-If you like/use this role, please consider giving it a star or reviewing it on Ansible Galaxy. Thanks!
+If you like/use this role, please consider giving it a star. Thanks!
 
 ## Requirements
 
-- The `filter_plugins` directory should be copied to `${ANSIBLE_HOME}`. It contains a few functions that manipulate IP addresses. If you forget this step, you will get the error message "`no filter named 'reverse_lookup_zone'`" in the task 'Main BIND config file'. See [~~Issue #5~~](https://github.com/bertvv/ansible-role-bind/issues/5).
+No specific requirements.
 
 ## Role Variables
 
