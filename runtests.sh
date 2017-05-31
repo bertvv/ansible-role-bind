@@ -16,7 +16,7 @@ bats_repo_url="https://github.com/sstephenson/bats.git"
 bats_install_dir="${test_dir}/bats"
 bats="${bats_install_dir}/libexec/bats"
 
-ns_ips="192.168.56.53 192.168.56.54"
+ns_ips=${*:-"192.168.56.53 192.168.56.54"}
 
 # color definitions
 Blue='\e[0;34m'
