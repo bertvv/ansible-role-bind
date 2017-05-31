@@ -29,6 +29,7 @@ $ORIGIN {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') }}
 
 {% if bind_zone_hosts|length > 1 %}
 {% for host in bind_zone_hosts %}
+{% if host.ip is defined %}
 {% if host.ip == item %}
 @ IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
 {% else %}
@@ -48,6 +49,7 @@ $ORIGIN {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') }}
 {% endif %}
 {% endif %}
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endif %}
 {% endfor %}
