@@ -60,10 +60,10 @@ zone "{{ bind_zone_name }}" IN {
 
 {% if bind_zone_networks is defined %}
 {% for network in bind_zone_networks %}
-zone "{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '') }}" IN {
+zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "slaves/{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$' ,'') }}";
+  file "slaves/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 };
 {% endfor %}
 {% endif %}

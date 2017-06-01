@@ -64,9 +64,9 @@ zone "{{ bind_zone_name }}" IN {
 
 {% if bind_zone_networks is defined %}
 {% for network in bind_zone_networks %}
-zone "{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '')  }}" IN {
+zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type master;
-  file "{{ network | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') | regex_replace('\\.$', '') }}";
+  file "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
 {% if bind_zone_also_notify|length > 0 %}
   also-notify  { {{ bind_zone_also_notify|join(';') }}; };

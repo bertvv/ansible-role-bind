@@ -18,7 +18,7 @@ If you like/use this role, please consider giving it a star. Thanks!
 
 ## Requirements
 
-- The package `python-netaddr` should be installed on the management node
+No specific requirements
 
 ## Role Variables
 

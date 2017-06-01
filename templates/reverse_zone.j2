@@ -3,7 +3,7 @@
 ; vi: ft=bindzone
 
 $TTL {{ bind_zone_ttl }}
-$ORIGIN {{ item | ipaddr('revdns') | regex_replace('^(0+\\.)+', '') }}
+$ORIGIN {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa.
 
 {% if bind_zone_name_servers|length > 0 %}
 @ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (

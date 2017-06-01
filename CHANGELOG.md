@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.6.1 - 2017-06-01
+
+### Changed
+
+- Fixed a bug with generating the reverse zone names. As an added benefit, the `python-netaddr` dependency was removed.
+
 ## 3.6.0 - 2017-06-01
 
 ### Changed
