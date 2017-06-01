@@ -14,6 +14,10 @@
       - name: acl1
         match_list:
           - 172.17.0.0/16
+    bind_forwarders:
+      - '8.8.8.8'
+      - '8.8.4.4'
+    bind_recursion: true
     bind_zone_networks:
       - '172.17'
       - '10'
