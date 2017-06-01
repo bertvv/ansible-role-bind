@@ -32,9 +32,14 @@ bind_allow_update:
   - "none"
 
 # Determines whether recursion should be allowed. Typically, an authoritative
-# name server (= the target use case of this role) should have recursion turned
-# OFF.
+# name server should have recursion turned OFF.
 bind_recursion: false
+
+# Allows BIND to be set up as a caching name server
+bind_forward_only: false
+
+# List of name servers to forward DNS requests to.
+bind_forwarders: []
 
 # DNS round robin order (random or cyclic)
 bind_rrset_order: "random"

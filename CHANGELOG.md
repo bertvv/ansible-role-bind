@@ -9,6 +9,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 ### Added
 
 - (GH-10) Implement reverse IPv6 lookups
+- (GH-28) Add option `bind_forwarders` and `bind_forward_only`, which allows BIND to be set up as a caching name server.
 
 ## 3.6.1 - 2017-06-01
 

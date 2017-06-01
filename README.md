@@ -29,6 +29,8 @@ Variables are not required, unless specified.
 | `bind_acls`                    | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.        |
 | `bind_allow_query`             | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
 | `bind_allow_update`            | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS server.                                          |
+| `bind_forwarders`              | `[]`                             | A list of name servers to forward DNS requests to.                                                               |
+| `bind_forward_only`            | `false`                          | If `true`, BIND is set up as a caching name server                                                               |
 | `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                             |
