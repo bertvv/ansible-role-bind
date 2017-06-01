@@ -15,7 +15,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ### Changed
 
-- Fixed a bug with generating the reverse zone names. As an added benefit, the `python-netaddr` dependency was removed.
+- Fixed a bug with generating the reverse zone names.
 
 ## 3.6.0 - 2017-06-01
 
