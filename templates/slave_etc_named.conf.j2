@@ -69,3 +69,14 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 };
 {% endfor %}
 {% endif %}
+
+{% if bind_zone_ipv6_networks is defined %}
+{% for network in bind_zone_ipv6_networks %}
+zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+  type slave;
+  masters { {{ bind_zone_master_server_ip }}; };
+  file "slaves/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+};
+{% endfor %}
+{% endif %}
+
