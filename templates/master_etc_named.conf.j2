@@ -75,3 +75,17 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 };
 {% endfor %}
 {% endif %}
+
+{% if bind_zone_ipv6_networks is defined %}
+{% for network in bind_zone_ipv6_networks %}
+zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+  type master;
+  file "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  notify yes;
+{% if bind_zone_also_notify|length > 0 %}
+  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% endif %}
+  allow-update { {{ bind_allow_update|join(';') }}; };
+};
+{% endfor %}
+{% endif %}

@@ -6,6 +6,7 @@ bind_log: "data/named.run"
 bind_zone_name: "example.com"
 bind_zone_networks:
   - "10.0.2"
+bind_zone_ipv6_networks: []
 
 # List of servers to be notified when the master zone is reloaded.
 bind_zone_also_notify: []

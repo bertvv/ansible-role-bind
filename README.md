@@ -10,7 +10,7 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones. Forward IPv6 lookups are also supported. [Reverse IPv6 lookups](http://www.zytrax.com/books/dns/ch3/#ipv6), as of yet, are not (See [Issue #10](https://github.com/bertvv/ansible-role-bind/issues/10)).
+This role supports multiple reverse zones. IPv6 lookups are also supported, both forward and reverse.
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
@@ -18,7 +18,7 @@ If you like/use this role, please consider giving it a star. Thanks!
 
 ## Requirements
 
-No specific requirements
+- **The package `python-ipaddr` should be installed on the management node** (since v3.7.0)
 
 ## Role Variables
 
@@ -28,7 +28,7 @@ Variables are not required, unless specified.
 | :---                           | :---                             | :---                                                                                                             |
 | `bind_acls`                    | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.        |
 | `bind_allow_query`             | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                     |
-| `bind_allow_update`             | `['none']`                  | A list of hosts that are allowed to dynamically update this DNS server.                      |
+| `bind_allow_update`            | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS server.                                          |
 | `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces. |
 | `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                              |
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                             |
@@ -44,6 +44,7 @@ Variables are not required, unless specified.
 | `bind_zone_name_servers`       | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                       |
 | `bind_zone_name`               | `example.com`                    | The domain name                                                                                                  |
 | `bind_zone_networks`           | `['10.0.2']`                     | A list of the networks that are part of the domain                                                               |
+| `bind_zone_ipv6_networks`      | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                   |
 | `bind_zone_other_name_servers` | `[]`                             | A list of the DNS servers outside of this domain.                                                                |
 | `bind_zone_services`           | `[]`                             | A list of services to be advertized by SRV records                                                               |
 | `bind_zone_text`               | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records                                            |

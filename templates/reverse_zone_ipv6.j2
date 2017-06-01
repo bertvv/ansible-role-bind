@@ -1,0 +1,60 @@
+; Reverse zone file for {{ bind_zone_name }}
+; {{ ansible_managed }}
+; vi: ft=bindzone
+
+$TTL {{ bind_zone_ttl }}
+$ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }}
+
+{% if bind_zone_name_servers|length > 0 %}
+@ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+{% else %}
+@ IN SOA {{ ansible_hostname }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+{% endif %}
+  {{ timestamp.stdout }}
+  {{ bind_zone_time_to_refresh }}
+  {{ bind_zone_time_to_retry }}
+  {{ bind_zone_time_to_expire }}
+  {{ bind_zone_minimum_ttl }} )
+
+{% if bind_zone_name_servers|length > 0 %}
+{% for ns in bind_zone_name_servers %}
+                 IN  NS   {{ ns }}.{{ bind_zone_name }}.
+{% endfor %}
+{% else %}
+                 IN  NS   {{ ansible_hostname }}.{{ bind_zone_name }}.
+{% endif %}
+{% for ns in bind_other_name_servers %}
+                 IN  NS   {{ ns }}.
+{% endfor %}
+
+{% if bind_zone_hosts|length > 1 %}
+{% for host in bind_zone_hosts %}
+{% if host.ipv6 is defined %}
+{% if host.ipv6 == item %}
+@                IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% else %}
+{% if host.ipv6 is string and host.ipv6.startswith(item|regex_replace('/.*$','')) %}
+{% if host.name == '@' %}
+{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ bind_zone_name }}.
+{% else %}
+{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endif %}
+{% else %}
+{% for ip in host.ipv6 %}
+{% if ip.startswith(item|regex_replace('/.*$','')) %}
+{{ ip | ipaddr('revdns') }} IN  PTR  {{ bind_zone_name }}.
+{% if host.name == '@' %}
+{% else %}
+{{ ip | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% else %}
+{{ ansible_default_ipv6.address | ipaddr('revdns') }} IN  PTR  {{ ansible_hostname }}.{{ bind_zone_name }}.
+{% endif %}
+{# vim: ft=text
+#}
