@@ -17,6 +17,8 @@
     bind_zone_networks:
       - '172.17'
       - '10'
+    bind_zone_ipv6_networks:
+      - '2001:db8::/48'
     bind_zone_name: 'acme-inc.com'
     bind_zone_master_server_ip: 172.17.0.2
     bind_zone_name_servers:

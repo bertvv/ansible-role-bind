@@ -168,7 +168,14 @@ assert_txt_lookup() {
   assert_forward_ipv6_lookup mail001 2001:db8::d:1
   assert_forward_ipv6_lookup mail002 2001:db8::d:2
   assert_forward_ipv6_lookup mail003 2001:db8::d:3
+}
 
+@test 'IPv6 reverse lookups' {
+  assert_reverse_lookup srv001 2001:db8::1
+  assert_reverse_lookup srv002 2001:db8::2
+  assert_reverse_lookup mail001 2001:db8::d:1
+  assert_reverse_lookup mail002 2001:db8::d:2
+  assert_reverse_lookup mail003 2001:db8::d:3
 }
 
 @test 'NS record lookup' {
