@@ -2,7 +2,8 @@
 ---
 
 # Initialise distribution-specific variables
-- include_vars: "{{ item }}"
+- name: Source specific variables
+  include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
@@ -35,7 +36,31 @@
   command: date +%y%m%d%H
   register: timestamp
   changed_when: false
+  run_once: True
   tags: bind
+
+- name: Read forward zone hashes
+  shell: 'grep "^; Hash:" {{ bind_dir }}/{{ bind_zone_name }} || true'
+  changed_when: False
+  always_run: True
+  check_mode: False
+  register: forward_hashes
+
+- name: Read reverse ipv4 zone hashes
+  shell: "grep \"^; Hash:\" {{ bind_dir }}/{{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  changed_when: False
+  always_run: True
+  check_mode: False
+  register: reverse_hashes
+  with_items: "{{ bind_zone_networks }}"
+
+- name: Read reverse ipv6 zone hashes
+  shell: "grep \"^; Hash:\" {{bind_dir}}/{{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  changed_when: False
+  always_run: True
+  check_mode: False
+  register: reverse_hashes_ipv6
+  with_items: "{{ bind_zone_ipv6_networks }}"
 
 - include: master.yml
   when: bind_zone_master_server_ip in ansible_all_ipv4_addresses

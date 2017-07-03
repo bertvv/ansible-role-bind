@@ -1,51 +1,87 @@
-; Reverse zone file for {{ bind_zone_name }}
+{#
+ #  First create a dict holding the entire zone information and create a hash
+ #  from it, that it can be compared with subsequent task executions. In this
+ #  way the serial will only be updated if there are some content changes.
+ #}
+{% set _zone_data = {} %}
+{% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
+{% set _ = _zone_data.update({'domain': bind_zone_name }) %}
+{% set _ = _zone_data.update({'mname': bind_zone_name_servers}) %}
+{% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
+{% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
+{% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
+{% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
+{% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
+{% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
+{% set _ = _zone_data.update({'hosts': bind_zone_hosts }) %}
+{% set _ = _zone_data.update({'revip': (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }) %}
+{#
+ #  Compare the zone file hash with the current zone data hash and set serial
+ #  accordingly
+ #}
+{% set _zone = {'hash': _zone_data | string | hash('md5')} %}
+{% for _result in reverse_hashes_ipv6.results %}
+{%   if (item in _result.item ) %}
+{%     set _hash_serial = _result.stdout.split(' ')[2:] %}
+{%     if _hash_serial and _hash_serial[0] == _zone['hash'] %}
+{%       set _ = _zone.update({'serial': _hash_serial[1]}) %}
+{%     else %}
+{%       set _ = _zone.update({'serial': timestamp.stdout}) %}
+{%     endif %}
+{%   endif %}
+{% endfor %}
+{#
+ #  Eventually output the zone data
+ #}
+; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
+; Reverse zone file for {{ _zone_data['domain'] }}
 ; {{ ansible_managed }}
 ; vi: ft=bindzone
 
-$TTL {{ bind_zone_ttl }}
+$TTL {{ _zone_data['ttl'] }}
 $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }}
 
-{% if bind_zone_name_servers|length > 0 %}
-@ IN SOA {{ bind_zone_name_servers|first }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+{% if _zone_data['mname']|length > 0 %}
+@ IN SOA {{ _zone_data['mname']|first }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
 {% else %}
-@ IN SOA {{ ansible_hostname }}.{{ bind_zone_name }}. {{ bind_zone_hostmaster_email }}.{{ bind_zone_name }}. (
+@ IN SOA {{ ansible_hostname }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
 {% endif %}
-  {{ timestamp.stdout }}
-  {{ bind_zone_time_to_refresh }}
-  {{ bind_zone_time_to_retry }}
-  {{ bind_zone_time_to_expire }}
-  {{ bind_zone_minimum_ttl }} )
+  {{ _zone['serial'] }}
+  {{ _zone_data['refresh'] }}
+  {{ _zone_data['retry'] }}
+  {{ _zone_data['expire'] }}
+  {{ _zone_data['minimum'] }} )
 
-{% if bind_zone_name_servers|length > 0 %}
-{% for ns in bind_zone_name_servers %}
-                 IN  NS   {{ ns }}.{{ bind_zone_name }}.
+{% if _zone_data['mname']|length > 0 %}
+{% for ns in _zone_data['mname'] %}
+                 IN  NS   {{ ns }}.{{ _zone_data['domain'] }}.
 {% endfor %}
 {% else %}
-                 IN  NS   {{ ansible_hostname }}.{{ bind_zone_name }}.
+                 IN  NS   {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
 {% endif %}
-{% for ns in bind_other_name_servers %}
+{% for ns in _zone_data['aname'] %}
                  IN  NS   {{ ns }}.
 {% endfor %}
 
-{% if bind_zone_hosts|length > 1 %}
-{% for host in bind_zone_hosts %}
+{% if _zone_data['hosts']|length > 1 %}
+{% for host in _zone_data['hosts'] %}
 {% if host.ipv6 is defined %}
 {% if host.ipv6 == item %}
-@                IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+@                IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% else %}
 {% if host.ipv6 is string and host.ipv6.startswith(item|regex_replace('/.*$','')) %}
 {% if host.name == '@' %}
-{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ bind_zone_name }}.
+{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ _zone_data['domain'] }}.
 {% else %}
-{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {% else %}
 {% for ip in host.ipv6 %}
 {% if ip.startswith(item|regex_replace('/.*$','')) %}
-{{ ip | ipaddr('revdns') }} IN  PTR  {{ bind_zone_name }}.
+{{ ip | ipaddr('revdns') }} IN  PTR  {{ _zone_data['domain'] }}.
 {% if host.name == '@' %}
 {% else %}
-{{ ip | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ bind_zone_name }}.
+{{ ip | ipaddr('revdns') }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -54,7 +90,7 @@ $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2)
 {% endif %}
 {% endfor %}
 {% else %}
-{{ ansible_default_ipv6.address | ipaddr('revdns') }} IN  PTR  {{ ansible_hostname }}.{{ bind_zone_name }}.
+{{ ansible_default_ipv6.address | ipaddr('revdns') }} IN  PTR  {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {# vim: ft=text
 #}
