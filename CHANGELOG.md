@@ -4,7 +4,13 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## 3.7.0 - 2017-06-0X
+## 3.7.1 - 2017-07-03
+
+### Changed
+
+- (GH-29) Zone files are fully idempotent, so are only changed when actual content changes (credit: [@Stuart Knight](https://github.com/blofeldthefish))
+
+## 3.7.0 - 2017-06-01
 
 ### Added
 
