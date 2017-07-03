@@ -279,9 +279,9 @@ BSD
 Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Please create a topic branch for your proposed changes, it's the easiest way to merge back into the project.
 
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
-- [@blofeldthefish](https://github.com/blofeldthefish)
 - [B. Verschueren](https://github.com/bverschueren)
 - [Joanna Delaporte](https://github.com/jdelaporte)
 - [Jose Taas](https://github.com/josetaas)
 - [Peter Janes](https://github.com/peterjanes)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Stuart Knight](https://github.com/blofeldthefish)
