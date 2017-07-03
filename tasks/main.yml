@@ -36,29 +36,26 @@
   command: date +%y%m%d%H
   register: timestamp
   changed_when: false
-  run_once: True
+  run_once: true
   tags: bind
 
 - name: Read forward zone hashes
   shell: 'grep "^; Hash:" {{ bind_dir }}/{{ bind_zone_name }} || true'
-  changed_when: False
-  always_run: True
-  check_mode: False
+  changed_when: false
+  check_mode: false
   register: forward_hashes
 
 - name: Read reverse ipv4 zone hashes
   shell: "grep \"^; Hash:\" {{ bind_dir }}/{{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
-  changed_when: False
-  always_run: True
-  check_mode: False
+  changed_when: false
+  check_mode: false
   register: reverse_hashes
   with_items: "{{ bind_zone_networks }}"
 
 - name: Read reverse ipv6 zone hashes
   shell: "grep \"^; Hash:\" {{bind_dir}}/{{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):-1] }} || true"
-  changed_when: False
-  always_run: True
-  check_mode: False
+  changed_when: false
+  check_mode: false
   register: reverse_hashes_ipv6
   with_items: "{{ bind_zone_ipv6_networks }}"
 
