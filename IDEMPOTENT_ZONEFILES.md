@@ -1,1 +1,0 @@
-Based on the idea and examples detailed at https://linuxmonk.ch/wordpress/index.php/2016/managing-dns-zones-with-ansible/ for the gdnsd package, I have now made changes to this role, so that the zonefiles created are fully idempotent, and thus only get updated if "real" content changes.
