@@ -97,7 +97,13 @@ $TTL {{ _zone_data['ttl'] }}
 {{ service.name.ljust(20) }} IN  SRV    {{ service.priority|default('0') }} {{ service.weight|default('0') }} {{ service.port }} {{ service.target }}
 {% endfor %}
 {% for text in _zone_data['text'] %}
+{% if text.text is string %}
 {{ text.name.ljust(20) }} IN  TXT    "{{ text.text }}"
+{% else %}
+{%   for entry in text.text %}
+{{ text.name.ljust(20) }} IN  TXT    "{{ entry }}"
+{%   endfor %}
+{% endif %}
 {% endfor %}
 {# vim: ft=text
 #}
