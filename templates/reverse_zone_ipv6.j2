@@ -13,7 +13,7 @@
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': bind_zone_hosts }) %}
+{% set _ = _zone_data.update({'hosts': bind_zone_hosts | selectattr('ipv6','defined') | selectattr('ipv6', 'search', '^'+item|regex_replace('/.*$','')) | list }) %}
 {% set _ = _zone_data.update({'revip': (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
@@ -63,7 +63,7 @@ $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2)
                  IN  NS   {{ ns }}.
 {% endfor %}
 
-{% if _zone_data['hosts']|length > 1 %}
+{% if _zone_data['hosts']|length > 0 %}
 {% for host in _zone_data['hosts'] %}
 {% if host.ipv6 is defined %}
 {% if host.ipv6 == item %}
