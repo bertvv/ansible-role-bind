@@ -13,7 +13,7 @@
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': bind_zone_hosts | selectattr('ip', 'search', '^'+item) | list }) %} 
+{% set _ = _zone_data.update({'hosts': bind_zone_hosts | selectattr('ip', 'defined') | selectattr('ip', 'string') | selectattr('ip', 'search', '^'+item) | list }) %}
 {% set _ = _zone_data.update({'revip': ('.'.join(item.replace(item+'.','').split('.')[::-1])) }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
