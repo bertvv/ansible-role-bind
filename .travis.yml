@@ -4,8 +4,6 @@ env:
   matrix:
     - DISTRIBUTION: centos
       VERSION: 7
-#    - DISTRIBUTION: ubuntu
-#      VERSION: 14.04
     - DISTRIBUTION: ubuntu
       VERSION: 16.04
 
