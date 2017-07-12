@@ -276,12 +276,16 @@ BSD
 
 ## Contributors
 
-Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section. Pull requests are also very welcome. Please create a topic branch for your proposed changes, it's the easiest way to merge back into the project.
+Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section.
+
+Pull requests are also very welcome. Please create a topic branch for your proposed changes. If you don't, this will create conflicts in your fork after the merge. Don't hesitate to add yourself to the contributor list below in your PR!
 
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [B. Verschueren](https://github.com/bverschueren)
+- [Greg Cockburn](https://github.com/gergnz)
 - [Joanna Delaporte](https://github.com/jdelaporte)
 - [Jose Taas](https://github.com/josetaas)
 - [Peter Janes](https://github.com/peterjanes)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)

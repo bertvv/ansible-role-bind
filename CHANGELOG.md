@@ -4,6 +4,19 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.8.0 - 2017-07-12
+
+This release adds support for multiple TXT entries and fixes some bugs.
+
+### Added
+
+- (GH-31) Support for multiple TXT entries for the same name (credit: [Rafael Bodill](https://github.com/rafi))
+
+### Changed
+
+- (GH-31) Fixed ipv6 reverse zone hash calculation for complete idempotency (credit: [Stuart Knight](https://github.com/blofeldthefish))
+- (GH-32, GH-33) Fix for bug where CNAMEs and Multi-IP entries weren't working (credit: [Greg Cockburn](https://github.com/gergnz))
+
 ## 3.7.1 - 2017-07-03
 
 ### Changed
