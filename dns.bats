@@ -107,17 +107,18 @@ assert_srv_lookup() {
 }
 
 # Perform a TXT record lookup
-# Usage: text_lookup NAME TEXT
+# Usage: assert_txt_lookup NAME TEXT...
 assert_txt_lookup() {
   local name="$1"
-  local text="$2"
+  local result=$(dig @${SUT_IP} TXT ${name} +short)
+  shift
 
-  local expected="\"${text}\""
-  local result=$(dig @${SUT_IP} TXT ${name}.${domain} +short)
-
-  echo "expected: ${expected}"
+  echo "expected: ${*}"
   echo "actual  : ${result}"
-  [ "${expected}" = "${result}" ]
+  while [ "$#" -ne "0" ]; do
+    grep "${1}" <<< "${result}"
+    shift
+  done
 }
 
 
@@ -192,5 +193,6 @@ assert_txt_lookup() {
 }
 
 @test 'TXT record lookup' {
-  assert_txt_lookup _kerberos KERBEROS.ACME-INC.COM
+  assert_txt_lookup "_kerberos.${domain}" KERBEROS.ACME-INC.COM
+  assert_txt_lookup "${domain}" "some text" "more text"
 }
