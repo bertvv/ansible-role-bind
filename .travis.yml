@@ -33,3 +33,5 @@ script:
   - sleep 6s
   - SUT_IP=172.17.0.3 ./tests/functional-tests.sh
 
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
