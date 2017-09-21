@@ -2,6 +2,7 @@
 ---
 
 bind_packages:
+  - python-netaddr
   - bind
   - bind-utils
 
