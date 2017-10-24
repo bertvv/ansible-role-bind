@@ -36,6 +36,7 @@ Variables are not required, unless specified.
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                             |
 | `bind_other_name_servers`      | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
 | `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
+| `bind_allow_recursion`         | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                           |
 | `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
 | `bind_zone_also_notify`        | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                        |
 | `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
@@ -289,3 +290,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Mario Ciccarelli](https://github.com/kartone)
 - [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)
+- [Loic Dachary](http://dachary.org)
