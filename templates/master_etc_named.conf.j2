@@ -64,6 +64,13 @@ zone "{{ bind_zone_name }}" IN {
   allow-update { {{ bind_allow_update|join(';') }}; };
 };
 
+{% if forward_zone_name is defined %}
+zone "{{ forward_zone_name }}" IN {
+  type forward;
+  forwarders { {{ forward_zone_forwarders }}; };
+};
+{% endif %}
+
 {% if bind_zone_networks is defined %}
 {% for network in bind_zone_networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {

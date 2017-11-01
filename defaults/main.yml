@@ -59,3 +59,7 @@ bind_zone_mail_servers: []
 bind_zone_name_servers: []
 bind_zone_services: []
 bind_zone_text: []
+
+#Forwarded zone lookup
+forward_zone_name: []
+forward_zone_forwarders: []
