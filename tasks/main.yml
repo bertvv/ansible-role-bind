@@ -13,12 +13,23 @@
   assert:
     that: bind_zone_master_server_ip is defined
 
-- name: Install BIND
-  package:
+- name: Install BIND on Debian
+  apt:
     pkg: "{{ item }}"
     state: installed
+    update_cache: yes
   with_items: "{{ bind_packages }}"
   tags: bind
+  when: ansible_os_family == 'Debian'
+
+- name: Install BIND on RedHat
+  yum:
+    pkg: "{{ item }}"
+    state: installed
+    update_cache: yes
+  with_items: "{{ bind_packages }}"
+  tags: bind
+  when: ansible_os_family == 'RedHat'
 
 - name: Ensure runtime directories referenced in config exist
   file:
@@ -71,4 +82,3 @@
     state: started
     enabled: yes
   tags: bind
-
