@@ -15,6 +15,7 @@
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
 {% set _ = _zone_data.update({'hosts': bind_zone_hosts }) %}
+{% set _ = _zone_data.update({'delegate': bind_zone_delegate }) %}
 {% set _ = _zone_data.update({'services': bind_zone_services }) %}
 {% set _ = _zone_data.update({'text': bind_zone_text }) %}
 {#
@@ -61,8 +62,14 @@ $TTL {{ _zone_data['ttl'] }}
 {% endfor %}
 
 {% for mail in _zone_data['mail'] %}
-{% if loop.first %}@{% else %} {% endif %}                    IN  MX     {{ mail.preference}}  {{ mail.name }}.{{ _zone_data['domain'] }}.
+{% if loop.first %}@{% else %} {% endif %}                    IN  MX     {{ mail.preference}}  {{ mail.name }}{% if not mail.name.endswith('.') %}.{{ _zone_data['domain'] }}.{% endif %} 
 {% endfor %}
+
+{% if _zone_data['delegate']|length > 0 %}
+{% for host in _zone_data['delegate'] %}
+{{ host.zone.ljust(20) }} IN  NS     {{ host.dns }}
+{% endfor %}
+{% endif %}
 
 {% if _zone_data['hosts']|length > 0 %}
 {% for host in _zone_data['hosts'] %}
