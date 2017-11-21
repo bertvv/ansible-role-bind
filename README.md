@@ -176,7 +176,7 @@ There are two test environments for this role, one based on Vagrant, the other o
 ### Running Docker tests
 
 1. Fetch the test branch: `git fetch origin docker-tests`
-2. Create a Git worktree for the test code: `git worktree add tests docker-tests`. This will create a directory `tests/`
+2. Create a Git worktree for the test code: `git worktree add docker-tests docker-tests`. This will create a directory `docker-tests/`
 
 The script `docker-tests.sh` will create a Docker container, and apply this role from a playbook `test.yml`. The Docker images are configured for testing Ansible roles and are published at <https://hub.docker.com/r/bertvv/ansible-testing/>. There are images available for several distributions and versions. The distribution and version should be specified outside the script using environment variables:
 
@@ -305,6 +305,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [B. Verschueren](https://github.com/bverschueren)
 - [Greg Cockburn](https://github.com/gergnz)
+- [Guillaume Darmont](https://github.com/gdarmont)
 - [Joanna Delaporte](https://github.com/jdelaporte)
 - [Jose Taas](https://github.com/josetaas)
 - [Peter Janes](https://github.com/peterjanes)

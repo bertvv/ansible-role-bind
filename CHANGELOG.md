@@ -4,6 +4,19 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.9.0 - 2017-11-21
+
+### Added
+
+- (GH-35) Role variable `bind_check_names`, which adds support for check-names (e.g. `check-names master ignore;`)
+- (GH-36) Role variable `bind_allow_recursion`, which adds support for allow-recursion (credit: [Loic Dachary](https://github.com/dachary))
+- (GH-39) Role variable `bind_zone_delegate`, which adds support for zone delegation / NS records (credit: [Loic Dachary](https://github.com/dachary))
+- (GH-40) Role variables `bind_dnssec_enable` and `bind_dnssec_validation`, which makes DNSSEC validation configurable (credit: [Guillaume Darmont](https://github.com/gdarmont)).
+
+### Changed
+
+- (GH-38) Only append domain to MX if it does not end with a dot (credit: [Loic Dachary](https://github.com/dachary))
+
 ## 3.8.0 - 2017-07-12
 
 This release adds support for multiple TXT entries and fixes some bugs.
