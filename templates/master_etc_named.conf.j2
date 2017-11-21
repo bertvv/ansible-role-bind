@@ -22,6 +22,9 @@ options {
 {% if bind_acls|length != 0 %}
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
+{% if bind_check_names is defined %}
+  bind-check-names  {{ check-names }};
+{% endif %}
 
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
   {% if bind_recursion %}
