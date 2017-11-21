@@ -18,6 +18,7 @@
       - '8.8.8.8'
       - '8.8.4.4'
     bind_recursion: true
+    bind_check_hosts: 'master ignore'
     bind_zone_networks:
       - '172.17'
       - '10'
