@@ -32,8 +32,8 @@ options {
 
   rrset-order { order {{ bind_rrset_order }}; };
 
-  dnssec-enable yes;
-  dnssec-validation yes;
+  dnssec-enable {{ bind_dnssec_enable }};
+  dnssec-validation {{ bind_dnssec_validation }};
   dnssec-lookaside auto;
 
   /* Path to ISC DLV key */

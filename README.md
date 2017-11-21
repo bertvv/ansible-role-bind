@@ -38,6 +38,8 @@ Variables are not required, unless specified.
 | `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
 | `bind_allow_recursion`         | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                           |
 | `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
+| `bind_dnssec_enable`           | `true`                           | Is DNSSEC enabled                                                                                                |
+| `bind_dnssec_validation`       | `true`                           | Is DNSSEC validation enabled                                                                                     |
 | `bind_zone_also_notify`        | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                        |
 | `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`              | `[]`                             | Host definitions. See below this table for examples.                                                             |
