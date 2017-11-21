@@ -57,6 +57,7 @@ bind_zone_minimum_ttl: "1D"
 # Zone Resource Records
 bind_other_name_servers: []
 bind_zone_hosts: []
+bind_zone_delegate: []
 bind_zone_mail_servers: []
 bind_zone_name_servers: []
 bind_zone_services: []
