@@ -34,6 +34,8 @@ bind_allow_update:
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
 bind_recursion: false
+bind_allow_recursion:
+  - "any"
 
 # Allows BIND to be set up as a caching name server
 bind_forward_only: false
