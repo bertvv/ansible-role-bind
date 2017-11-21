@@ -34,6 +34,8 @@ bind_allow_update:
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
 bind_recursion: false
+bind_allow_recursion:
+  - "any"
 
 # Allows BIND to be set up as a caching name server
 bind_forward_only: false
@@ -43,6 +45,10 @@ bind_forwarders: []
 
 # DNS round robin order (random or cyclic)
 bind_rrset_order: "random"
+
+# DNSSEC configuration
+bind_dnssec_enable: true
+bind_dnssec_validation: true
 
 # SOA information
 bind_zone_hostmaster_email: "hostmaster"
@@ -55,6 +61,7 @@ bind_zone_minimum_ttl: "1D"
 # Zone Resource Records
 bind_other_name_servers: []
 bind_zone_hosts: []
+bind_zone_delegate: []
 bind_zone_mail_servers: []
 bind_zone_name_servers: []
 bind_zone_services: []

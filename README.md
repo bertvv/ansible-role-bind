@@ -36,10 +36,14 @@ Variables are not required, unless specified.
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                             |
 | `bind_other_name_servers`      | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                         |
 | `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                  |
+| `bind_allow_recursion`         | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                           |
 | `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                  |
+| `bind_dnssec_enable`           | `true`                           | Is DNSSEC enabled                                                                                                |
+| `bind_dnssec_validation`       | `true`                           | Is DNSSEC validation enabled                                                                                     |
 | `bind_zone_also_notify`        | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                        |
 | `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                   |
 | `bind_zone_hosts`              | `[]`                             | Host definitions. See below this table for examples.                                                             |
+| `bind_zone_delegate`           | `[]`                             | Zone delegation. See below this table for examples.                                                              |
 | `bind_zone_mail_servers`       | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.               |
 | `bind_zone_master_server_ip`   | -                                | **(Required)** The IP address of the master DNS server.                                                          |
 | `bind_zone_minimum_ttl`        | `1D`                             | Minimum TTL field in the SOA record.                                                                             |
@@ -110,6 +114,23 @@ bind_zone_networks:
 Remark that only the network part should be specified here! When specifying a class B IP address (e.g. "172.16") in a variable file, it must be quoted. Otherwise, the Yaml parser will interpret it as a float.
 
 Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index.php/2016/managing-dns-zones-with-ansible/> for the gdnsd package, the zonefiles are fully idempotent, and thus only get updated if "real" content changes.
+
+### Zone delgation
+
+To delegate a zone to a DNS, it is enough to create a `NS` record with:
+
+```Yaml
+bind_zone_delegate:
+  - zone: foo
+    dns: 192.0.2.1
+```
+
+which is the equivalent of:
+
+```
+foo IN NS 192.0.2.1
+```
+
 
 ### Service records
 
@@ -289,3 +310,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Mario Ciccarelli](https://github.com/kartone)
 - [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)
+- [Loic Dachary](http://dachary.org)
