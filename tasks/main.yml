@@ -32,8 +32,8 @@
     - "{{ bind_dir }}/data"
   tags: bind
 
-- name: Create serial, based on last two digits of year, month, day, and hour
-  command: date +%y%m%d%H
+- name: Create serial, based on UTC UNIX time
+  command: date -u +%s
   register: timestamp
   changed_when: false
   run_once: true
