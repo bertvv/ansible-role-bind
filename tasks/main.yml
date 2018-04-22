@@ -69,6 +69,5 @@
   service:
     name: "{{ bind_service }}"
     state: started
-    enabled: yes
+    enabled: true
   tags: bind
-
