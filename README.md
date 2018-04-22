@@ -87,21 +87,19 @@ bind_zone_hosts:
     aliases:
       - ns
   - name: '@'
-    ip:
-      - 192.0.2.2
-      - 192.0.2.3
-    ipv6:
-      - 2001:db8::2
-      - 2001:db8::3
+    ip: 192.0.2.2
+    ipv6: 2001:db8::2
     aliases:
       - www
   - name: priv01
-    ip: 10.0.0.1
+    ip: 10.0.0.10
+  - name: priv01
+    ip: 10.0.0.11
 ```
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
-IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
+If you want to specify multiple IP addresses for a host, add entries to `bind_zone_hosts` with the same name (e.g. `priv01` in the code snippet). This results in multiple A/AAAA records for that host and allows [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
 As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `bind_zone_networks`, though, or the host will not get a PTR record for reverse lookup:
 
