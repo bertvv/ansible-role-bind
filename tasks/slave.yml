@@ -11,6 +11,5 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
-  notify: restart bind
+  notify: reload bind
   tags: bind
-
