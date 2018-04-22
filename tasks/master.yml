@@ -36,7 +36,7 @@
     setype: named_zone_t
     validate: "named-checkzone {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
   with_items: "{{ bind_zone_networks }}"
-  notify: restart bind
+  notify: reload bind
   tags: bind
 
 - name: Master | Create reverse IPv6 lookup zone file
@@ -47,8 +47,7 @@
     group: "{{ bind_group }}"
     mode: "0640"
     setype: named_zone_t
-    #validate: "named-checkzone {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }} %s"
+    validate: "named-checkzone {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }} %s"
   with_items: "{{ bind_zone_ipv6_networks }}"
-  #notify: restart bind
+  notify: reload bind
   tags: bind
-    
