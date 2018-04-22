@@ -24,6 +24,8 @@
     bind_zone_networks:
       - '192.168.56'
       - '172.16'
+    bind_zone_ipv6_networks:
+      - '2001:db8::/48'
     bind_zone_master_server_ip: 192.168.56.53
     bind_zone_name_servers:
       - testbindmaster
@@ -44,12 +46,8 @@
         aliases:
           - ns2
       - name: '@'
-        ip:
-          - 192.168.56.20
-          - 192.168.56.21
-        ipv6:
-          - 2001:db8::20
-          - 2001:db8::21
+        ip: 192.168.56.20
+        ipv6: 2001:db8::20
         aliases:
           - www
       - name: mail
@@ -60,6 +58,7 @@
           - imap
       - name: dc001
         ip: 192.168.56.40
+        ipv6: 2001:db8::40
       - name: priv0001
         ip: 172.16.0.10
       - name: priv0002
