@@ -35,7 +35,7 @@
  #}
 ; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
 ; Reverse zone file for {{ _zone_data['domain'] }}
-; {{ ansible_managed }}
+{{ ansible_managed | comment(decoration='; ') }}
 ; vi: ft=bindzone
 
 $TTL {{ _zone_data['ttl'] }}

@@ -1,8 +1,7 @@
 //
 // named.conf
 //
-// {{ ansible_managed }}
-//
+{{ ansible_managed | comment('c') }}
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
 {% for match in acl.match_list %}
