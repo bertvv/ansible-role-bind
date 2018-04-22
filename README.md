@@ -304,6 +304,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [B. Verschueren](https://github.com/bverschueren)
+- [David J. Haines](https://github.com/dhaines)
 - [Greg Cockburn](https://github.com/gergnz)
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [Joanna Delaporte](https://github.com/jdelaporte)
