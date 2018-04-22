@@ -141,6 +141,7 @@ reverse_domain_lookup() {
   forward_lookup testbindslave  192.168.56.54
 
   domain_lookup                 192.168.56.20
+  domain_lookup                 192.168.56.21
 
   forward_lookup mail           192.168.56.30
   forward_lookup priv0001       172.16.0.10
@@ -149,11 +150,13 @@ reverse_domain_lookup() {
 
 @test 'It should be able to resolve IPv6 addresses' {
   ipv6_domain_lookup 2001:db8::20
+  ipv6_domain_lookup 2001:db8::21
   ipv6_lookup mail   2001:db8::30
 }
 
 @test 'It should be able to do reverse lookups' {
   reverse_domain_lookup 192.168.56.20
+  reverse_domain_lookup 192.168.56.21
 
   reverse_lookup 192.168.56.53 testbindmaster
   reverse_lookup 192.168.56.54 testbindslave
@@ -165,6 +168,7 @@ reverse_domain_lookup() {
 
 @test 'It should be able to resolve aliases' {
   domain_alias_lookup www            192.168.56.20
+  domain_alias_lookup www            192.168.56.21
 
   alias_lookup ns1    testbindmaster 192.168.56.53
   alias_lookup ns2    testbindslave  192.168.56.54
