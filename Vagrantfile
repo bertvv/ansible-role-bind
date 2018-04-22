@@ -11,7 +11,7 @@ hosts = [
 VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = 'bertvv/centos72'
+  config.vm.box = 'bento/centos-7.4'
 
   hosts.each do |host|
     host_name = BASE_NAME + host[:name]
