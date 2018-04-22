@@ -1,7 +1,7 @@
 # roles/bind/handlers/main.yml
 ---
 
-- name: restart bind
+- name: reload bind
   service:
     name: "{{ bind_service }}"
-    state: restarted
+    state: reloaded
