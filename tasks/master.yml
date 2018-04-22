@@ -11,7 +11,7 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
-  notify: restart bind
+  notify: reload bind
   tags: bind
 
 - name: Master | Create forward lookup zone file
@@ -23,7 +23,7 @@
     mode: "0640"
     setype: named_zone_t
     validate: 'named-checkzone -d {{ bind_zone_name }} %s'
-  notify: restart bind
+  notify: reload bind
   tags: bind
 
 - name: Master | Create reverse lookup zone file
