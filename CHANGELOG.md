@@ -4,6 +4,16 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 3.9.1 - 2018-04-22
+
+## Changed
+
+- Allow multi-line `ansible_managed` comment (credit: [Fazle Arefin](https://github.com/fazlearefin))
+- Fix the atrocious implementation of (GH-35)
+- Updated documentation for specifying hosts with multiple IP addresses
+- Create serial as UTC UNIX time (credit: [David J. Haines](https://github.com/dhaines))
+- Fix bugs, linter and deprecation warnings
+
 ## 3.9.0 - 2017-11-21
 
 ### Added
