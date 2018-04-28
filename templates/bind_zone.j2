@@ -7,7 +7,7 @@
 {% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
 {% set _ = _zone_data.update({'domain': item.name }) %}
 {% set _ = _zone_data.update({'mname': item.name_servers|default([]) }) %}
-{% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
+{% set _ = _zone_data.update({'aname': item.other_name_servers|default([]) }) %}
 {% set _ = _zone_data.update({'mail': item.mail_servers|default([]) }) %}
 {% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
 
-An Ansible role for setting up BIND ISC as an authoritative DNS server for a single domain on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up BIND ISC as an authoritative DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -10,7 +10,7 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for a sin
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple reverse zones. IPv6 lookups are also supported, both forward and reverse.
+This role supports multiple forward and reverse zones, including for IPv6.
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
@@ -26,13 +26,13 @@ Variables are not required, unless specified.
 
 | Variable                       | Default                          | Comments (type)                                                                                                          |
 | :---                           | :---                             | :---                                                                                                                     |
-| `bind_acls`                    | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.           |
+| `bind_acls`                    | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.                |
 | `bind_allow_query`             | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                             |
 | `bind_allow_update`            | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS server.                                                  |
-| `bind_check_names`             | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`). |
+| `bind_check_names`             | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`).  |
 | `bind_forwarders`              | `[]`                             | A list of name servers to forward DNS requests to.                                                                       |
 | `bind_forward_only`            | `false`                          | If `true`, BIND is set up as a caching name server                                                                       |
-| `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.        |
+| `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.         |
 | `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                      |
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                                     |
 | `bind_other_name_servers`      | `[]`                             | A list of nameservers outside of the domain. For each one, an NS record will be created.                                 |
@@ -43,18 +43,19 @@ Variables are not required, unless specified.
 | `bind_dnssec_validation`       | `true`                           | Is DNSSEC validation enabled                                                                                             |
 | `bind_zone_also_notify`        | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                |
 | `bind_zone_hostmaster_email`   | `hostmaster`                     | The e-mail address of the system administrator                                                                           |
-| `bind_zone_hosts`              | `[]`                             | Host definitions. See below this table for examples.                                                                     |
-| `bind_zone_delegate`           | `[]`                             | Zone delegation. See below this table for examples.                                                                      |
-| `bind_zone_mail_servers`       | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                       |
 | `bind_zone_master_server_ip`   | -                                | **(Required)** The IP address of the master DNS server.                                                                  |
 | `bind_zone_minimum_ttl`        | `1D`                             | Minimum TTL field in the SOA record.                                                                                     |
-| `bind_zone_name_servers`       | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                               |
-| `bind_zone_name`               | `example.com`                    | The domain name                                                                                                          |
-| `bind_zone_networks`           | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                       |
-| `bind_zone_ipv6_networks`      | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                           |
-| `bind_zone_other_name_servers` | `[]`                             | A list of the DNS servers outside of this domain.                                                                        |
-| `bind_zone_services`           | `[]`                             | A list of services to be advertized by SRV records                                                                       |
-| `bind_zone_text`               | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.            |
+| `bind_zone_domains`            | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                              |
+| `- name`                       | `example.com`                    | The domain name                                                                                                          |
+| `- networks`                   | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                       |
+| `- ipv6_networks`              | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                           |
+| `- name_servers`               | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                               |
+| `- other_name_servers`         | `[]`                             | A list of the DNS servers outside of this domain.                                                                        |
+| `- services`                   | `[]`                             | A list of services to be advertized by SRV records                                                                       |
+| `- text`                       | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                   |
+| `- hosts`                      | `[]`                             | Host definitions. See below this table for examples.                                                                     |
+| `- delegate`                   | `[]`                             | Zone delegation. See below this table for examples.                                                                      |
+| `- mail_servers`               | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                       |
 | `bind_zone_time_to_expire`     | `1W`                             | Time to expire field in the SOA record.                                                                                  |
 | `bind_zone_time_to_refresh`    | `1D`                             | Time to refresh field in the SOA record.                                                                                 |
 | `bind_zone_time_to_retry`      | `1H`                             | Time to retry field in the SOA record.                                                                                   |
@@ -64,53 +65,65 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even thoug only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
 | Variable                 | Master | Slave |
 | :---                     | :---:  | :---: |
-| `bind_zone_name`         | V      | V     |
-| `bind_zone_networks`     | V      | V     |
-| `bind_zone_name_servers` | V      | V     |
-| `bind_zone_hosts`        | V      | --    |
+| `bind_zone_domains`      | V      | V     |
+| `  - name`               | V      | V     |
+| `  - networks`           | V      | V     |
+| `  - name_servers`       | V      | V     |
+| `  - hosts`              | V      | --    |
 | `bind_listen_ipv4`       | V      | V     |
 | `bind_allow_query`       | V      | V     |
 
-### Host definitions
-
-Host names that this DNS server should resolve can be specified with the variable `bind_zone_hosts` as a list of dicts with fields `name`, `ip` and `aliases`, e.g.:
+### Domain definitions
 
 ```Yaml
-bind_zone_hosts:
-  - name: pub01
-    ip: 192.0.2.1
-    ipv6: 2001:db8::1
-    aliases:
-      - ns
-  - name: '@'
-    ip:
-      - 192.0.2.2
-      - 192.0.2.3
-    ipv6:
-      - 2001:db8::2
-      - 2001:db8::3
-    aliases:
-      - www
-  - name: priv01
-    ip: 10.0.0.1
+bind_zone_domains:
+  - name: mydomain.com
+    hosts:
+      - name: pub01
+        ip: 192.0.2.1
+        ipv6: 2001:db8::1
+        aliases:
+          - ns
+      - name: '@'
+        ip:
+          - 192.0.2.2
+          - 192.0.2.3
+        ipv6:
+          - 2001:db8::2
+          - 2001:db8::3
+        aliases:
+          - www
+      - name: priv01
+        ip: 10.0.0.1
+    networks:
+      - '192.0.2'
+      - '10'
+      - '172.16'
+    delegate:
+      - zone: foo
+        dns: 192.0.2.1
+    services:
+      - name: _ldap._tcp
+        weight: 100
+        port: 88
+        target: dc001
 ```
+
+### Hosts
+
+Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip` and `aliases`
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
 IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
-As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `bind_zone_networks`, though, or the host will not get a PTR record for reverse lookup:
+### Networks
 
-```Yaml
-bind_zone_networks:
-  - '192.0.2'
-  - '10'
-  - '172.16'
-```
+As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `networks` (part of bind_zone_domains.name dict), though, or the host will not get a PTR record for reverse lookup:
 
 Remark that only the network part should be specified here! When specifying a class B IP address (e.g. "172.16") in a variable file, it must be quoted. Otherwise, the Yaml parser will interpret it as a float.
 
@@ -118,34 +131,16 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 ### Zone delgation
 
-To delegate a zone to a DNS, it is enough to create a `NS` record with:
-
-```Yaml
-bind_zone_delegate:
-  - zone: foo
-    dns: 192.0.2.1
-```
+To delegate a zone to a DNS, it is enough to create a `NS` record (under delegate)
 
 which is the equivalent of:
 
-```
 foo IN NS 192.0.2.1
-```
 
 
 ### Service records
 
-Service (SRV) records can be added with the variable `bind_zone_services`, e.g.:
-
-```Yaml
-bind_zone_services:
-  - name: _ldap._tcp
-    weight: 100
-    port: 88
-    target: dc001
-```
-
-This is a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
+Service (SRV) records can be added with the services,  this should be a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
 
 ### ACLs
 

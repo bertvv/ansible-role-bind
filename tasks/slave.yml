@@ -13,4 +13,3 @@
     validate: 'named-checkconf %s'
   notify: restart bind
   tags: bind
-
