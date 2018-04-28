@@ -119,7 +119,7 @@ Host names that this DNS server should resolve can be specified in `hosts` as a 
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
-IP addresses (both IPv4 and IPv6) can be specified as a string or as a list. This results in a single or multiple A/AAAA records for the host, respectively. This enables [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
+If you want to specify multiple IP addresses for a host, add entries to `bind_zone_hosts` with the same name (e.g. `priv01` in the code snippet). This results in multiple A/AAAA records for that host and allows [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
 ### Networks
 
@@ -299,6 +299,8 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [B. Verschueren](https://github.com/bverschueren)
+- [David J. Haines](https://github.com/dhaines)
+- [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [Joanna Delaporte](https://github.com/jdelaporte)

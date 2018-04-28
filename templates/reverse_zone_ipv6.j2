@@ -8,12 +8,12 @@
 {% set _ = _zone_data.update({'domain': item.0.name }) %}
 {% set _ = _zone_data.update({'mname': item.0.name_servers|default([])}) %}
 {% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
-{% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
+{% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email is search('\.')) else ('.' + _zone_data['domain']))}) %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': item.0.hosts|default([]) | selectattr('ipv6','defined') | selectattr('ipv6', 'search', '^'+item.1|regex_replace('/.*$','')) | list }) %}
+{% set _ = _zone_data.update({'hosts': item.0.hosts|default([]) | selectattr('ipv6','defined') | selectattr('ipv6','string') | selectattr('ipv6', 'search', '^'+item.1|regex_replace('/.*$','')) | list }) %}
 {% set _ = _zone_data.update({'revip': (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
@@ -33,7 +33,7 @@
  #}
 ; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
 ; Reverse zone file for {{ _zone_data['domain'] }}
-; {{ ansible_managed }}
+{{ ansible_managed | comment(decoration='; ') }}
 
 $TTL {{ _zone_data['ttl'] }}
 $ORIGIN {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }}

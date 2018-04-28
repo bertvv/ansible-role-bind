@@ -1,8 +1,7 @@
 //
 // named.conf
 //
-// {{ ansible_managed }}
-//
+{{ ansible_managed | comment('c') }}
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
 {% for match in acl.match_list %}
@@ -23,7 +22,7 @@ options {
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
 {% if bind_check_names is defined %}
-  bind-check-names  {{ check-names }};
+  check-names  {{ bind_check_names }};
 {% endif %}
 
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};

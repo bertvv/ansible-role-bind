@@ -7,7 +7,7 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: httpd
+  tags: bind
 
 - name: Check whether `master_server_ip` was set
   assert:
@@ -33,7 +33,7 @@
     - "{{ bind_dir }}/data"
   tags: bind
 
-- name: Create serial, using unixtime, give granularity to the second.
+- name: Create serial, based on UTC UNIX time
   command: date -u +%s
   register: timestamp
   changed_when: false
@@ -101,5 +101,5 @@
   service:
     name: "{{ bind_service }}"
     state: started
-    enabled: yes
+    enabled: true
   tags: bind

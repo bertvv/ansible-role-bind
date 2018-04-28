@@ -36,7 +36,7 @@
  #}
 ; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
 ; Zone file for {{ _zone_data['domain'] }}
-; {{ ansible_managed }}
+{{ ansible_managed | comment(decoration='; ') }}
 
 $ORIGIN {{ _zone_data['domain'] }}.
 $TTL {{ _zone_data['ttl'] }}
