@@ -3,10 +3,10 @@
 
 bind_log: "data/named.run"
 
-bind_zone_name: "example.com"
-bind_zone_networks:
-  - "10.0.2"
-bind_zone_ipv6_networks: []
+bind_zone_domains:
+  - name: "example.com"
+    networks:
+      - "10.0.2"
 
 # List of servers to be notified when the master zone is reloaded.
 bind_zone_also_notify: []
@@ -60,9 +60,3 @@ bind_zone_minimum_ttl: "1D"
 
 # Zone Resource Records
 bind_other_name_servers: []
-bind_zone_hosts: []
-bind_zone_delegate: []
-bind_zone_mail_servers: []
-bind_zone_name_servers: []
-bind_zone_services: []
-bind_zone_text: []

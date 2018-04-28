@@ -5,29 +5,28 @@
  #}
 {% set _zone_data = {} %}
 {% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
-{% set _ = _zone_data.update({'domain': bind_zone_name }) %}
-{% set _ = _zone_data.update({'mname': bind_zone_name_servers}) %}
+{% set _ = _zone_data.update({'domain': item.0.name }) %}
+{% set _ = _zone_data.update({'mname': item.0.name_servers|default([])}) %}
 {% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
 {% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': bind_zone_hosts | selectattr('ipv6','defined') | selectattr('ipv6', 'search', '^'+item|regex_replace('/.*$','')) | list }) %}
-{% set _ = _zone_data.update({'revip': (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }) %}
+{% set _ = _zone_data.update({'hosts': item.0.hosts|default([]) | selectattr('ipv6','defined') | selectattr('ipv6', 'search', '^'+item.1|regex_replace('/.*$','')) | list }) %}
+{% set _ = _zone_data.update({'revip': (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
  #  accordingly
  #}
 {% set _zone = {'hash': _zone_data | string | hash('md5')} %}
-{% for _result in reverse_hashes_ipv6.results %}
-{%   if (item in _result.item ) %}
-{%     set _hash_serial = _result.stdout.split(' ')[2:] %}
-{%     if _hash_serial and _hash_serial[0] == _zone['hash'] %}
-{%       set _ = _zone.update({'serial': _hash_serial[1]}) %}
-{%     else %}
-{%       set _ = _zone.update({'serial': timestamp.stdout}) %}
-{%     endif %}
+{% for _result in reverse_hashes_ipv6 if _result.network == item.1 %}
+{{ item.1 }}
+{%   set _hash_serial = _result.hash.split(' ')[2:] %}
+{%   if _hash_serial and _hash_serial[0] == _zone['hash'] %}
+{%     set _ = _zone.update({'serial': _hash_serial[1]}) %}
+{%   else %}
+{%     set _ = _zone.update({'serial': timestamp.stdout}) %}
 {%   endif %}
 {% endfor %}
 {#
@@ -36,10 +35,9 @@
 ; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
 ; Reverse zone file for {{ _zone_data['domain'] }}
 ; {{ ansible_managed }}
-; vi: ft=bindzone
 
 $TTL {{ _zone_data['ttl'] }}
-$ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }}
+$ORIGIN {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }}
 
 {% if _zone_data['mname']|length > 0 %}
 @ IN SOA {{ _zone_data['mname']|first }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
@@ -66,10 +64,10 @@ $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2)
 {% if _zone_data['hosts']|length > 0 %}
 {% for host in _zone_data['hosts'] %}
 {% if host.ipv6 is defined %}
-{% if host.ipv6 == item %}
+{% if host.ipv6 == item.1 %}
 @                IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% else %}
-{% if host.ipv6 is string and host.ipv6.startswith(item|regex_replace('/.*$','')) %}
+{% if host.ipv6 is string and host.ipv6.startswith(item.1|regex_replace('/.*$','')) %}
 {% if host.name == '@' %}
 {{ host.ipv6 | ipaddr('revdns') }} IN  PTR  {{ _zone_data['domain'] }}.
 {% else %}
@@ -77,7 +75,7 @@ $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2)
 {% endif %}
 {% else %}
 {% for ip in host.ipv6 %}
-{% if ip.startswith(item|regex_replace('/.*$','')) %}
+{% if ip.startswith(item.1|regex_replace('/.*$','')) %}
 {{ ip | ipaddr('revdns') }} IN  PTR  {{ _zone_data['domain'] }}.
 {% if host.name == '@' %}
 {% else %}
@@ -92,5 +90,3 @@ $ORIGIN {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2)
 {% else %}
 {{ ansible_default_ipv6.address | ipaddr('revdns') }} IN  PTR  {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
 {% endif %}
-{# vim: ft=text
-#}
