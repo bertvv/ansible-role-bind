@@ -19,7 +19,7 @@
       - '8.8.4.4'
     bind_recursion: true
     bind_check_hosts: 'master ignore'
-    master_server_ip: 172.17.0.2
+    bind_zone_master_server_ip: 172.17.0.2
     bind_zone_domains:
       - name: 'acme-inc.com'
         networks:

@@ -9,9 +9,9 @@
     - "{{ ansible_os_family }}.yml"
   tags: bind
 
-- name: Check whether `master_server_ip` was set
+- name: Check whether `bind_zone_master_server_ip` was set
   assert:
-    that: master_server_ip is defined
+    that: bind_zone_master_server_ip is defined
 
 - name: Install BIND
   package:
@@ -92,10 +92,10 @@
     - item
 
 - include_tasks: master.yml
-  when: master_server_ip in ansible_all_ipv4_addresses
+  when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
 
 - include_tasks: slave.yml
-  when: master_server_ip not in ansible_all_ipv4_addresses
+  when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
 
 - name: Start BIND service
   service:
