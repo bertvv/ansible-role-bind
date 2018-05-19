@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
 
-An Ansible role for setting up BIND ISC as an authoritative DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -10,11 +10,13 @@ An Ansible role for setting up BIND ISC as an authoritative DNS server for multi
     - slave server
 - set up forward and reverse lookup zone files
 
-This role supports multiple forward and reverse zones, including for IPv6.
+This role supports multiple forward and reverse zones, including for IPv6. Although enabling recursion is supported (albeit *strongly* discouraged), consider using another role if you want to set up a caching or forwarding name server.
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
 If you like/use this role, please consider giving it a star. Thanks!
+
+See the [change log](CHANGELOG.md) for notable changes between versions.
 
 ## Requirements
 
@@ -131,16 +133,15 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 ### Zone delgation
 
-To delegate a zone to a DNS, it is enough to create a `NS` record (under delegate)
+To delegate a zone to a DNS, it is enough to create a `NS` record (under delegate) which is the equivalent of:
 
-which is the equivalent of:
-
+```
 foo IN NS 192.0.2.1
-
+```
 
 ### Service records
 
-Service (SRV) records can be added with the services,  this should be a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
+Service (SRV) records can be added with the services. Tis should be a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
 
 ### ACLs
 
@@ -162,7 +163,7 @@ No dependencies. If you want to configure the firewall, do this through another 
 
 ## Example Playbook
 
-See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that shows all features.
+See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that showcases most, if not all features.
 
 ## Testing
 
@@ -176,7 +177,7 @@ There are two test environments for this role, one based on Vagrant, the other o
 The script `docker-tests.sh` will create a Docker container, and apply this role from a playbook `test.yml`. The Docker images are configured for testing Ansible roles and are published at <https://hub.docker.com/r/bertvv/ansible-testing/>. There are images available for several distributions and versions. The distribution and version should be specified outside the script using environment variables:
 
 ```
-DISTRIBUTION=centos VERSION=7 ./tests/docker-tests.sh
+DISTRIBUTION=centos VERSION=7 ./docker-tests/docker-tests.sh
 ```
 
 The specific combinations of distributions and versions that are supported by this role are specified in `.travis.yml`.
@@ -197,10 +198,10 @@ srv001.acme-inc.com.
 172.17.1.1
 ```
 
-The script `tests/functional-tests.sh` will run a [BATS](https://github.com/sstephenson/bats) test suite, `dns.bats` that performs a number of different queries. Specify the server IP address as the environment variable `${SUT_IP}` (short for System Under Test).
+The script `docker-tests/functional-tests.sh` will run a [BATS](https://github.com/sstephenson/bats) test suite, `dns.bats` that performs a number of different queries. Specify the server IP address as the environment variable `${SUT_IP}` (short for System Under Test).
 
 ```
-$ SUT_IP=172.17.0.2 ./tests/functional-tests.sh
+$ SUT_IP=172.17.0.2 ./docker-tests/functional-tests.sh
 ### Using BATS executable at: /usr/local/bin/bats
 ### Running test /home/bert/CfgMgmt/roles/bind/tests/dns.bats
  ✓ Forward lookups public servers
@@ -213,7 +214,7 @@ $ SUT_IP=172.17.0.2 ./tests/functional-tests.sh
  ✓ TXT record lookup
 
 8 tests, 0 failures
-$ SUT_IP=172.17.0.3 ./tests/functional-tests.sh
+$ SUT_IP=172.17.0.3 ./docker-tests/functional-tests.sh
 [...]
 ```
 
@@ -246,7 +247,7 @@ $ dig @192.168.56.54 MX example.com +short
 
 ```
 
-An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `tests/test.yml`. You can run it by executing the shell script `tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `tests/dns.bats` on both the master and the slave DNS server.
+An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `vagrant-tests/test.yml`. You can run it by executing the shell script `vagrant-tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `vagrant-tests/dns.bats` on both the master and the slave DNS server.
 
 ```ShellSession
 $ cd vagrant-tests
@@ -293,7 +294,9 @@ BSD
 
 ## Contributors
 
-Issues, feature requests, ideas, suggestions, etc. are appreciated and can be posted in the Issues section.
+This role could only have been realized thanks to the contributions of many. If you have an idea to improve it even further, don't hesitate to pitch in!
+
+Issues, feature requests, ideas, suggestions, etc. can be posted in the Issues section.
 
 Pull requests are also very welcome. Please create a topic branch for your proposed changes. If you don't, this will create conflicts in your fork after the merge. Don't hesitate to add yourself to the contributor list below in your PR!
 

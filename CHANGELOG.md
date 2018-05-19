@@ -4,6 +4,13 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 4.0.0 - 2018-05-19
+
+### Added
+
+- (GH-50) Add support for multiple zones (credit: [Stuart Knight](https://github.com/blofeldthefish)). **This is a breaking change,** as it changes the syntax for specifying zones.
+- Allow out-of-zone name server records
+
 ## 3.9.1 - 2018-04-22
 
 ## Changed
