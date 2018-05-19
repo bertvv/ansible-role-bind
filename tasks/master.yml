@@ -17,37 +17,47 @@
 - name: Master | Create forward lookup zone file
   template:
     src: bind_zone.j2
-    dest: "{{ bind_dir }}/{{ bind_zone_name }}"
+    dest: "{{ bind_dir }}/{{ item.name }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "0640"
     setype: named_zone_t
-    validate: 'named-checkzone -d {{ bind_zone_name }} %s'
+    validate: 'named-checkzone -d {{ item.name }} %s'
+  with_items:
+    - "{{ bind_zone_domains }}"
   notify: reload bind
   tags: bind
 
 - name: Master | Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_dir }}/{{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa"
+    dest: "{{ bind_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "0640"
     setype: named_zone_t
-    validate: "named-checkzone {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
-  with_items: "{{ bind_zone_networks }}"
+    validate: "named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
+  with_subelements:
+    - "{{ bind_zone_domains }}"
+    - networks
+    - flags:
+      skip_missing: true
   notify: reload bind
   tags: bind
 
 - name: Master | Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{bind_dir}}/{{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{bind_dir}}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "0640"
     setype: named_zone_t
-    validate: "named-checkzone {{ (item | ipaddr('revdns'))[-(9+(item|regex_replace('^.*/','')|int)//2):] }} %s"
-  with_items: "{{ bind_zone_ipv6_networks }}"
+    validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
+  with_subelements:
+    - "{{ bind_zone_domains }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
   notify: reload bind
   tags: bind

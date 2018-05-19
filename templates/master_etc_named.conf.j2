@@ -59,9 +59,11 @@ logging {
 include "{{ file }}";
 {% endfor %}
 
-zone "{{ bind_zone_name }}" IN {
+{% if bind_zone_domains is defined %}
+{% for bind_zone in bind_zone_domains %}
+zone "{{ bind_zone.name }}" IN {
   type master;
-  file "{{ bind_zone_name }}";
+  file "{{ bind_zone.name }}";
   notify yes;
 {% if bind_zone_also_notify|length > 0 %}
   also-notify  { {{ bind_zone_also_notify|join(';') }}; };
@@ -69,8 +71,8 @@ zone "{{ bind_zone_name }}" IN {
   allow-update { {{ bind_allow_update|join(';') }}; };
 };
 
-{% if bind_zone_networks is defined %}
-{% for network in bind_zone_networks %}
+{% if bind_zone.networks is defined %}
+{% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type master;
   file "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
@@ -83,8 +85,8 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% endfor %}
 {% endif %}
 
-{% if bind_zone_ipv6_networks is defined %}
-{% for network in bind_zone_ipv6_networks %}
+{% if bind_zone.ipv6_networks is defined %}
+{% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type master;
   file "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
@@ -94,5 +96,7 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% endif %}
   allow-update { {{ bind_allow_update|join(';') }}; };
 };
+{% endfor %}
+{% endif %}
 {% endfor %}
 {% endif %}

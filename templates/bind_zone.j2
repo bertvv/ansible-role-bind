@@ -5,30 +5,32 @@
  #}
 {% set _zone_data = {} %}
 {% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
-{% set _ = _zone_data.update({'domain': bind_zone_name }) %}
-{% set _ = _zone_data.update({'mname': bind_zone_name_servers}) %}
-{% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
-{% set _ = _zone_data.update({'mail': bind_zone_mail_servers}) %}
+{% set _ = _zone_data.update({'domain': item.name }) %}
+{% set _ = _zone_data.update({'mname': item.name_servers|default([]) }) %}
+{% set _ = _zone_data.update({'aname': item.other_name_servers|default([]) }) %}
+{% set _ = _zone_data.update({'mail': item.mail_servers|default([]) }) %}
 {% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': bind_zone_hosts }) %}
-{% set _ = _zone_data.update({'delegate': bind_zone_delegate }) %}
-{% set _ = _zone_data.update({'services': bind_zone_services }) %}
-{% set _ = _zone_data.update({'text': bind_zone_text }) %}
+{% set _ = _zone_data.update({'hosts': item.hosts|default([]) }) %}
+{% set _ = _zone_data.update({'delegate': item.delegate|default([]) }) %}
+{% set _ = _zone_data.update({'services': item.services|default([]) }) %}
+{% set _ = _zone_data.update({'text': item.text|default([]) }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
  #  accordingly
  #}
 {% set _zone = {'hash': _zone_data | string | hash('md5')} %}
-{% set _hash_serial = forward_hashes.stdout.split(' ')[2:] %}
-{% if _hash_serial and _hash_serial[0] == _zone['hash'] %}
-{%   set _ = _zone.update({'serial': _hash_serial[1]}) %}
-{% else %}
-{%   set _ = _zone.update({'serial': timestamp.stdout}) %}
-{% endif %}
+{% for _result in forward_hashes if _result.name == item.name %}
+{%   set _hash_serial = _result.hash.split(' ')[2:] %}
+{%   if _hash_serial and _hash_serial[0] == _zone['hash'] %}
+{%     set _ = _zone.update({'serial': _hash_serial[1]}) %}
+{%   else %}
+{%     set _ = _zone.update({'serial': timestamp.stdout}) %}
+{%   endif %}
+{% endfor %}
 {#
  #  Eventually output the zone data
  #}
@@ -112,5 +114,3 @@ $TTL {{ _zone_data['ttl'] }}
 {%   endfor %}
 {% endif %}
 {% endfor %}
-{# vim: ft=text
-#}

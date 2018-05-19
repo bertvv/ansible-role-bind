@@ -5,29 +5,27 @@
  #}
 {% set _zone_data = {} %}
 {% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
-{% set _ = _zone_data.update({'domain': bind_zone_name }) %}
-{% set _ = _zone_data.update({'mname': bind_zone_name_servers}) %}
+{% set _ = _zone_data.update({'domain': item.0.name }) %}
+{% set _ = _zone_data.update({'mname': item.0.name_servers|default([])}) %}
 {% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
 {% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email | search('\.')) else ('.' + _zone_data['domain']))}) %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': bind_zone_hosts | selectattr('ip', 'defined') | selectattr('ip', 'string') | selectattr('ip', 'search', '^'+item) | list }) %}
-{% set _ = _zone_data.update({'revip': ('.'.join(item.replace(item+'.','').split('.')[::-1])) }) %}
+{% set _ = _zone_data.update({'hosts': item.0.hosts|default([]) | selectattr('ip', 'defined') | selectattr('ip', 'string') | selectattr('ip', 'search', '^'+item.1) | list }) %}
+{% set _ = _zone_data.update({'revip': ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
  #  accordingly
  #}
 {% set _zone = {'hash': _zone_data | string | hash('md5')} %}
-{% for _result in reverse_hashes.results %}
-{%   if (item in _result.item ) %}
-{%     set _hash_serial = _result.stdout.split(' ')[2:] %}
-{%     if _hash_serial and _hash_serial[0] == _zone['hash'] %}
-{%       set _ = _zone.update({'serial': _hash_serial[1]}) %}
-{%     else %}
-{%       set _ = _zone.update({'serial': timestamp.stdout}) %}
-{%     endif %}
+{% for _result in reverse_hashes if _result.network == item.1 %}
+{%   set _hash_serial = _result.hash.split(' ')[2:] %}
+{%   if _hash_serial and _hash_serial[0] == _zone['hash'] %}
+{%     set _ = _zone.update({'serial': _hash_serial[1]}) %}
+{%   else %}
+{%     set _ = _zone.update({'serial': timestamp.stdout}) %}
 {%   endif %}
 {% endfor %}
 {#
@@ -36,10 +34,9 @@
 ; Hash: {{ _zone['hash'] }} {{ _zone['serial'] }}
 ; Reverse zone file for {{ _zone_data['domain'] }}
 {{ ansible_managed | comment(decoration='; ') }}
-; vi: ft=bindzone
 
 $TTL {{ _zone_data['ttl'] }}
-$ORIGIN {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arpa.
+$ORIGIN {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.
 
 {% if _zone_data['mname']|length > 0 %}
 @ IN SOA {{ _zone_data['mname']|first }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
@@ -66,22 +63,22 @@ $ORIGIN {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arp
 {% if _zone_data['hosts']|length > 0 %}
 {% for host in _zone_data['hosts'] %}
 {% if host.ip is defined %}
-{% if host.ip == item %}
+{% if host.ip == item.1 %}
 @                IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% else %}
-{% if host.ip is string and host.ip.startswith(item) %}
+{% if host.ip is string and host.ip.startswith(item.1) %}
 {% if host.name == '@' %}
-{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ _zone_data['domain'] }}.
+{{ ('.'.join(host.ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ _zone_data['domain'] }}.
 {% else %}
-{{ ('.'.join(host.ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
+{{ ('.'.join(host.ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {% else %}
 {% for ip in host.ip %}
-{% if ip.startswith(item) %}
-{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ _zone_data['domain'] }}.
+{% if ip.startswith(item.1) %}
+{{ ('.'.join(ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ _zone_data['domain'] }}.
 {% if host.name == '@' %}
 {% else %}
-{{ ('.'.join(ip.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
+{{ ('.'.join(ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -90,7 +87,5 @@ $ORIGIN {{ ('.'.join(item.replace(item+'.','').split('.')[::-1])) }}.in-addr.arp
 {% endif %}
 {% endfor %}
 {% else %}
-{{ ('.'.join(ansible_default_ipv4.address.replace(item+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
+{{ ('.'.join(ansible_default_ipv4.address.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
 {% endif %}
-{# vim: ft=text
-#}
