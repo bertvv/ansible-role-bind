@@ -42,7 +42,7 @@ $ORIGIN {{ _zone_data['domain'] }}.
 $TTL {{ _zone_data['ttl'] }}
 
 {% if _zone_data['mname']|length > 0 %}
-@ IN SOA {{ _zone_data['mname']|first }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
+@ IN SOA {{ _zone_data['mname']|first }}{% if not _zone_data['mname']|first|regex_search('\.$') %}.{{ _zone_data['domain'] }}.{% endif %} {{ _zone_data['rname'] }}. (
 {% else %}
 @ IN SOA {{ ansible_hostname }}.{{ _zone_data['domain'] }}. {{ _zone_data['rname'] }}. (
 {% endif %}
@@ -54,7 +54,8 @@ $TTL {{ _zone_data['ttl'] }}
 
 {% if _zone_data['mname']|length > 0 %}
 {% for ns in _zone_data['mname'] %}
-                     IN  NS     {{ ns }}.{{ _zone_data['domain'] }}.
+                     IN  NS     {{ ns }}{% if not ns|regex_search('\.$') %}.{{ _zone_data['domain'] }}.{% endif %}
+
 {% endfor %}
 {% else %}
                      IN  NS     {{ ansible_hostname }}.{{ _zone_data['domain'] }}.
