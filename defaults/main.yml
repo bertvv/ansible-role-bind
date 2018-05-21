@@ -5,11 +5,9 @@ bind_log: "data/named.run"
 
 bind_zone_domains:
   - name: "example.com"
+    hostmaster_email: "hostmaster"
     networks:
       - "10.0.2"
-
-# List of servers to be notified when the master zone is reloaded.
-bind_zone_also_notify: []
 
 # List of acls.
 bind_acls: []
@@ -26,10 +24,6 @@ bind_listen_ipv6:
 # List of hosts that are allowed to query this DNS server.
 bind_allow_query:
   - "localhost"
-
-# List of hosts that are allowed to dynamically update this DNS server
-bind_allow_update:
-  - "none"
 
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
@@ -51,12 +45,8 @@ bind_dnssec_enable: true
 bind_dnssec_validation: true
 
 # SOA information
-bind_zone_hostmaster_email: "hostmaster"
 bind_zone_ttl: "1W"
 bind_zone_time_to_refresh: "1D"
 bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
-
-# Zone Resource Records
-bind_other_name_servers: []

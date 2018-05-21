@@ -28,7 +28,7 @@ options {
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
   {% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
   {% endif %}
-  {% if bind_forwarders|length > 0 %}forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
+{% if bind_forwarders|length > 0 %}forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   {% if bind_forward_only %}forward only;{% endif %}
 
   rrset-order { order {{ bind_rrset_order }}; };
@@ -64,10 +64,14 @@ zone "{{ bind_zone.name }}" IN {
   type master;
   file "{{ bind_zone.name }}";
   notify yes;
-{% if bind_zone_also_notify|length > 0 %}
-  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
-  allow-update { {{ bind_allow_update|join(';') }}; };
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
 };
 
 {% if bind_zone.networks is defined %}
@@ -76,10 +80,14 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   type master;
   file "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
-{% if bind_zone_also_notify|length > 0 %}
-  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
-  allow-update { {{ bind_allow_update|join(';') }}; };
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
 };
 {% endfor %}
 {% endif %}
@@ -90,10 +98,14 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
   type master;
   file "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
-{% if bind_zone_also_notify|length > 0 %}
-  also-notify  { {{ bind_zone_also_notify|join(';') }}; };
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
-  allow-update { {{ bind_allow_update|join(';') }}; };
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
 };
 {% endfor %}
 {% endif %}
