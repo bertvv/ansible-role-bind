@@ -5,10 +5,14 @@
  #}
 {% set _zone_data = {} %}
 {% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
-{% set _ = _zone_data.update({'domain': item.0.name }) %}
+{% set _ = _zone_data.update({'domain': item.0.name}) %}
 {% set _ = _zone_data.update({'mname': item.0.name_servers|default([])}) %}
-{% set _ = _zone_data.update({'aname': bind_other_name_servers}) %}
-{% set _ = _zone_data.update({'rname': (( bind_zone_hostmaster_email)) + ('' if (bind_zone_hostmaster_email is search('\.')) else ('.' + _zone_data['domain']))}) %}
+{% set _ = _zone_data.update({'aname': item.0.other_name_servers|default([])}) %}
+{% if item.0.hostmaster_email is defined %}
+{% set _ = _zone_data.update({'rname': (( item.0.hostmaster_email )) + ('' if (item.0.hostmaster_email is search('\.')) else ('.' + _zone_data['domain']))}) %}
+{% else %}
+{% set _ = _zone_data.update({'rname': 'hostmaster.' + _zone_data['domain']}) %}
+{% endif %}
 {% set _ = _zone_data.update({'refresh': bind_zone_time_to_refresh}) %}
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
