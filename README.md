@@ -42,7 +42,6 @@ Variables are not required, unless specified.
 | `bind_dnssec_enable`           | `true`                           | Is DNSSEC enabled                                                                                                        |
 | `bind_dnssec_validation`       | `true`                           | Is DNSSEC validation enabled                                                                                             |
 | `bind_zone_master_server_ip`   | -                                | **(Required)** The IP address of the master DNS server.                                                                  |
-| `bind_zone_minimum_ttl`        | `1D`                             | Minimum TTL field in the SOA record.                                                                                     |
 | `bind_zone_domains`            | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                              |
 | `- name`                       | `example.com`                    | The domain name                                                                                                          |
 | `- networks`                   | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                       |
@@ -57,6 +56,7 @@ Variables are not required, unless specified.
 | `- delegate`                   | `[]`                             | Zone delegation. See below this table for examples.                                                                      |
 | `- also_notify`                | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                |
 | `- mail_servers`               | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                       |
+| `bind_zone_minimum_ttl`        | `1D`                             | Minimum TTL field in the SOA record.                                                                                     |
 | `bind_zone_time_to_expire`     | `1W`                             | Time to expire field in the SOA record.                                                                                  |
 | `bind_zone_time_to_refresh`    | `1D`                             | Time to refresh field in the SOA record.                                                                                 |
 | `bind_zone_time_to_retry`      | `1H`                             | Time to retry field in the SOA record.                                                                                   |
