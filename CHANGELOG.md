@@ -4,6 +4,12 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 4.0.1 - 2018-05-21
+
+### Changed
+
+- (GH-52) Move all zone specific configuration options to `bind_zones`  (credit: [Stuart Knight](https://github.com/blofeldthefish))
+
 ## 4.0.0 - 2018-05-19
 
 ### Added
