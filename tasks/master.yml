@@ -51,7 +51,7 @@
     dest: "{{bind_zone_dir}}{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
-    mode: "0640"
+    mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
     validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
   with_subelements:
