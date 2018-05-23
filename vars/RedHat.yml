@@ -18,7 +18,6 @@ bind_default_zone_files:
 
 # Directory with run-time stuff
 bind_dir: /var/named
-bind_zone_dir: "{{ bind_dir }}/"
 
 bind_owner: root
 bind_group: named
