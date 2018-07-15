@@ -1,0 +1,42 @@
+# Test playbook for Ansible role bertvv.bind
+---
+
+- hosts: dns_master
+  become: true
+  vars:
+    bind_allow_query:
+      - any
+    bind_listen_ipv4:
+      - any
+    bind_listen_ipv6:
+      - any
+    bind_acls:
+      - name: acl1
+        match_list:
+          - 192.168.56.11/32
+    bind_forwarders:
+      - '8.8.8.8'
+      - '8.8.4.4'
+    bind_recursion: true
+    bind_check_names: 'master ignore'
+    bind_zone_master_server_ip: 192.168.56.10
+    bind_zone_minimum_ttl: "2D"
+    bind_zone_ttl: "2W"
+    bind_zone_time_to_refresh: "2D"
+    bind_zone_time_to_retry: "2H"
+    bind_zone_time_to_expire: "2W"
+    bind_zone_domains:
+      - name: 'openshift.local'
+        networks:
+          - '192.168.56'
+        name_servers:
+          - ocmaster39.openshift.local.
+          - ocslave39.openshift.local.
+        hostmaster_email: admin
+        hosts:
+          - name: ocmaster39
+            ip: 192.168.56.10
+          - name: ocslave39
+            ip: 192.168.56.11
+  roles:
+    - ansible-role-bind
