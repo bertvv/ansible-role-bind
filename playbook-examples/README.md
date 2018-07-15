@@ -2,13 +2,13 @@
 
 ### Used two VMs
 
-ocmaster39.openshift.local => 192.168.56.10
-ocslave39.openshift.local => 192.168.56.11
+* ocmaster39.openshift.local => 192.168.56.10
+* ocslave39.openshift.local => 192.168.56.11
 
 ### Playbook examples
 
-[master_playbook](./master.yml)
-[slave_playbook](./slave.yml)
+* [master_playbook](./master.yml)
+* [slave_playbook](./slave.yml)
 
 ### Testing resolution w/ master
 
