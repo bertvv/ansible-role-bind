@@ -1,0 +1,17 @@
+# Test playbook for Ansible role bertvv.bind
+---
+
+- hosts: dns_slave
+  vars:
+    bind_recursion: true
+    bind_listen_ipv4: ['any']
+    bind_allow_query: ['any']
+    bind_forwarders:
+      - '8.8.8.8'
+      - '8.8.4.4'
+    bind_recursion: true
+    bind_zone_master_server_ip: 192.168.56.10
+    bind_zone_domains:
+      - name: openshift.local
+  roles:
+    - ansible-role-bind
