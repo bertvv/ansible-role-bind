@@ -50,3 +50,7 @@ bind_zone_time_to_refresh: "1D"
 bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
+
+bind_zone_dir: "{{ bind_dir }}/"
+#File mode for master zone files (needs to be something like 0660 for dynamic updates)
+bind_zone_file_mode: "0640"

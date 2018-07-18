@@ -53,6 +53,11 @@ logging {
 {% for file in bind_default_zone_files %}
 include "{{ file }}";
 {% endfor %}
+{% if bind_extra_include_files is defined %}
+{% for file in bind_extra_include_files %}
+include "{{ file }}";
+{% endfor %}
+{% endif %}
 
 {% if bind_zone_domains is defined %}
 {% for bind_zone in bind_zone_domains %}

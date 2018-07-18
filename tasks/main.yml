@@ -31,6 +31,7 @@
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
+    - "{{ bind_zone_dir }}"
   tags: bind
 
 - name: Create serial, based on UTC UNIX time
@@ -41,7 +42,7 @@
   tags: bind
 
 - name: Read forward zone hashes
-  shell: 'grep -s "^; Hash:" {{ bind_dir }}/{{ item.name }} || true'
+  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -56,7 +57,7 @@
 
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -74,7 +75,7 @@
     - item
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{bind_dir}}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
