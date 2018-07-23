@@ -65,6 +65,9 @@ zone "{{ bind_zone.name }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
   file "slaves/{{ bind_zone.name }}";
+{% if bind_zone.delegate is defined %}
+  forwarders {};
+{% endif %}
 };
 
 {% if bind_zone.networks is defined %}
