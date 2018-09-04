@@ -36,6 +36,7 @@ Variables are not required, unless specified.
 | `bind_listen_ipv4`             | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.         |
 | `bind_listen_ipv6`             | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                      |
 | `bind_log`                     | `data/named.run`                 | Path to the log file                                                                                                     |
+| `bind_query_log`               | `data/query.log`                 | Path to the log query file                                                                                               |
 | `bind_recursion`               | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                          |
 | `bind_allow_recursion`         | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                   |
 | `bind_rrset_order`             | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                          |
