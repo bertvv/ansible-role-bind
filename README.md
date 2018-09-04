@@ -313,3 +313,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Loic Dachary](http://dachary.org)
+- [Angel Barrera](https://github.com/angelbarrera92)
