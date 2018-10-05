@@ -48,12 +48,14 @@ logging {
     severity dynamic;
     print-time yes;
   };
+{% if bind_query_log is defined %}
   channel querylog {
     file "{{ bind_query_log }}" versions 600 size 20m;
     severity dynamic;
     print-time yes;
   };
   category queries { querylog; };
+{% endif %}
 };
 
 {% for file in bind_default_zone_files %}

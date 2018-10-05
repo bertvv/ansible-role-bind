@@ -2,7 +2,6 @@
 ---
 
 bind_log: "data/named.run"
-bind_query_log: "data/query.log"
 
 bind_zone_domains:
   - name: "example.com"
