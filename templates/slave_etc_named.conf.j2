@@ -40,6 +40,9 @@ options {
 
   pid-file "/run/named/named.pid";
   session-keyfile "/run/named/session.key";
+{% if bind_query_log is defined %}
+  querylog yes;
+{% endif %}
 };
 
 logging {
