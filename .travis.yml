@@ -7,6 +7,14 @@ env:
       VERSION: 7
     - DISTRIBUTION: ubuntu
       VERSION: 16.04
+    - DISTRIBUTION: ubuntu
+      VERSION: 18.04
+    - DISTRIBUTION: debian
+      VERSION: 8
+    - DISTRIBUTION: debian
+      VERSION: 9
+    - DISTRIBUTION: arch
+      VERSION: latest
 
 services:
   - docker
