@@ -69,15 +69,15 @@ Variables are not required, unless specified.
 
 Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
-| Variable                 | Master | Slave |
-| :---                     | :---:  | :---: |
-| `bind_zone_domains`      | V      | V     |
-| `  - name`               | V      | V     |
-| `  - networks`           | V      | V     |
-| `  - name_servers`       | V      | V     |
-| `  - hosts`              | V      | --    |
-| `bind_listen_ipv4`       | V      | V     |
-| `bind_allow_query`       | V      | V     |
+| Variable                     | Master | Slave |
+| :---                         | :---:  | :---: |
+| `bind_zone_domains`          | V      | V     |
+| `  - name`                   | V      | V     |
+| `  - networks`               | V      | --    |
+| `  - name_servers`           | V      | --    |
+| `  - hosts`                  | V      | --    |
+| `bind_listen_ipv4`           | V      | V     |
+| `bind_allow_query`           | V      | V     |
 
 ### Domain definitions
 
@@ -113,6 +113,16 @@ bind_zone_domains:
         weight: 100
         port: 88
         target: dc001
+```
+
+### Minimal slave configuration
+
+```Yaml
+    bind_listen_ipv4: ['any']
+    bind_allow_query: ['any']
+    bind_zone_master_server_ip: 192.168.111.222
+    bind_zone_domains:
+      - name: example.com
 ```
 
 ### Hosts
@@ -314,3 +324,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Loic Dachary](http://dachary.org)
 - [Angel Barrera](https://github.com/angelbarrera92)
+- [Christopher Hicks](http://www.chicks.net/)
