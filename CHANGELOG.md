@@ -17,6 +17,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 - (GH-57) Fix issue with forwarding in subdomain delegations (credit: [Stuart Knight](https://github.com/blofeldthefish))
 - (GH-66) Fix issue that causes playbook to fail when running in `--check` mode (credit: [Jörg Eichhorn](https://github.com/jeichhorn))
 - (GH-67) Improved documentation with minimal slave configuration (credit: [Christopher Hicks](https://github.com/chicks-net))
+- Add Ubuntu 18.04, Debian 8-9 and Arch Linux to list of supported distros.
 
 ## 4.0.1 - 2018-05-21
 
