@@ -39,7 +39,7 @@
   register: timestamp
   changed_when: false
   run_once: true
-  check_mode: no
+  check_mode: false
   tags: bind
 
 - name: Read forward zone hashes
@@ -93,10 +93,12 @@
     - "{{ reverse_hashes_ipv6_temp.results }}"
     - item
 
-- include_tasks: master.yml
+- name: Set up the machine as a master DNS server
+  include_tasks: master.yml
   when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
 
-- include_tasks: slave.yml
+- name: Set up the machine as a slave DNS server
+  include_tasks: slave.yml
   when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
 
 - name: Start BIND service
