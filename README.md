@@ -78,7 +78,6 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | `  - hosts`                  | V      | --    |
 | `bind_listen_ipv4`           | V      | V     |
 | `bind_allow_query`           | V      | V     |
-| `bind_zone_master_server_ip` | --     | V     |
 
 ### Domain definitions
 
