@@ -4,6 +4,20 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 4.1.0 - 2018-10-05
+
+## Added
+
+- (GH-53) Add variable `bind_zone_dir` and `bind_zone_file_mode` for setting the master zone file path and mode, and `bind_extra_include_files` for including arbitrary configuration files into named.conf. (credit: [Brad Durrow](https://github.com/bdurrow))
+- (GH-64) Add variable `bind_query_log` to enable query logging (credit: [Angel Barrera](https://github.com/angelbarrera92))
+
+## Changed
+
+- (GH-55) Fix issue with non-existing file when grepping domain (credit: [Tom Meinlschmidt](https://github.com/tmeinlschmidt))
+- (GH-57) Fix issue with forwarding in subdomain delegations (credit: [Stuart Knight](https://github.com/blofeldthefish))
+- (GH-66) Fix issue that causes playbook to fail when running in `--check` mode (credit: [Jörg Eichhorn](https://github.com/jeichhorn))
+- (GH-67) Improved documentation with minimal slave configuration (credit: [Christopher Hicks](https://github.com/chicks-net))
+
 ## 4.0.1 - 2018-05-21
 
 ### Changed

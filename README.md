@@ -26,42 +26,45 @@ See the [change log](CHANGELOG.md) for notable changes between versions.
 
 Variables are not required, unless specified.
 
-| Variable                     | Default                          | Comments (type)                                                                                                         |
-| :---                         | :---                             | :---                                                                                                                    |
-| `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.               |
-| `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                            |
+| Variable                     | Default                          | Comments (type)                                                                                                             |
+| :---                         | :---                             | :---                                                                                                                        |
+| `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.                   |
+| `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                |
+| `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                      |
 | `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`). |
-| `bind_forwarders`            | `[]`                             | A list of name servers to forward DNS requests to.                                                                      |
-| `bind_forward_only`          | `false`                          | If `true`, BIND is set up as a caching name server                                                                      |
-| `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.        |
-| `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                     |
-| `bind_log`                   | `data/named.run`                 | Path to the log file                                                                                                    |
-| `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                   |
-| `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                         |
-| `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                  |
-| `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                         |
-| `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                       |
-| `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                            |
-| `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                 |
-| `bind_zone_domains`          | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                             |
-| `- name`                     | `example.com`                    | The domain name                                                                                                         |
-| `- networks`                 | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                      |
-| `- ipv6_networks`            | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                          |
-| `- name_servers`             | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                              |
-| `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                       |
-| `- hostmaster_email`         | `hostmaster`                     | The e-mail address of the system administrator for the zone                                                             |
-| `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                   |
-| `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                      |
-| `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                  |
-| `- hosts`                    | `[]`                             | Host definitions. See below this table for examples.                                                                    |
-| `- delegate`                 | `[]`                             | Zone delegation. See below this table for examples.                                                                     |
-| `- also_notify`              | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                               |
-| `- mail_servers`             | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                      |
-| `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                    |
-| `bind_zone_time_to_expire`   | `1W`                             | Time to expire field in the SOA record.                                                                                 |
-| `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                                |
-| `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                                  |
-| `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                                   |
+| `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
+| `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
+| `bind_extra_include_files`   | `[]`                             |                                                                                                                             |
+| `bind_forward_only`          | `false`                          | If `true`, BIND is set up as a caching name server                                                                          |
+| `bind_forwarders`            | `[]`                             | A list of name servers to forward DNS requests to.                                                                          |
+| `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.            |
+| `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                         |
+| `bind_log`                   | `data/named.run`                 | Path to the log file                                                                                                        |
+| `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                       |
+| `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                             |
+| `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                             |
+| `bind_zone_dir`              | -                                | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.            |
+| `bind_zone_domains`          | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                                 |
+| `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
+| `- also_notify`              | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                   |
+| `- delegate`                 | `[]`                             | Zone delegation. See below this table for examples.                                                                         |
+| `- hostmaster_email`         | `hostmaster`                     | The e-mail address of the system administrator for the zone                                                                 |
+| `- hosts`                    | `[]`                             | Host definitions. See below this table for examples.                                                                        |
+| `- ipv6_networks`            | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                              |
+| `- mail_servers`             | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                          |
+| `- name_servers`             | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                                  |
+| `- name`                     | `example.com`                    | The domain name                                                                                                             |
+| `- networks`                 | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                          |
+| `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
+| `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                          |
+| `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
+| `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
+| `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                     |
+| `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                        |
+| `bind_zone_time_to_expire`   | `1W`                             | Time to expire field in the SOA record.                                                                                     |
+| `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                                    |
+| `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                                      |
+| `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                                       |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
@@ -173,7 +176,7 @@ No dependencies. If you want to configure the firewall, do this through another 
 
 ## Example Playbook
 
-See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that showcases most, if not all features.
+See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that showcases most features.
 
 ## Testing
 
@@ -313,6 +316,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Angel Barrera](https://github.com/angelbarrera92)
 - [B. Verschueren](https://github.com/bverschueren)
 - [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
+- [Brad Durrow](https://github.com/bdurrow)
 - [Christopher Hicks](http://www.chicks.net/)
 - [David J. Haines](https://github.com/dhaines)
 - [Fazle Arefin](https://github.com/fazlearefin)
@@ -320,8 +324,10 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [Joanna Delaporte](https://github.com/jdelaporte)
 - [Jose Taas](https://github.com/josetaas)
+- [Jörg Eichhorn](https://github.com/jeichhorn)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)
+- [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
