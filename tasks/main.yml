@@ -39,6 +39,7 @@
   register: timestamp
   changed_when: false
   run_once: true
+  check_mode: no
   tags: bind
 
 - name: Read forward zone hashes
