@@ -7,7 +7,17 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: bind
+  tags: bind,pretask
+
+# JY | file to set keys for XFR authentication
+- name: create extra config file for authenticated XFR request
+  tags: pretask
+  template:
+    src: auth_transfer.j2
+    dest: /etc/bind/auth_transfer.conf
+    mode: 0640
+    owner: root
+    group: bind
 
 - name: Check whether `bind_zone_master_server_ip` was set
   assert:
