@@ -190,6 +190,21 @@ bind_acls:
 
 The names of the ACLs will be added to the `allow-transfer` clause in global options.
 
+### Binding Keys
+
+Binding keys can be defined like this:
+
+```Yaml
+bind_dns_keys:
+  - name: master_key
+    algorithm: hmac-sha256
+    secret: "azertyAZERTY123456"
+bind_extra_include_files:
+  - /etc/bind/auth_transfer.conf
+```
+
+This will be set in a file */etc/bind/auth_transfer.conf* which have to be added in the list variable **bind_extra_include_files**
+
 ## Dependencies
 
 No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base)).
