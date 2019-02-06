@@ -48,7 +48,7 @@
 - name: Master | Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{bind_zone_dir}}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
