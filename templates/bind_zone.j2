@@ -107,6 +107,11 @@ $TTL {{ _zone_data['ttl'] }}
 {% else %}
 {{ ansible_hostname.ljust(20) }} IN A     {{ ansible_default_ipv4.address }}
 {% endif %}
+{% if host.sshfp is defined %}
+{% for sshfp in host.sshfp %}
+{{ host.name.ljust(20) }} IN SSHFP {{ sshfp}}
+{% endfor %}
+{% endif %}
 {% for service in _zone_data['services'] %}
 {{ service.name.ljust(20) }} IN  SRV    {{ service.priority|default('0') }} {{ service.weight|default('0') }} {{ service.port }} {{ service.target }}
 {% endfor %}
