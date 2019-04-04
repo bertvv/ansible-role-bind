@@ -104,6 +104,10 @@ bind_zone_domains:
           - www
       - name: priv01
         ip: 10.0.0.1
+      - name: mydomain.net.
+        aliases:
+          - name: sub01
+            type: DNAME
     networks:
       - '192.0.2'
       - '10'
@@ -130,7 +134,7 @@ bind_zone_domains:
 
 ### Hosts
 
-Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip` and `aliases`
+Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip` and `aliases` Aliases can be CNAME (default) or DNAME records.
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
