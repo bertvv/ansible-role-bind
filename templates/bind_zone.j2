@@ -83,10 +83,10 @@ $TTL {{ _zone_data['ttl'] }}
 {% for host in _zone_data['hosts'] %}
 {% if host.ip is defined %}
 {% if host.ip is string %}
-{% if "GENERATE" not in host.name.upper() %}
+{% if "$GENERATE" not in host.name.upper() %}
 {{ host.name.ljust(20) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  A      {{ host.ip }}
 {% endif %}
-{% if "GENERATE" in host.name.upper() %}
+{% if "$GENERATE" in host.name.upper() %}
 {{ host.name.ljust(20) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  A      {{ host.ip }}
 {% endif %}
 {% else %}
@@ -106,10 +106,10 @@ $TTL {{ _zone_data['ttl'] }}
 {% endif %}
 {% if host.aliases is defined %}
 {% for alias in host.aliases %}
-{% if "GENERATE" not in host.name.upper() %}
+{% if "$GENERATE" not in host.name.upper() %}
 {{ (alias.name|default(alias)).ljust(20) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  {{ alias.type|default('cname')|upper}}  {{ host.name }}
 {% endif %}
-{% if "GENERATE" in host.name.upper() %}
+{% if "$GENERATE" in host.name.upper() %}
 {{ alias.ljust(20) }} IN  CNAME  {{ host.name.rsplit(None, 1)[1] }}
 {% endif %}
 {% endfor %}
