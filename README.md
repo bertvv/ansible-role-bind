@@ -31,18 +31,33 @@ Variables are not required, unless specified.
 | `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.                   |
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                |
 | `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                      |
-| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`). |
+| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`).     |
+| `bind_controls`              | `[]`                             | A list of access controls for rndc utility, which are dicts with fields.  See example below for fields and usage.           |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
-| `bind_extra_include_files`   | `[]`                             |                                                                                                                             |
+| `bind_extra_include_files`   | `[]`                             | Option to include additional files.                                                                                         |
 | `bind_forward_only`          | `false`                          | If `true`, BIND is set up as a caching name server                                                                          |
 | `bind_forwarders`            | `[]`                             | A list of name servers to forward DNS requests to.                                                                          |
+| `bind_keys`                  | `[]`                             | A list of Transaction Signature (TSIG) keys, which are dicts with fields `name`, `algorithm`, & `secret`. See example below.|
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.            |
-| `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                         |
-| `bind_log`                   | `data/named.run`                 | Path to the log file                                                                                                        |
+| `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on. Set to ['none'] to not listen on any interfaces.       |
+| `bind_log`                   | `data/named.run`                 | Path to the log file.                                                                                                       |
+| `bind_masters`               | `[]`                             | A list of master servers for zone transfers or slaves servers to be notified with `also-notify`. See example below.         |
 | `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                       |
 | `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                             |
 | `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                             |
+| `bind_views`                 | n/a                              | A list of views to configure, with a seperate dict for each view, with relevant details.                                    |
+| ` - allow_query`             | `[]`                             | A list of IPs or ACLs allowed to query the zones in the view.                                                               |
+| ` - allow_transfer`          | `[]`                             | A list of IPs or ACLs allowed to do zone transfers from the zones in the view.                                              |
+| ` - allow_notify`            | `[]`                             | A list of IPs or ACLs allowed to send NOTIFY messages to zones in the view.                                                 |
+| ` - also_notify`             | `[]`                             | A list of IPs or masters/slaves defined in `bind_masters` that will receive NOTIFY messages from zones in the view.         |
+| ` - match_clients`           | `[]`                             | A list of IPs or ACLs of client source IP addresses that can send messages to the view.                                     |
+| ` - match_destination`       | `[]`                             | A list of IPs or ACLs of server destination IP addresses that can receive messages for the view.                            |
+| ` - match_recursive_only`    | -                                | Determines if only recursive queries can access view.                                                                       |
+| ` - notify`                  | -                                | Determines notify behavior when a zone is changed.  Valid choices are `yes`, `no`, or `explicit`.                           |
+| ` - name`                    | -                                | The view name.                                                                                                              |
+| ` - tsig_keys`               | `[]`                             | A list of Transaction Signature keys used exclusively by the view.  Can not match global keys defined by `bind_keys`.       |
+| ` - recursion`               | -     `                          | Determines if recursion is enabled for the view.                                                                            |
 | `bind_zone_dir`              | -                                | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.            |
 | `bind_zone_domains`          | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                                 |
 | `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
@@ -52,12 +67,14 @@ Variables are not required, unless specified.
 | `- hosts`                    | `[]`                             | Host definitions. See below this table for examples.                                                                        |
 | `- ipv6_networks`            | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                              |
 | `- mail_servers`             | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                          |
+| `- masters`                  | `[]`                             | A list of masters to use for zone transfers. Must be defined in `bind_masters`. Overrides `bind_zone_master_server_ip`      |
 | `- name_servers`             | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                                  |
 | `- name`                     | `example.com`                    | The domain name                                                                                                             |
 | `- networks`                 | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                          |
 | `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
 | `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                          |
 | `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
+| `- view`                     | -                                | The view this zone will exist in. View must be defined in `bind_views`. Same zone can be in multiple views. Examples below. |
 | `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
 | `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                     |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                        |
@@ -65,6 +82,8 @@ Variables are not required, unless specified.
 | `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                                    |
 | `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                                      |
 | `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                                       |
+| `selinux`                    | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
+| `views`                      | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be in a view.                                     |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
@@ -118,6 +137,33 @@ bind_zone_domains:
         target: dc001
 ```
 
+### View definitions
+
+```Yaml
+bind_views:
+  - name: EXTERNAL
+    allow_query:
+      - external_key
+    allow_transfer:
+      - external_key
+    allow_notify:
+      - ptx_infoblox
+    also_notify:
+      - AKAMAI_ZTAS
+    match_clients:
+      - external_key
+      - ptx_infoblox
+    match_destinations:
+      - any
+    match_recursive_only: false
+    notify: explicit
+    tsig_keys:
+      - name: external.example.com
+        algorithm: HMAC-SHA256
+        secret: "{{ vault_external_ctx_ib_ipam01_secret }}"
+    recursion: false
+```
+
 ### Minimal slave configuration
 
 ```Yaml
@@ -169,6 +215,63 @@ bind_acls:
 ```
 
 The names of the ACLs will be added to the `allow-transfer` clause in global options.
+
+### Global Transaction Signature (TSIG) keys
+
+```Yaml
+bind_keys:
+  - name: rndc-key
+    algorithm: hmac-md5
+    secret: "+Cdjlkef9ZTSeixERZ433Q=="
+```
+
+The key secret is a security credential and should be protected as a variable encrypted with ansible-vault.
+
+```Yaml
+bind_keys:
+  - name: rndc-key
+    algorithm: hmac-md5
+    secret: "{{ vault_rndc_key_secret }}"
+```
+
+bind_keys defines global keys only. Keys used by views must be defined within bind_views.
+
+### Masters
+
+Masters can be defined like this:
+
+```Yaml
+bind_masters:
+  - name: EXTERNAL_MASTERS
+    master_list:
+      - address: 200.100.230.160
+        tsig_key: external.example.com
+  - name: INTERNAL_MASTERS
+    master_list:
+      - address: 192.168.8230.160
+
+  - name: AKAMAI_ZTAS
+    master_list:
+      - address: 23.14.128.185
+        tsig_key: external.example.com
+      - address: 23.73.133.141
+        tsig_key: external.example.com
+      - address: 23.73.133.237
+        tsig_key: external.example.com
+      - address: 23.73.134.141
+        tsig_key: external.example.com
+      - address: 23.73.134.237
+        tsig_key: external.example.com
+      - address: 23.205.121.134
+        tsig_key: external.example.com
+      - address: 23.207.197.166
+        tsig_key: external.example.com
+      - address: 72.246.0.10
+        tsig_key: external.example.com
+      - address: 72.247.124.98
+        tsig_key: external.example.com
+      - address: 104.122.95.88
+```
 
 ## Dependencies
 
