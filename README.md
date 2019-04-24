@@ -60,21 +60,21 @@ Variables are not required, unless specified.
 | ` - recursion`               | -     `                          | Determines if recursion is enabled for the view.                                                                            |
 | `bind_zone_dir`              | -                                | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.            |
 | `bind_zone_domains`          | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                                 |
-| `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
-| `- also_notify`              | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                   |
-| `- delegate`                 | `[]`                             | Zone delegation. See below this table for examples.                                                                         |
-| `- hostmaster_email`         | `hostmaster`                     | The e-mail address of the system administrator for the zone                                                                 |
-| `- hosts`                    | `[]`                             | Host definitions. See below this table for examples.                                                                        |
-| `- ipv6_networks`            | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                              |
-| `- mail_servers`             | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                          |
-| `- masters`                  | `[]`                             | A list of masters to use for zone transfers. Must be defined in `bind_masters`. Overrides `bind_zone_master_server_ip`      |
-| `- name_servers`             | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                                  |
-| `- name`                     | `example.com`                    | The domain name                                                                                                             |
-| `- networks`                 | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                          |
-| `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
-| `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                          |
-| `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
-| `- view`                     | -                                | The view this zone will exist in. View must be defined in `bind_views`. Same zone can be in multiple views. Examples below. |
+| ` - allow_update`            | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
+| ` - also_notify`             | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                   |
+| ` - delegate`                | `[]`                             | Zone delegation. See below this table for examples.                                                                         |
+| ` - hostmaster_email`        | `hostmaster`                     | The e-mail address of the system administrator for the zone                                                                 |
+| ` - hosts`                   | `[]`                             | Host definitions. See below this table for examples.                                                                        |
+| ` - ipv6_networks`           | `[]`                             | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                              |
+| ` - mail_servers`            | `[{name: mail, preference: 10}]` | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                          |
+| ` - masters`                 | `[]`                             | A list of masters to use for zone transfers. Must be defined in `bind_masters`. Overrides `bind_zone_master_server_ip`      |
+| ` - name_servers`            | `[ansible_hostname]`             | A list of the DNS servers for this domain.                                                                                  |
+| ` - name`                    | `example.com`                    | The domain name                                                                                                             |
+| ` - networks`                | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                          |
+| ` - other_name_servers`      | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
+| ` - services`                | `[]`                             | A list of services to be advertized by SRV records                                                                          |
+| ` - text`                    | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
+| ` - view`                    | -                                | The view this zone will exist in. View must be defined in `bind_views`. Same zone can be in multiple views. Examples below. |
 | `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
 | `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                     |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                        |
@@ -82,7 +82,7 @@ Variables are not required, unless specified.
 | `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                                    |
 | `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                                      |
 | `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                                       |
-| `selinux`                    | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
+| `enable_selinux`             | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
 | `views`                      | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be in a view.                                     |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
@@ -137,33 +137,6 @@ bind_zone_domains:
         target: dc001
 ```
 
-### View definitions
-
-```Yaml
-bind_views:
-  - name: EXTERNAL
-    allow_query:
-      - external_key
-    allow_transfer:
-      - external_key
-    allow_notify:
-      - ptx_infoblox
-    also_notify:
-      - AKAMAI_ZTAS
-    match_clients:
-      - external_key
-      - ptx_infoblox
-    match_destinations:
-      - any
-    match_recursive_only: false
-    notify: explicit
-    tsig_keys:
-      - name: external.example.com
-        algorithm: HMAC-SHA256
-        secret: "{{ vault_external_ctx_ib_ipam01_secret }}"
-    recursion: false
-```
-
 ### Minimal slave configuration
 
 ```Yaml
@@ -216,7 +189,7 @@ bind_acls:
 
 The names of the ACLs will be added to the `allow-transfer` clause in global options.
 
-### Global Transaction Signature (TSIG) keys
+### Transaction Signature (TSIG) keys
 
 ```Yaml
 bind_keys:
@@ -234,7 +207,7 @@ bind_keys:
     secret: "{{ vault_rndc_key_secret }}"
 ```
 
-bind_keys defines global keys only. Keys used by views must be defined within bind_views.
+bind_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
 
 ### Masters
 
@@ -271,6 +244,33 @@ bind_masters:
       - address: 72.247.124.98
         tsig_key: external.example.com
       - address: 104.122.95.88
+```
+
+### View definitions
+
+```Yaml
+bind_views:
+  - name: EXTERNAL
+    allow_query:
+      - external_key
+    allow_transfer:
+      - external_key
+    allow_notify:
+      - ptx_infoblox
+    also_notify:
+      - AKAMAI_ZTAS
+    match_clients:
+      - external_key
+      - ptx_infoblox
+    match_destinations:
+      - any
+    match_recursive_only: false
+    notify: explicit
+    tsig_keys:
+      - name: external.example.com
+        algorithm: HMAC-SHA256
+        secret: "{{ vault_external_secret }}"
+    recursion: false
 ```
 
 ## Dependencies
