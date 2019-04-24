@@ -1,6 +1,10 @@
 # roles/bind/defaults/main.yml
 ---
 
+views: false
+
+enable_selinux: false
+
 bind_log: "data/named.run"
 
 bind_zone_domains:

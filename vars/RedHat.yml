@@ -5,11 +5,15 @@ bind_packages:
   - python-netaddr
   - bind
   - bind-utils
+  - libselinux-python
 
 bind_service: named
 
 # Main config file
 bind_config: /etc/named.conf
+
+# rndc config directory
+bind_rndc_dir: /etc
 
 # Zone files included in the installation
 bind_default_zone_files:

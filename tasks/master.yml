@@ -2,6 +2,31 @@
 # Set up a BIND master server
 ---
 
+- name: Master | Configure named options (master)
+  template:
+    src: etc_sysconfig_named.j2
+    dest: "/etc/sysconfig/named"
+    owner: root    
+    group: root
+    mode: '644'
+    setype: named_conf_t
+  tags: bind
+
+- name: Master | Create rndc config file (master)
+  template:
+    src: etc_rndc.conf.j2
+    dest: "{{ bind_rndc_dir }}/rndc.conf"
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: '0640'
+    setype: named_conf_t
+  tags: bind
+
+- name: Master | Remove rndc key file if exists (master)
+  file:
+    path: "{{ bind_rndc_dir }}/rndc.key" 
+    state: absent
+
 - name: Master | Main BIND config file (master)
   template:
     src: master_etc_named.conf.j2
@@ -17,7 +42,7 @@
 - name: Master | Create forward lookup zone file
   template:
     src: bind_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ item.name }}"
+    dest: "{{ bind_zone_dir }}/{% if views == true %}{{ item.view }}_{% endif %}{{ item.name }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -31,7 +56,7 @@
 - name: Master | Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+    dest: "{{ bind_zone_dir }}/{% if views == true %}{{ item.0.view }}_{% endif %}{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -48,7 +73,7 @@
 - name: Master | Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{bind_zone_dir}}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{bind_zone_dir}}/{% if views == true %}{{ item.0.view }}_{% endif %}{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
