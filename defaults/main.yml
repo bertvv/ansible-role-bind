@@ -1,9 +1,9 @@
 # roles/bind/defaults/main.yml
 ---
 
-views: false
-
-enable_selinux: false
+bind_enable_views: false
+bind_enable_selinux: false
+bind_enable_rndc_controls: false
 
 bind_log: "data/named.run"
 

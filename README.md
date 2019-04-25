@@ -35,6 +35,9 @@ Variables are not required, unless specified.
 | `bind_controls`              | `[]`                             | A list of access controls for rndc utility, which are dicts with fields.  See example below for fields and usage.           |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
+| `bind_enable_rndc_controls`  | `false`                          | Determines if /etc/rndc.conf is create and /etc/rndc.key removed if it exists.                                              |
+| `bind_enable_selinux`        | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
+| `bind_enable_views`          | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be assigned to a view.                            |
 | `bind_extra_include_files`   | `[]`                             | Option to include additional files.                                                                                         |
 | `bind_forward_only`          | `false`                          | If `true`, BIND is set up as a caching name server                                                                          |
 | `bind_forwarders`            | `[]`                             | A list of name servers to forward DNS requests to.                                                                          |
@@ -82,8 +85,6 @@ Variables are not required, unless specified.
 | `bind_zone_time_to_refresh`  | `1D`                             | Time to refresh field in the SOA record.                                                                                    |
 | `bind_zone_time_to_retry`    | `1H`                             | Time to retry field in the SOA record.                                                                                      |
 | `bind_zone_ttl`              | `1W`                             | Time to Live field in the SOA record.                                                                                       |
-| `enable_selinux`             | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
-| `views`                      | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be in a view.                                     |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
@@ -187,7 +188,21 @@ bind_acls:
       - 10.0.0.0/8
 ```
 
-The names of the ACLs will be added to the `allow-transfer` clause in global options.
+The names of the ACLs will be added to the `allow-transfer` clause in global options if bind_views is not defined.
+
+ACLs can also be paired with TSIG keys as a way to control access to views:
+
+```Yaml
+bind_acls:
+  - name: external_key
+    match_list:
+      - "!key internal.example.com"
+      - "key external.example.com"
+  - name: internal_key
+    match_list:
+      - "!key external.example.com"
+      - "key internal.example.com"
+```
 
 ### Transaction Signature (TSIG) keys
 
@@ -209,6 +224,8 @@ bind_keys:
 
 bind_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
 
+[NIST recommends using HMAC-SHA256 instead of HMAC-MD5 for the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final).
+
 ### Masters
 
 Masters can be defined like this:
@@ -219,14 +236,13 @@ bind_masters:
     master_list:
       - address: 200.100.230.160
         tsig_key: external.example.com
+
   - name: INTERNAL_MASTERS
     master_list:
       - address: 192.168.8230.160
 
   - name: AKAMAI_ZTAS
     master_list:
-      - address: 23.14.128.185
-        tsig_key: external.example.com
       - address: 23.73.133.141
         tsig_key: external.example.com
       - address: 23.73.133.237
@@ -235,16 +251,9 @@ bind_masters:
         tsig_key: external.example.com
       - address: 23.73.134.237
         tsig_key: external.example.com
-      - address: 23.205.121.134
-        tsig_key: external.example.com
-      - address: 23.207.197.166
-        tsig_key: external.example.com
-      - address: 72.246.0.10
-        tsig_key: external.example.com
-      - address: 72.247.124.98
-        tsig_key: external.example.com
-      - address: 104.122.95.88
 ```
+
+The first two masters are masters server to get zone tranfers from.  The third master is a list of slaves, specifically Zone Transfer Agents (ZTAs) for Akamai's Fast DNS cloud DNS service.  Masters can be configured to require TSIG keys for access control instead of IP addresses.
 
 ### View definitions
 
@@ -256,12 +265,11 @@ bind_views:
     allow_transfer:
       - external_key
     allow_notify:
-      - ptx_infoblox
+      - external_key
     also_notify:
       - AKAMAI_ZTAS
     match_clients:
       - external_key
-      - ptx_infoblox
     match_destinations:
       - any
     match_recursive_only: false
@@ -271,6 +279,107 @@ bind_views:
         algorithm: HMAC-SHA256
         secret: "{{ vault_external_secret }}"
     recursion: false
+
+  - name: INTERNAL
+    allow_query:
+      - "!key external.example.com"
+      - "key internal.example.com"
+      - 192.168.20.20
+      - 127.0.0.1
+    allow_transfer:
+      - "!key external.example.com"
+      - "key internal.example.com"
+    allow_notify:
+      - "!key external.example.com"
+      - "key internal.example.com"
+    also_notify:
+      - 192.168.12.12 
+    match_clients:
+      - "!key external.example.com"
+      - "key internal.example.com"
+      - 192.168.20.20
+      - 127.0.0.1
+    match_destinations:
+      - any
+    match_recursive_only: false
+    notify: explicit
+    tsig_keys:
+      - name: internal.example.com
+        algorithm: HMAC-SHA256
+        secret: "{{ vault_internal_secret }}"
+    recursion: false
+```
+
+Above are two common views, internal and external.  The external view controls access with TSIG keys defined previously as ACLs.  It also notifies the Akamai cloud DNS servers by its masters name after any zone changes.  The internal view controls access using TSIG keys and IP addresses and sends notifies by IP.  Each view has its own TSIG key.  [NIST recommends using HMAC-SHA256 the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final)
+
+For more information on configuring views, read: [Understanding views in BIND 9, by example](https://kb.isc.org/docs/aa-00851) 
+
+For more information on configuring DNS securely, read NIST Special Publication 800-81-2: [Secure Domain Name System (DNS) Deployment Guide](https://csrc.nist.gov/publications/detail/sp/800-81/2/final) 
+
+### Minimal variables for a working zone with views
+
+Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+
+| Variable                     | Master | Slave |
+| :---                         | :---:  | :---: |
+| `bind_zone_domains`          | V      | V     |
+| `  - name`                   | V      | V     |
+| `  - view`                   | V      | V     |
+| `  - networks`               | V      | --    |
+| `  - name_servers`           | V      | --    |
+| `  - hosts`                  | V      | --    |
+| `bind_listen_ipv4`           | V      | V     |
+| `bind_allow_query`           | V      | V     |
+
+### Domain definitions for master with view and masters defined.
+
+```Yaml
+bind_zone_domains:
+  - name: example.com
+    view: EXTERNAL
+    masters: EXTERNAL_MASTER
+    hosts:
+      - name: pub01
+        ip: 192.0.2.1
+        ipv6: 2001:db8::1
+        aliases:
+          - ns
+      - name: '@'
+        ip:
+          - 192.0.2.2
+          - 192.0.2.3
+        ipv6:
+          - 2001:db8::2
+          - 2001:db8::3
+        aliases:
+          - www
+      - name: priv01
+        ip: 10.0.0.1
+    networks:
+      - '192.0.2'
+      - '10'
+      - '172.16'
+    delegate:
+      - zone: foo
+        dns: 192.0.2.1
+    services:
+      - name: _ldap._tcp
+        weight: 100
+        port: 88
+        target: dc001
+```
+
+This domain is configured for the EXTERNAL view.  It will use the masters configuration named EXTERNAL_MASTERS instead of the bind_zone_master_server_ip value.
+
+### Domain definition for slave with view and masters defined. 
+
+```Yaml
+bind_zone_domains: [
+  { name: example.com, view: EXTERNAL, masters: EXTERNAL_MASTERS },
+  { name: test.com, view: EXTERNAL, masters: EXTERNAL_MASTERS },
+  { name: example.com, view: INTERNAL },
+  { name: test.com, view: INTERNAL }
+]
 ```
 
 ## Dependencies
@@ -434,3 +543,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Rafael Bodill](https://github.com/rafi)
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
+- [Robbie Fontenot](https://github.com/WRJFontenot)
