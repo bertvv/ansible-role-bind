@@ -12,6 +12,10 @@ bind_service: named
 # Main config file
 bind_config: /etc/named.conf
 
+# BIND Options
+bind_options: /etc/sysconfig/named
+bind_options_template: etc_sysconfig_named.j2
+
 # rndc config directory
 bind_rndc_dir: /etc
 

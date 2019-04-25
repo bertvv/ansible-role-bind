@@ -35,7 +35,8 @@ Variables are not required, unless specified.
 | `bind_controls`              | `[]`                             | A list of access controls for rndc utility, which are dicts with fields.  See example below for fields and usage.           |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
-| `bind_enable_rndc_controls`  | `false`                          | Determines if /etc/rndc.conf is create and /etc/rndc.key removed if it exists.                                              |
+| `bind_disable_ipv6`          | `false`                          | Determines if IPv6 support is enabled or disabled in BIND on startup.                                                       |
+| `bind_enable_rndc_controls`  | `false`                          | Determines if /etc/rndc.conf is created and /etc/rndc.key removed if it exists.                                             |
 | `bind_enable_selinux`        | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
 | `bind_enable_views`          | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be assigned to a view.                            |
 | `bind_extra_include_files`   | `[]`                             | Option to include additional files.                                                                                         |
@@ -310,11 +311,11 @@ bind_views:
     recursion: false
 ```
 
-Above are two common views, internal and external.  The external view controls access with TSIG keys defined previously as ACLs.  It also notifies the Akamai cloud DNS servers by its masters name after any zone changes.  The internal view controls access using TSIG keys and IP addresses and sends notifies by IP.  Each view has its own TSIG key.  [NIST recommends using HMAC-SHA256 the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final)
+Above are two common views, internal and external.  The external view controls access with TSIG keys defined previously as ACLs.  It also notifies the Akamai cloud DNS servers by its masters name after any zone changes.  The internal view controls access using TSIG keys and IP addresses and sends notifies by IP.  Each view has its own TSIG key.  [NIST recommends using HMAC-SHA256 as the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final)
 
 For more information on configuring views, read: [Understanding views in BIND 9, by example](https://kb.isc.org/docs/aa-00851) 
 
-For more information on configuring DNS securely, read NIST Special Publication 800-81-2: [Secure Domain Name System (DNS) Deployment Guide](https://csrc.nist.gov/publications/detail/sp/800-81/2/final) 
+For more information on configuring DNS securely, read NIST Special Publication 800-81-2: [Secure Domain Name System (DNS) Deployment Guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-81-2.pdf) 
 
 ### Minimal variables for a working zone with views
 

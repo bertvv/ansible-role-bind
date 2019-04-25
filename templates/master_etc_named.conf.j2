@@ -77,7 +77,7 @@ include "{{ file }}";
 {% for bind_zone in bind_zone_domains %}
 zone "{{ bind_zone.name }}" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
+  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };
@@ -96,7 +96,7 @@ zone "{{ bind_zone.name }}" IN {
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };
@@ -114,7 +114,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };

@@ -19,4 +19,7 @@
 #                            valid before named starts. If you set this option
 #                            to 'yes' then service file doesn't perform those
 #                            checks.
+{% if bind_disable_ipv6 is sameas true %}
 OPTIONS="-4"
+{% else %}
+{% endif %}

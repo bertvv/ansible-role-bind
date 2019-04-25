@@ -2,33 +2,6 @@
 # Set up a BIND slave server
 ---
 
-- name: Master | Configure named options (master)
-  template:
-    src: etc_sysconfig_named.j2
-    dest: "/etc/sysconfig/named"
-    owner: root
-    group: root
-    mode: '644'
-    setype: named_conf_t
-  tags: bind
-
-- name: Slave | Create rndc config file (slave)
-  template:
-    src: etc_rndc.conf.j2
-    dest: "{{ bind_rndc_dir }}/rndc.conf"
-    owner: "{{ bind_owner }}"
-    group: "{{ bind_group }}"
-    mode: '0640'
-    setype: named_conf_t
-  tags: bind
-  when: bind_enable_rndc_controls
-
-- name: Slave | Remove rndc key file if exists (slave)
-  file:
-    path: "{{ bind_rndc_dir }}/rndc.key"
-    state: absent
-  when: bind_enable_rndc_controls
-
 - name: Slave | Main BIND config file (slave)
   template:
     src: slave_etc_named.conf.j2

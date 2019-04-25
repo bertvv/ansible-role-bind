@@ -21,12 +21,6 @@
     - "{{ bind_packages }}"
   tags: bind
 
-- name: Enable SELinux
-  selinux:
-    policy: targeted
-    state: enforcing  
-  when: bind_enable_selinux
-
 - name: Ensure runtime directories referenced in config exist
   file:
     path: "{{ item }}"
@@ -49,7 +43,7 @@
   tags: bind
 
 - name: Read forward zone hashes
-  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ item.view }}_{% endif %}{{ item.name }} || true'
+  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ item.view }}_{% endif %}{{ item.name }} || true'
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -64,7 +58,7 @@
 
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ item.0.view }}_{% endif %}{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ item.0.view }}_{% endif %}{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -82,7 +76,7 @@
     - item
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{% if bind_enable_views == true %}{{ item.0.view }}_{% endif %}{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ item.0.view }}_{% endif %}{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -98,6 +92,9 @@
   with_subelements:
     - "{{ reverse_hashes_ipv6_temp.results }}"
     - item
+
+- name: Perform common BIND configurations
+  include_tasks: common.yml
 
 - name: Set up the machine as a master DNS server
   include_tasks: master.yml
