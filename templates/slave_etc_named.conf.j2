@@ -3,7 +3,7 @@
 //
 {{ ansible_managed | comment('c') }}
 //
-// See http://www.zytrax.com/books/dns/ch7/
+// See http://www.zytrax.com/books/dns/ch7/ for named.conf configuration details
 //
 //
 {% for key in bind_keys %}
@@ -119,7 +119,7 @@ options {
   /* Statistics */
   statistics-file "{{ bind_dir }}/data/named_stats.txt";
 
-}; # end OPTIONS
+}; # end GLOBAL options
 
 
 {% if bind_masters is defined %}
@@ -239,7 +239,7 @@ view "{{ bind_view.name }}" {
 
   /* Zones */
 {% for file in bind_default_zone_files %}
-include "{{ file }}";
+  include "{{ file }}";
 {% endfor %}
 
 {% for bind_zone in bind_zone_domains %}
