@@ -2,51 +2,43 @@
 // named.conf
 //
 {{ ansible_managed | comment('c') }}
+//
+// See http://www.zytrax.com/books/dns/ch7/ for named.conf configuration details
+//
+//
+{% for key in bind_keys %}
+key "{{ key.name }}" {
+  algorithm {{ key.algorithm }};
+  secret "{{ key.secret }}";
+};
+{% endfor %}
+
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
 {% for match in acl.match_list %}
   {{ match }};
 {% endfor %}
 };
-
 {% endfor %}
-options {
-  listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
-  listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
-  directory   "{{ bind_dir }}";
-  dump-file   "{{ bind_dir }}/data/cache_dump.db";
-  statistics-file "{{ bind_dir }}/data/named_stats.txt";
-  memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
-  allow-query     { {{ bind_allow_query|join(';') }}; };
-{% if bind_acls|length != 0 %}
-  allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+
+controls {
+{% if bind_controls is defined %}
+{% for control in bind_controls %}
+  inet {{ control.inet }} port {{ control.port }}
+    allow {
+{% for allow_item in control.allow_list %}
+      {{ allow_item }};
+{% endfor %}
+    }
+{% if control.key_list is defined %}
+    keys {
+{% for key_item in control.key_list %}
+      {{ key_item }};
+{% endfor %}
+    }
 {% endif %}
-{% if bind_check_names is defined %}
-  check-names  {{ bind_check_names }};
-{% endif %}
-
-  recursion {% if bind_recursion %}yes{% else %}no{% endif %};
-  {% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
-  {% endif %}
-{% if bind_forwarders|length > 0 %}forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
-  {% if bind_forward_only %}forward only;{% endif %}
-
-  rrset-order { order {{ bind_rrset_order }}; };
-
-  dnssec-enable {{ bind_dnssec_enable }};
-  dnssec-validation {{ bind_dnssec_validation }};
-  dnssec-lookaside auto;
-
-  /* Path to ISC DLV key */
-  bindkeys-file "/etc/named.iscdlv.key";
-
-  managed-keys-directory "{{ bind_dir }}/dynamic";
-
-  pid-file "/run/named/named.pid";
-  session-keyfile "/run/named/session.key";
-
-{% if bind_query_log is defined %}
-  querylog yes;
+  ;
+{% endfor %}
 {% endif %}
 };
 
@@ -66,14 +58,89 @@ logging {
 {% endif %}
 };
 
-{% for file in bind_default_zone_files %}
-include "{{ file }}";
+options {
+
+  /* Queries */
+{% if bind_allow_query is defined %}
+  allow-query { {{ bind_allow_query|join('; ') }}; };
+{% endif %}
+  disable-empty-zone "254.169.IN-ADDR.ARPA";
+  filter-aaaa-on-v4 yes;
+{% if bind_forward_only %}  forward only;{% endif %}
+{% if bind_forwarders|length > 0 %}  forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
+  query-source address {{ ansible_host }};
+  recursion {% if bind_recursion %}yes{% else %}no{% endif %};
+  rrset-order { order {{ bind_rrset_order }}; };
+
+  /* Transfer */
+{% if bind_views is not defined %}
+{% if bind_acls|length != 0 %}
+  allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+{% endif %}
+{% endif %}
+  #allow-update-forwarding { none; };
+  notify-source {{ ansible_host }};
+  serial-query-rate 200;
+  transfer-format many-answers;
+  transfer-source {{ ansible_host }};
+  transfers-in 300;
+  transfers-out 500;
+  transfers-per-ns 200;
+
+  /* Operations */
+  avoid-v4-udp-ports { 2114; 2113; 2115; 3000; 8000; 8089; 9997; 2222; 7911; 7912; 8000; 8089; 9997; 8080; 9000; 9999; 9004; 2022; 3374; 3115; 1194; };
+{% if bind_check_names is defined %}
+  check-names slave {{ bind_check_names }};
+{% endif %}
+  directory   "{{ bind_dir }}";
+  dump-file   "{{ bind_dir }}/data/cache_dump.db";
+  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
+  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
+  masterfile-format text;
+  memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
+  pid-file "/run/named/named.pid";
+{% if bind_query_log is defined %}
+  querylog yes;
+{% else %}
+  querylog no;
+{% endif %}
+  session-keyfile "/run/named/session.key";
+  tcp-clients 500;
+  tcp-listen-queue 500;
+  version none;
+
+  /* Security */
+  dnssec-enable {{ bind_dnssec_enable }};
+  dnssec-validation {{ bind_dnssec_validation }};
+  dnssec-lookaside auto;
+  bindkeys-file "/etc/named.iscdlv.key";
+  managed-keys-directory "{{ bind_dir }}/dynamic";
+
+  /* Statistics */
+  statistics-file "{{ bind_dir }}/data/named_stats.txt";
+
+}; # end GLOBAL options
+
+
+{% if bind_masters is defined %}
+{% for bind_master in bind_masters %}
+masters "{{ bind_master.name }}" {
+{% for master in bind_master.master_list %}
+  {{ master.address }}{% if master.tsig_key is defined %} key {{ master.tsig_key }}{% endif %};
 {% endfor %}
+}; 
+{% endfor %}
+{% endif %}
+
 {% for file in bind_extra_include_files %}
 include "{{ file }}";
 {% endfor %}
 
-{% if bind_zone_domains is defined %}
+{% if bind_zone_domains is defined and bind_views is not defined %}
+{% for file in bind_default_zone_files %}
+include "{{ file }}";
+{% endfor %}
+
 {% for bind_zone in bind_zone_domains %}
 zone "{{ bind_zone.name }}" IN {
   type master;
@@ -127,5 +194,126 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 };
 {% endfor %}
 {% endif %}
+{% endfor %}
+{% endif %}
+
+{% if bind_views is defined %}
+{% for bind_view in bind_views %}
+view "{{ bind_view.name }}" {
+{% if bind_view.match_clients is defined %}
+  match-clients { {{ bind_view.match_clients|join('; ') }}; };
+{% endif %}
+{% if bind_view.match_destinations is defined %}
+  match-destinations { {{ bind_view.match_destinations|join('; ') }}; };
+{% endif %}
+{% if bind_view.match_recursive_only is defined %}
+  match-recursive-only {% if bind_view.match_recursive_only %}yes{% else %}no{% endif %};
+{% endif %}
+
+{% if bind_view.tsig_keys is defined %}
+{% for key in bind_view.tsig_keys %}
+  key "{{ key.name }}" {
+    algorithm {{ key.algorithm }};
+    secret "{{ key.secret }}";
+  };
+{% endfor %}
+{% endif %}
+
+  /* Queries */
+{% if bind_view.allow_query is defined %}
+  allow-query { {{ bind_view.allow_query|join('; ') }}; };
+{% endif %}
+{% if bind_view.recursion is defined %}
+  additional-from-auth {% if bind_view.recursion %}yes{% else %}no{% endif %};
+  additional-from-cache {% if bind_view.recursion %}yes{% else %}no{% endif %}; 
+  recursion {% if bind_view.recursion %}yes{% else %}no{% endif %};
+{% endif %}
+
+  /* Transfer */
+{% if bind_view.allow_notify is defined %}
+  allow-notify { {{ bind_view.allow_notify|join('; ') }}; };
+{% endif %}
+{% if bind_view.allow_transfer is defined %}
+  allow-transfer { {{ bind_view.allow_transfer|join('; ') }}; };
+{% endif %}
+{% if bind_view.also_notify is defined %}
+  also-notify { {{ bind_view.also_notify|join('; ') }}; };
+{% endif %}
+{% if bind_view.notify is defined %}
+  notify {{ bind_view.notify }};
+{% endif %}
+
+  /* Operations */
+
+  /* Security */
+
+  /* Statistics */
+
+  /* Zones */
+
+{% for file in bind_default_zone_files %}
+  include "{{ file }}";
+{% endfor %}
+
+{% for bind_zone in bind_zone_domains %}
+{% if bind_zone.view is defined and bind_zone.view == bind_view.name %}
+  zone "{{ bind_zone.name }}" IN {
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
+    notify yes;
+{% if bind_zone.also_notify is defined %}
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+    allow-update { none; };
+{% endif %}							 
+{% if bind_zone.delegate is defined %}
+    forwarders {};
+{% endif %}
+  };
+
+{% if bind_zone.networks is defined %}
+{% for network in bind_zone.networks %}
+  zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+    notify yes;
+{% if bind_zone.also_notify is defined %}
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+    allow-update { none; };
+{% endif %}
+  };
+{% endfor %}
+{% endif %}
+
+{% if bind_zone.ipv6_networks is defined %}
+{% for network in bind_zone.ipv6_networks %}
+  zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+    notify yes;
+{% if bind_zone.also_notify is defined %}
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
+{% else %}
+    allow-update { none; };
+{% endif %}
+  };
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
+
+}; # end {{ bind_view.name }} view
+
+
 {% endfor %}
 {% endif %}

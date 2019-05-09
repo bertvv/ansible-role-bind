@@ -238,6 +238,7 @@ view "{{ bind_view.name }}" {
   /* Statistics */
 
   /* Zones */
+
 {% for file in bind_default_zone_files %}
   include "{{ file }}";
 {% endfor %}
@@ -256,6 +257,7 @@ view "{{ bind_view.name }}" {
     forwarders {};
 {% endif %}
   };
+
 {% if bind_zone.networks is defined %}
 {% for network in bind_zone.networks %}
   zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
@@ -269,6 +271,7 @@ view "{{ bind_view.name }}" {
   };
 {% endfor %}
 {% endif %}
+
 {% if bind_zone.ipv6_networks is defined %}
 {% for network in bind_zone.ipv6_networks %}
   zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
@@ -290,4 +293,3 @@ view "{{ bind_view.name }}" {
 
 {% endfor %}
 {% endif %}
-
