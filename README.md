@@ -227,9 +227,9 @@ bind_keys defines global TSIG keys only. TSIG keys used by views must be defined
 
 [NIST recommends using HMAC-SHA256 instead of HMAC-MD5 for the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final).
 
-### Masters
+### Masters list
 
-Masters can be defined like this:
+A masters list can be used in two different ways.  First, it can be used with the masters statement in a slave zone to define a list of master servers and the TSIG keys needed to transfer a zone file. Second, it can be used with the also-notify statement to define a list of slave servers with the TSIG keys needed to notify after an update.  Masters lists are defined like this:
 
 ```Yaml
 bind_masters:
@@ -254,7 +254,7 @@ bind_masters:
         tsig_key: external.example.com
 ```
 
-The first two masters are masters server to get zone tranfers from.  The third master is a list of slaves, specifically Zone Transfer Agents (ZTAs) for Akamai's Fast DNS cloud DNS service.  Masters can be configured to require TSIG keys for access control instead of IP addresses.
+In the example above, the first two masters lists are masters a slave server will get zone tranfers from along with a TSIG key, if needed.  The third master is a list of slaves for a cloud DNS service that will be notified after an update.
 
 ### View definitions
 
@@ -332,7 +332,7 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | `bind_listen_ipv4`           | V      | V     |
 | `bind_allow_query`           | V      | V     |
 
-### Domain definitions for master with view and masters defined.
+### Domain definitions for master with view and masters list defined.
 
 ```Yaml
 bind_zone_domains:
