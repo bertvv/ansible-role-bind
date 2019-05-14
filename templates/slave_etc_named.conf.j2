@@ -6,12 +6,14 @@
 // See http://www.zytrax.com/books/dns/ch7/ for named.conf configuration details
 //
 //
+{% if bind_keys is defined %}
 {% for key in bind_keys %}
 key "{{ key.name }}" {
   algorithm {{ key.algorithm }};
   secret "{{ key.secret }}";
 };
 {% endfor %}
+{% endif %}
 
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
