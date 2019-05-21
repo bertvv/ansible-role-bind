@@ -82,15 +82,15 @@ options {
 {% endif %}
   #allow-update-forwarding { none; };
   notify-source {{ ansible_host }};
-  serial-query-rate 200;
+  serial-query-rate 500;
   transfer-format many-answers;
   transfer-source {{ ansible_host }};
-  transfers-in 300;
+  transfers-in 500;
   transfers-out 500;
-  transfers-per-ns 200;
+  transfers-per-ns 500;
 
   /* Operations */
-  avoid-v4-udp-ports { 2114; 2113; 2115; 3000; 8000; 8089; 9997; 2222; 7911; 7912; 8000; 8089; 9997; 8080; 9000; 9999; 9004; 2022; 3374; 3115; 1194; };
+  avoid-v4-udp-ports { 2049; 2114; 2113; 2115; 3000; 8000; 8089; 9997; 2222; 4040; 5575; 7077; 7911; 7912; 8000; 8089; 9090; 9091; 9997; 8070; 8787; 9999; 9004; 2022; 3374; 3115; 1194; 8080; 9000; 9183; };
 {% if bind_check_names is defined %}
   check-names slave {{ bind_check_names }};
 {% endif %}
