@@ -49,6 +49,7 @@ Variables are not required, unless specified.
 | `bind_masters`               | `[]`                             | A list of master servers for zone transfers or slaves servers to be notified with `also-notify`. See example below.         |
 | `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                       |
 | `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                             |
+| `bind_remove_slave_zones`    | `false`                          | Determines if all zone files in slaves directory should be removed.                                                         |
 | `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                             |
 | `bind_views`                 | n/a                              | A list of views to configure, with a seperate dict for each view, with relevant details.                                    |
 | ` - allow_query`             | `[]`                             | A list of IPs or ACLs allowed to query the zones in the view.                                                               |
@@ -381,6 +382,79 @@ bind_zone_domains: [
   { name: example.com, view: INTERNAL },
   { name: test.com, view: INTERNAL }
 ]
+```
+
+### Scaling slave zones
+
+If you have very large numbers of forward and reverse slave zones in multiple views, you can easily manage them as multiple dicts stored in separate YAML files:
+
+group_vars/all/external_forward_zones.yaml:
+
+```Yaml
+---
+external_forward_zones: [
+  { name: example.com, view: External, masters: EXTERNAL_MASTERS },
+  { name: example.net, view: External, masters: EXTERNAL_MASTERS },
+  { name: example.org, view: External, masters: EXTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/external_reverse_zones.yaml:
+
+```Yaml
+---
+external_reverse_zones: [
+  { name: 16.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  { name: 17.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  { name: 18.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/internal_forward_zones.yaml:
+
+```Yaml
+---
+internal_forward_zones: [
+  { name: internal.com, view: Internal, masters: INTERNAL_MASTERS },
+  { name: internal.net, view: Internal, masters: INTERNAL_MASTERS },
+  { name: intenral.org, view: Internal, masters: INTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/internal_reverse_zones.yaml:
+
+```Yaml
+---
+internal_reverse_zones: [
+  { name: 8.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  { name: 9.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  { name: 10.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+You can then merge one or more dicts into bind_zone_domains in your playbook:
+
+```Yaml
+---
+- hosts: my_slave_zones
+  become: yes
+  roles:
+    - ansible-role-bind
+
+  pre_tasks:
+  - name: Merge zones dicts
+    set_fact:
+      bind_zone_domains: "{{ external_forward_zones }} + {{ external_reverse_zones }} +
+                          {{ internal_forward_zones }} + {{ internal_reverse_zones }}"
+
 ```
 
 ## Dependencies
