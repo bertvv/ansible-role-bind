@@ -64,6 +64,18 @@ logging {
   };
   category queries { querylog; };
 {% endif %}
+
+{% if bind_other_logs is defined %}
+{% for log in bind_other_logs %}
+  channel {{ log.name }} {
+    file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    severity dynamic;
+    print-time yes;
+  };
+  category "{{ log.name }}" { "{{ log.name }}"; };
+{% endfor %}
+{% endif %}
+
 };
 
 {% for file in bind_default_zone_files %}
