@@ -2,11 +2,12 @@
 # Set up a BIND slave server
 ---
 
-- name: Slave | Remove existing slave zones (slave) 
+- name: Slave | Clear existing slave zones (slave) 
   shell: rm -f {{ bind_dir }}/slaves/*
   args:
     warn: no
-  when: bind_remove_slave_zones
+  when: bind_clear_slave_zones
+  notify: restart bind
 
 - name: Slave | Main BIND config file (slave)
   template:
@@ -19,3 +20,4 @@
     validate: 'named-checkconf %s'
   notify: reload bind
   tags: bind
+

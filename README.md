@@ -32,6 +32,7 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                |
 | `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                      |
 | `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`).     |
+| `bind_clear_slave_zones`     | `false`                          | Determines if all zone files in the slaves directory should be cleared.                                                         |
 | `bind_controls`              | `[]`                             | A list of access controls for rndc utility, which are dicts with fields.  See example below for fields and usage.           |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
@@ -39,7 +40,7 @@ Variables are not required, unless specified.
 | `bind_enable_rndc_controls`  | `false`                          | Determines if /etc/rndc.conf is created and /etc/rndc.key removed if it exists.                                             |
 | `bind_enable_selinux`        | `false`                          | Determines if selinux is enabled or disabled.                                                                               |
 | `bind_enable_views`          | `false`                          | Determines if views are enabled or disabled. When enabled, all zones must be assigned to a view.                            |
-| `bind_extra_include_files`   | `[]`                             | Option to include additional files.                                                                                         |
+| `bind_extra_include_files`   | `[]`                             | Option to include additional global include files.                                                                                         |
 | `bind_forward_only`          | `false`                          | If `true`, BIND is set up as a caching name server                                                                          |
 | `bind_forwarders`            | `[]`                             | A list of name servers to forward DNS requests to.                                                                          |
 | `bind_keys`                  | `[]`                             | A list of Transaction Signature (TSIG) keys, which are dicts with fields `name`, `algorithm`, & `secret`. See example below.|
@@ -49,13 +50,13 @@ Variables are not required, unless specified.
 | `bind_masters`               | `[]`                             | A list of master servers for zone transfers or slaves servers to be notified with `also-notify`. See example below.         |
 | `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                       |
 | `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                             |
-| `bind_remove_slave_zones`    | `false`                          | Determines if all zone files in slaves directory should be removed.                                                         |
 | `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                             |
 | `bind_views`                 | n/a                              | A list of views to configure, with a seperate dict for each view, with relevant details.                                    |
 | ` - allow_query`             | `[]`                             | A list of IPs or ACLs allowed to query the zones in the view.                                                               |
 | ` - allow_transfer`          | `[]`                             | A list of IPs or ACLs allowed to do zone transfers from the zones in the view.                                              |
 | ` - allow_notify`            | `[]`                             | A list of IPs or ACLs allowed to send NOTIFY messages to zones in the view.                                                 |
 | ` - also_notify`             | `[]`                             | A list of IPs or masters/slaves defined in `bind_masters` that will receive NOTIFY messages from zones in the view.         |
+| ` - include_files`           | `[]`                             | A list of files that will be included in the named.conf configuration for a specific view.                                  |
 | ` - match_clients`           | `[]`                             | A list of IPs or ACLs of client source IP addresses that can send messages to the view.                                     |
 | ` - match_destination`       | `[]`                             | A list of IPs or ACLs of server destination IP addresses that can receive messages for the view.                            |
 | ` - match_recursive_only`    | -                                | Determines if only recursive queries can access view.                                                                       |
@@ -305,6 +306,8 @@ bind_views:
       - any
     match_recursive_only: false
     notify: explicit
+    include_files:
+      - /etc/named.extra.zones
     tsig_keys:
       - name: internal.example.com
         algorithm: HMAC-SHA256

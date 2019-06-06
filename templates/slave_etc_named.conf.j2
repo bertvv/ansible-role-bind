@@ -239,11 +239,17 @@ view "{{ bind_view.name }}" {
 
   /* Statistics */
 
-  /* Zones */
-
+  /* Includes */
 {% for file in bind_default_zone_files %}
   include "{{ file }}";
 {% endfor %}
+{% if bind_view.include_files is defined %}
+{% for file in bind_view.include_files %}
+  include "{{ file }}";
+{% endfor %}
+{% endif %}
+
+  /* Zones */
 
 {% for bind_zone in bind_zone_domains %}
 {% if bind_zone.view is defined and bind_zone.view == bind_view.name %}
