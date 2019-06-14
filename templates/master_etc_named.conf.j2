@@ -112,8 +112,8 @@ options {
   version none;
 
   /* Security */
-  dnssec-enable {{ bind_dnssec_enable }};
-  dnssec-validation {{ bind_dnssec_validation }};
+  dnssec-enable {% if bind_dnssec_enable %}yes{% else %}no{% endif %};
+  dnssec-validation {% if bind_dnssec_validation %}yes{% else %}no{% endif %};
   dnssec-lookaside auto;
   bindkeys-file "/etc/named.iscdlv.key";
   managed-keys-directory "{{ bind_dir }}/dynamic";
