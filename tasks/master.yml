@@ -2,6 +2,74 @@
 # Set up a BIND master server
 ---
 
+- name: Read forward zone hashes
+  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
+  changed_when: false
+  check_mode: false
+  register: forward_hashes_temp
+  with_items:
+    - "{{ bind_zone_domains }}"
+  run_once: true
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: create dict of forward hashes
+  set_fact:
+    forward_hashes: "{{ forward_hashes|default([]) + [ {'hash': item.stdout|default(), 'name': item.item.name} ] }}"
+  with_items:
+    - "{{ forward_hashes_temp.results }}"
+  run_once: true
+  loop_control:
+    label: "{{ item.item.name }}"
+
+- name: Read reverse ipv4 zone hashes
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  changed_when: false
+  check_mode: false
+  register: reverse_hashes_temp
+  with_subelements:
+    - "{{ bind_zone_domains }}"
+    - networks
+    - flags:
+      skip_missing: true
+  run_once: true
+  loop_control:
+    label: "{{ item.1 }}"
+
+- name: create dict of reverse hashes
+  set_fact:
+    reverse_hashes: "{{ reverse_hashes|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
+  with_subelements:
+    - "{{ reverse_hashes_temp.results }}"
+    - item
+  run_once: true
+  loop_control:
+    label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+
+- name: Read reverse ipv6 zone hashes
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  changed_when: false
+  check_mode: false
+  register: reverse_hashes_ipv6_temp
+  with_subelements:
+    - "{{ bind_zone_domains }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
+  run_once: true
+  loop_control:
+    label: "{{ item.1 }}"
+
+- name: create dict of reverse ipv6 hashes
+  set_fact:
+    reverse_hashes_ipv6: "{{ reverse_hashes_ipv6|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
+  with_subelements:
+    - "{{ reverse_hashes_ipv6_temp.results }}"
+    - item
+  run_once: true
+  loop_control:
+    label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+
 - name: Master | Main BIND config file (master)
   template:
     src: master_etc_named.conf.j2
@@ -25,6 +93,8 @@
     validate: 'named-checkzone -d {{ item.name }} %s'
   with_items:
     - "{{ bind_zone_domains }}"
+  loop_control:
+    label: "{{ item.name }}"
   notify: reload bind
   tags: bind
 
@@ -42,13 +112,15 @@
     - networks
     - flags:
       skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
   notify: reload bind
   tags: bind
 
 - name: Master | Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{bind_zone_dir}}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -59,5 +131,7 @@
     - ipv6_networks
     - flags:
       skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
   notify: reload bind
   tags: bind
