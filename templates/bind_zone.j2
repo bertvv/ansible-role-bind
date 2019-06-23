@@ -22,6 +22,7 @@
 {% set _ = _zone_data.update({'delegate': item.delegate|default([])}) %}
 {% set _ = _zone_data.update({'services': item.services|default([])}) %}
 {% set _ = _zone_data.update({'text': item.text|default([])}) %}
+{% set _ = _zone_data.update({'naptr': item.naptr|default([])}) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
  #  accordingly
@@ -123,4 +124,7 @@ $TTL {{ _zone_data['ttl'] }}
 {{ text.name.ljust(20) }} IN  TXT    "{{ entry }}"
 {%   endfor %}
 {% endif %}
+{% endfor %}
+{% for naptr in _zone_data['naptr'] %}
+{{ naptr.name.ljust(20) }} IN  NAPTR  {{ naptr.order|default('100') }} {{ naptr.pref|default('10') }} "{{ naptr.flags }}" "{{ naptr.service }}" "{{ naptr.regex }}" {{ naptr.replacement }}
 {% endfor %}

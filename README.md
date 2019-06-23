@@ -31,7 +31,7 @@ Variables are not required, unless specified.
 | `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.                   |
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                |
 | `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                      |
-| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`). |
+| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`).     |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
 | `bind_extra_include_files`   | `[]`                             |                                                                                                                             |
@@ -58,6 +58,7 @@ Variables are not required, unless specified.
 | `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
 | `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                          |
 | `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
+| `- naptr`                    | `[]`                             | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records.|
 | `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
 | `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                     |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                        |
@@ -123,6 +124,14 @@ bind_zone_domains:
         weight: 100
         port: 88
         target: dc001
+    naptr:
+      - name: "sip"
+        order: 100
+        pref: 10
+        flags: "S"
+        service: "SIP+D2T"
+        regex: "!^.*$!sip:customer-service@example.com!"
+        replacement: "_sip._tcp.example.com."
 ```
 
 ### Minimal slave configuration
