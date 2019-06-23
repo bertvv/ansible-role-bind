@@ -31,7 +31,7 @@ Variables are not required, unless specified.
 | `bind_acls`                  | `[]`                             | A list of ACL definitions, which are dicts with fields `name` and `match_list`. See below for an example.                   |
 | `bind_allow_query`           | `['localhost']`                  | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                |
 | `bind_allow_recursion`       | `['any']`                        | Similar to bind_allow_query, this option applies to recursive queries.                                                      |
-| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined actioni (e.g. `warn`, `ignore`, `fail`).     |
+| `bind_check_names`           | `[]`                             | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).     |
 | `bind_dnssec_enable`         | `true`                           | Is DNSSEC enabled                                                                                                           |
 | `bind_dnssec_validation`     | `true`                           | Is DNSSEC validation enabled                                                                                                |
 | `bind_extra_include_files`   | `[]`                             |                                                                                                                             |
@@ -40,11 +40,15 @@ Variables are not required, unless specified.
 | `bind_listen_ipv4`           | `['127.0.0.1']`                  | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.            |
 | `bind_listen_ipv6`           | `['::1']`                        | A list of the IPv6 address of the network interface(s) to listen on                                                         |
 | `bind_log`                   | `data/named.run`                 | Path to the log file                                                                                                        |
+| `bind_other_logs`            | -                                | A list of logging channels to configure, with a separate dict for each domain, with relevant details                        |
+| `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
+| `- also_notify`              | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                   |
+| `- delegate`                 | `[]`                             | Zone delegation. See below this table for examples.                                                                         |
 | `bind_query_log`             | -                                | When defined (e.g. `data/query.log`), this will turn on the query log                                                       |
 | `bind_recursion`             | `false`                          | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                             |
 | `bind_rrset_order`           | `random`                         | Defines order for DNS round robin (either `random` or `cyclic`)                                                             |
 | `bind_zone_dir`              | -                                | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.            |
-| `bind_zone_domains`          | n/a                              | A list of domains to configure, with a seperate dict for each domain, with relevant details                                 |
+| `bind_zone_domains`          | n/a                              | A list of domains to configure, with a separate dict for each domain, with relevant details                                 |
 | `- allow_update`             | `['none']`                       | A list of hosts that are allowed to dynamically update this DNS zone.                                                       |
 | `- also_notify`              | -                                | A list of servers that will receive a notification when the master zone file is reloaded.                                   |
 | `- delegate`                 | `[]`                             | Zone delegation. See below this table for examples.                                                                         |
@@ -56,7 +60,7 @@ Variables are not required, unless specified.
 | `- name`                     | `example.com`                    | The domain name                                                                                                             |
 | `- networks`                 | `['10.0.2']`                     | A list of the networks that are part of the domain                                                                          |
 | `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
-| `- services`                 | `[]`                             | A list of services to be advertized by SRV records                                                                          |
+| `- services`                 | `[]`                             | A list of services to be advertised by SRV records                                                                          |
 | `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
 | `- naptr`                    | `[]`                             | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records.|
 | `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
@@ -343,6 +347,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Jörg Eichhorn](https://github.com/jeichhorn)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
 - [Romuald](https://github.com/rds13)
