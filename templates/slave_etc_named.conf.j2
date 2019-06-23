@@ -40,6 +40,7 @@ options {
 
   pid-file "/run/named/named.pid";
   session-keyfile "/run/named/session.key";
+
 {% if bind_query_log is defined %}
   querylog yes;
 {% endif %}
@@ -100,4 +101,3 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% endif %}
 {% endfor %}
 {% endif %}
-

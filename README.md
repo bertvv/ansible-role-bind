@@ -62,6 +62,7 @@ Variables are not required, unless specified.
 | `- other_name_servers`       | `[]`                             | A list of the DNS servers outside of this domain.                                                                           |
 | `- services`                 | `[]`                             | A list of services to be advertised by SRV records                                                                          |
 | `- text`                     | `[]`                             | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                      |
+| `- naptr`                    | `[]`                             | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records.|
 | `bind_zone_file_mode`        | 0640                             | The file permissions for the main config file (named.conf)                                                                  |
 | `bind_zone_master_server_ip` | -                                | **(Required)** The IP address of the master DNS server.                                                                     |
 | `bind_zone_minimum_ttl`      | `1D`                             | Minimum TTL field in the SOA record.                                                                                        |
@@ -101,6 +102,9 @@ bind_zone_domains:
         ip:
           - 192.0.2.2
           - 192.0.2.3
+        sshfp:
+          - "3 1 1262006f9a45bb36b1aa14f45f354b694b77d7c3"
+          - "3 2 e5921564252fe10d2dbafeb243733ed8b1d165b8fa6d5a0e29198e5793f0623b"
         ipv6:
           - 2001:db8::2
           - 2001:db8::3
@@ -108,6 +112,10 @@ bind_zone_domains:
           - www
       - name: priv01
         ip: 10.0.0.1
+      - name: mydomain.net.
+        aliases:
+          - name: sub01
+            type: DNAME
     networks:
       - '192.0.2'
       - '10'
@@ -120,6 +128,14 @@ bind_zone_domains:
         weight: 100
         port: 88
         target: dc001
+    naptr:
+      - name: "sip"
+        order: 100
+        pref: 10
+        flags: "S"
+        service: "SIP+D2T"
+        regex: "!^.*$!sip:customer-service@example.com!"
+        replacement: "_sip._tcp.example.com."
 ```
 
 ### Minimal slave configuration
@@ -134,7 +150,7 @@ bind_zone_domains:
 
 ### Hosts
 
-Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip` and `aliases`
+Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip`,  `aliases` and `sshfp`. Aliases can be CNAME (default) or DNAME records.
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
@@ -158,7 +174,7 @@ foo IN NS 192.0.2.1
 
 ### Service records
 
-Service (SRV) records can be added with the services. Tis should be a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
+Service (SRV) records can be added with the services. This should be a list of dicts with mandatory fields `name` (service name), `target` (host providing the service), `port` (TCP/UDP port of the service) and optional fields `priority` (default = 0) and `weight` (default = 0).
 
 ### ACLs
 
@@ -334,5 +350,6 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
+- [Romuald](https://github.com/rds13)
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
