@@ -2,6 +2,7 @@
 // named.conf
 //
 {{ ansible_managed | comment('c') }}
+//
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
 {% for match in acl.match_list %}
@@ -11,13 +12,13 @@ acl "{{ acl.name }}" {
 
 {% endfor %}
 options {
-  listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
-  listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
+  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
+  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
   directory   "{{ bind_dir }}";
   dump-file   "{{ bind_dir }}/data/cache_dump.db";
   statistics-file "{{ bind_dir }}/data/named_stats.txt";
   memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
-  allow-query     { {{ bind_allow_query|join(';') }}; };
+  allow-query     { {{ bind_allow_query|join('; ') }}; };
 {% if bind_acls|length != 0 %}
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
@@ -80,10 +81,10 @@ zone "{{ bind_zone.name }}" IN {
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
 {% else %}
   allow-update { none; };
 {% endif %}
@@ -99,10 +100,10 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
 {% else %}
   allow-update { none; };
 {% endif %}
@@ -117,10 +118,10 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
   file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
 {% else %}
   allow-update { none; };
 {% endif %}
