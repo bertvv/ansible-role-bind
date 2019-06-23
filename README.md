@@ -332,5 +332,6 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Mario Ciccarelli](https://github.com/kartone)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
+- [Romuald](https://github.com/rds13)
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
