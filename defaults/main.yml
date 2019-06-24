@@ -12,6 +12,12 @@ bind_zone_domains:
 # List of acls.
 bind_acls: []
 
+# Key binding for slaves
+bind_dns_keys: []
+#  - name: master_key
+#    algorithm: hmac-sha256
+#    secret: "azertyAZERTY123456"
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
