@@ -32,6 +32,7 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                 |
 | `bind_allow_recursion`       | `['any']`            | Similar to bind_allow_query, this option applies to recursive queries.                                                       |
 | `bind_check_names`           | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).       |
+| `bind_dns_keys`              | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
 | `bind_dnssec_enable`         | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`     | `true`               | Is DNSSEC validation enabled                                                                                                 |
 | `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
@@ -200,10 +201,12 @@ bind_dns_keys:
     algorithm: hmac-sha256
     secret: "azertyAZERTY123456"
 bind_extra_include_files:
-  - /etc/bind/auth_transfer.conf
-```
+  - "{{ bind_auth_file }}"
 
-This will be set in a file */etc/bind/auth_transfer.conf* which have to be added in the list variable **bind_extra_include_files**
+```
+**tip**: Extra include file must be set as an ansible variable because file is OS dependant
+
+This will be set in a file *"{{ bind_auth_file }}* (e.g. /etc/bind/auth_transfer.conf for debian) which have to be added in the list variable **bind_extra_include_files**
 
 ## Dependencies
 
@@ -368,3 +371,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Romuald](https://github.com/rds13)
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
+- [jadjay](https://github.com/jadjay)
