@@ -75,7 +75,12 @@ $ORIGIN {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr
 {% if host.name == '@' %}
 {{ ('.'.join(host.ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  PTR  {{ _zone_data['domain'] }}.
 {% else %}
+{% if "$GENERATE" not in host.name.upper() %}
 {{ ('.'.join(host.ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
+{% endif %}
+{% if "$GENERATE" in host.name.upper() %}
+{{ host.name.rsplit(None, 1)[0] }} {{ ('.'.join(host.ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }} IN  PTR  {{ host.name.rsplit(None, 1)[1] }}.{{ _zone_data['domain'] }}.
+{% endif %}
 {% endif %}
 {% else %}
 {% for ip in host.ip %}
