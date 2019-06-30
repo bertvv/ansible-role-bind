@@ -46,6 +46,12 @@ options {
 {% endif %}
 };
 
+{% if bind_statistics_channel %}
+statistics-channels {
+  inet {{ bind_statistics_host }} port {{ bind_statistics_port }} allow { {{ bind_statistics_allow|join('; ') }}; };
+};
+{% endif %}
+
 logging {
   channel default_debug {
     file "{{ bind_log }}";
