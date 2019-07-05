@@ -24,6 +24,7 @@ options {
 {% endif %}
 
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
+  {% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
 {% if bind_forwarders|length > 0 %}forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   {% if bind_forward_only %}forward only;{% endif %}
 
