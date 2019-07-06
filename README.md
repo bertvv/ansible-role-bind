@@ -48,6 +48,7 @@ Variables are not required, unless specified.
 | `bind_query_log`             | -                    | When defined (e.g. `data/query.log`), this will turn on the query log                                                        |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
+| `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
