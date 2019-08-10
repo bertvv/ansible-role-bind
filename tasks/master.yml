@@ -25,6 +25,8 @@
     validate: 'named-checkzone -d {{ item.name }} %s'
   with_items:
     - "{{ bind_zone_domains }}"
+  loop_control:
+    label: "{{ item.name }}"
   notify: reload bind
   tags: bind
 
@@ -42,6 +44,8 @@
     - networks
     - flags:
       skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
   notify: reload bind
   tags: bind
 
@@ -59,5 +63,7 @@
     - ipv6_networks
     - flags:
       skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
   notify: reload bind
   tags: bind
