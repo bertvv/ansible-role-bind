@@ -58,7 +58,24 @@ logging {
   };
   category queries { querylog; };
 {% endif %}
+
+{% if bind_other_logs is defined %}
+{% for log in bind_other_logs %}
+  channel {{ log.name }} {
+    file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    severity dynamic;
+    print-time yes;
+  };
+  category "{{ log.name }}" { "{{ log.name }}"; };
+{% endfor %}
+{% endif %}
 };
+
+{% if bind_statistics_channels %}
+statistics-channels {
+  inet {{ bind_statistics_host }} port {{ bind_statistics_port }} allow { {{ bind_statistics_allow|join('; ') }}; };
+};
+{% endif %}
 
 options {
 
@@ -72,6 +89,8 @@ options {
 {% if bind_forwarders|length > 0 %}  forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   query-source address {{ ansible_host }};
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
+  {% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
+  {% endif %}
   rrset-order { order {{ bind_rrset_order }}; };
 
   /* Transfer */
@@ -146,7 +165,7 @@ include "{{ file }}";
 {% for bind_zone in bind_zone_domains %}
 zone "{{ bind_zone.name }}" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
+  file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };
@@ -165,7 +184,7 @@ zone "{{ bind_zone.name }}" IN {
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+  file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };
@@ -183,7 +202,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join(';') }}; };

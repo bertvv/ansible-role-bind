@@ -482,6 +482,23 @@ You can then merge one or more dicts into bind_zone_domains in your playbook:
 
 ```
 
+### Binding Keys
+
+Binding keys can be defined like this:
+
+```Yaml
+bind_dns_keys:
+  - name: master_key
+    algorithm: hmac-sha256
+    secret: "azertyAZERTY123456"
+bind_extra_include_files:
+  - "{{ bind_auth_file }}"
+
+```
+**tip**: Extra include file must be set as an ansible variable because file is OS dependant
+
+This will be set in a file *"{{ bind_auth_file }}* (e.g. /etc/bind/auth_transfer.conf for debian) which have to be added in the list variable **bind_extra_include_files**
+
 ## Dependencies
 
 No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base)).
