@@ -2,7 +2,7 @@
 // rndc.conf
 //
 {{ ansible_managed | comment('c') }}
-{% for key in bind_keys %}
+{% for key in bind_tsig_keys %}
 {% if key.name == "rndc-key" %}
 # Start of rndc.conf
 key "{{ key.name }}" {

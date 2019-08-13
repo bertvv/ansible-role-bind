@@ -6,8 +6,8 @@
 // See http://www.zytrax.com/books/dns/ch7/ for named.conf configuration details
 //
 //
-{% if bind_keys is defined %}
-{% for key in bind_keys %}
+{% if bind_tsig_keys is defined %}
+{% for key in bind_tsig_keys %}
 key "{{ key.name }}" {
   algorithm {{ key.algorithm }};
   secret "{{ key.secret }}";
@@ -89,8 +89,8 @@ options {
 {% if bind_forwarders|length > 0 %}  forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   query-source address {{ ansible_host }};
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
-  {% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
-  {% endif %}
+{% if bind_recursion %}allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
+{% endif %}
   rrset-order { order {{ bind_rrset_order }}; };
 
   /* Transfer */

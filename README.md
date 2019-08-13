@@ -44,7 +44,6 @@ Variables are not required, unless specified.
 | `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
 | `bind_forward_only`          | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
-| `bind_keys`                  | `[]`                 | A list of Transaction Signature (TSIG) keys, which are dicts with fields `name`, `algorithm`, & `secret`. See example below. |
 | `bind_listen_ipv4`           | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.             |
 | `bind_listen_ipv6`           | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                          |
 | `bind_log`                   | `data/named.run`     | Path to the log file                                                                                                         |
@@ -57,6 +56,7 @@ Variables are not required, unless specified.
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
+| `bind_tsig_keys`             | `[]`                 | A list of Transaction Signature (TSIG) keys, which are dicts with fields `name`, `algorithm`, & `secret`. See example below. |
 | `bind_views`                 | n/a                  | A list of views to configure, with a seperate dict for each view, with relevant details.                                     |
 | ` - allow_query`             | `[]`                 | A list of IPs or ACLs allowed to query the zones in the view.                                                                |
 | ` - allow_transfer`          | `[]`                 | A list of IPs or ACLs allowed to do zone transfers from the zones in the view.                                               |
@@ -68,7 +68,7 @@ Variables are not required, unless specified.
 | ` - match_recursive_only`    | -                    | Determines if only recursive queries can access view.                                                                        |
 | ` - notify`                  | -                    | Determines notify behavior when a zone is changed.  Valid choices are `yes`, `no`, or `explicit`.                            |
 | ` - name`                    | -                    | The view name.                                                                                                               |
-| ` - tsig_keys`               | `[]`                 | A list of Transaction Signature keys used exclusively by the view.  Can not match global keys defined by `bind_keys`.        |
+| ` - tsig_keys`               | `[]`                 | A list of Transaction Signature keys used exclusively by the view.  Can not match global keys defined by `bind_tsig_keys`.        |
 | ` - recursion`               | -     `              | Determines if recursion is enabled for the view.                                                                             |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
@@ -232,7 +232,7 @@ bind_acls:
 ### Transaction Signature (TSIG) keys
 
 ```Yaml
-bind_keys:
+bind_tsig_keys:
   - name: rndc-key
     algorithm: hmac-md5
     secret: "+Cdjlkef9ZTSeixERZ433Q=="
@@ -241,13 +241,13 @@ bind_keys:
 The key secret is a security credential and should be protected as a variable encrypted with ansible-vault.
 
 ```Yaml
-bind_keys:
+bind_tsig_keys:
   - name: rndc-key
     algorithm: hmac-md5
     secret: "{{ vault_rndc_key_secret }}"
 ```
 
-bind_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
+bind_tsig_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
 
 [NIST recommends using HMAC-SHA256 instead of HMAC-MD5 for the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final).
 
