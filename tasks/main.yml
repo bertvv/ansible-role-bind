@@ -7,7 +7,7 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: bind
+  tags: bind,pretask
 
 - name: Check whether `bind_zone_master_server_ip` was set
   assert:
@@ -43,10 +43,6 @@
   check_mode: false
   tags: bind
 
-- name: Create zone hashes
-  include_tasks: hashes.yml
-  when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
-
 - name: Perform common BIND configurations
   include_tasks: common.yml
 
@@ -57,6 +53,17 @@
 - name: Set up the machine as a slave DNS server
   include_tasks: slave.yml
   when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
+
+# file to set keys for XFR authentication
+- name: create extra config file for authenticated XFR request
+  tags: pretask
+  template:
+    src: auth_transfer.j2
+    dest: "{{ bind_conf_dir }}/{{ auth_file }}"
+    mode: 0640
+    owner: root
+    group: bind
+  when: bind_dns_keys is defined and bind_dns_keys|length > 0
 
 - name: Start BIND service
   service:

@@ -18,6 +18,12 @@ bind_zone_domains:
 # List of acls.
 bind_acls: []
 
+# Key binding for slaves
+bind_dns_keys: []
+#  - name: master_key
+#    algorithm: hmac-sha256
+#    secret: "azertyAZERTY123456"
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
@@ -45,6 +51,13 @@ bind_forwarders: []
 
 # DNS round robin order (random or cyclic)
 bind_rrset_order: "random"
+
+# statistics channels configuration
+bind_statistics_channels: false
+bind_statistics_port: 8053
+bind_statistics_host: 127.0.0.1
+bind_statistics_allow:
+  - "127.0.0.1"
 
 # DNSSEC configuration
 bind_dnssec_enable: true

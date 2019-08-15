@@ -20,4 +20,3 @@
     validate: 'named-checkconf %s'
   notify: reload bind
   tags: bind
-
