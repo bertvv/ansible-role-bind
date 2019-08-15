@@ -13,3 +13,12 @@
     validate: 'named-checkconf %s'
   notify: reload bind
   tags: bind
+
+- name: Slave | ensure directory for cached slaves zones
+  file:
+    path: "{{ bind_dir }}/slaves"
+    state: directory
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: '0770'
+    setype: named_cache_t
