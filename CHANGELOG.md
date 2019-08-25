@@ -4,7 +4,7 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## 4.2.0 - 2019-08-10
+## 4.2.0 - 2019-08-25
 
 ### Added
 
@@ -23,9 +23,8 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 ### Changed
 
 - Variable `bind_dnssec_enable` and `bind_dnssec_validation` true|false results in yes|no in named.conf. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Updated README to add information about adding TSIG keys to ACLs. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Improved performance creating slave zones by creating hashes only when creating master zones. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Reorganized global and view options to align with named.conf in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Updated README to explain using TSIG keys as ACLs. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Reorganized global and view options as recommended in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 
 ## 4.1.0 - 2018-10-05
 
