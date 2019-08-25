@@ -83,8 +83,8 @@ options {
 {% if bind_allow_query is defined %}
   allow-query { {{ bind_allow_query|join('; ') }}; };
 {% endif %}
-  disable-empty-zone "254.169.IN-ADDR.ARPA";
-  filter-aaaa-on-v4 yes;
+//  disable-empty-zone "168.192.IN-ADDR.ARPA";
+//  filter-aaaa-on-v4 yes;
 {% if bind_forward_only %}  forward only;{% endif %}
 {% if bind_forwarders|length > 0 %}  forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   query-source address {{ ansible_host }};
@@ -99,17 +99,17 @@ options {
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
 {% endif %}
-  allow-update-forwarding { none; };
+//  allow-update-forwarding { none; };
   notify-source {{ ansible_host }};
-  serial-query-rate 500;
-  transfer-format many-answers;
+//  serial-query-rate 20;
+//  transfer-format many-answers;
   transfer-source {{ ansible_host }};
-  transfers-in 500;
-  transfers-out 500;
-  transfers-per-ns 500;
+//  transfers-in 10;
+//  transfers-out 10;
+//  transfers-per-ns 2;
 
   /* Operations */
-  avoid-v4-udp-ports { 2049; 2114; 2113; 2115; 3000; 8000; 8089; 9997; 2222; 4040; 5575; 7077; 7911; 7912; 8000; 8089; 9090; 9091; 9997; 8070; 8787; 9999; 9004; 2022; 3374; 3115; 1194; 8080; 9000; 9183; };
+//  avoid-v4-udp-ports { none; };
 {% if bind_check_names is defined %}
   check-names {{ bind_check_names }};
 {% endif %}
@@ -117,7 +117,7 @@ options {
   dump-file   "{{ bind_dir }}/data/cache_dump.db";
   listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
   listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
-  masterfile-format text;
+//  masterfile-format text;
   memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
   pid-file "/run/named/named.pid";
 {% if bind_query_log is defined %}
@@ -126,8 +126,8 @@ options {
   querylog no;
 {% endif %}
   session-keyfile "/run/named/session.key";
-  tcp-clients 500;
-  tcp-listen-queue 500;
+//  tcp-clients 100;
+//  tcp-listen-queue 3;
   version none;
 
   /* Security */
