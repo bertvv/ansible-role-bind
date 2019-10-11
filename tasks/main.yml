@@ -21,16 +21,29 @@
     - "{{ bind_packages }}"
   tags: bind
 
-- name: Ensure runtime directories referenced in config exist
+- name: Ensure runtime cache directories referenced in config exist
   file:
     path: "{{ item }}"
     state: directory
     owner: root
     group: "{{ bind_group }}"
     mode: 0770
+    setype: named_cache_t
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
+    - "{{ bind_dir }}/slaves"
+  tags: bind
+
+- name: Ensure runtime zone directories referenced in config exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: "{{ bind_group }}"
+    mode: 0770
+    setype: named_zone_t
+  with_items:
     - "{{ bind_zone_dir }}"
   tags: bind
 
@@ -41,6 +54,9 @@
   run_once: true
   check_mode: false
   tags: bind
+
+- name: Perform common BIND configurations
+  include_tasks: common.yml
 
 - name: Set up the machine as a master DNS server
   include_tasks: master.yml

@@ -1,0 +1,37 @@
+# roles/bind/tasks/common.yml
+# Set up a BIND server
+---
+
+- name: Common | Enable SELinux (common)
+  selinux:
+    policy: targeted
+    state: enforcing
+  when: bind_enable_selinux
+
+- name: Common | Configure BIND options (common)
+  template:
+    src: "{{ bind_options_template }}"
+    dest: "{{ bind_options }}" 
+    owner: root    
+    group: root
+    mode: '0644'
+    setype: named_conf_t
+  notify: restart bind
+  tags: bind
+
+- name: Common | Create rndc config file (common)
+  template:
+    src: etc_rndc.conf.j2
+    dest: "{{ bind_rndc_dir }}/rndc.conf"
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: '0640'
+    setype: named_conf_t
+  tags: bind
+  when: bind_enable_rndc_controls
+
+- name: Common | Remove rndc key file if exists (common)
+  file:
+    path: "{{ bind_rndc_dir }}/rndc.key" 
+    state: absent
+  when: bind_enable_rndc_controls

@@ -4,14 +4,39 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 4.2.0 - 2019-10-11
+
+### Added
+
+- Added support for DNS views. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support for Transaction Signature (TSIG) keys. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support for masters list/clause which can be used with both masters statement and also-notify statement. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added option to clear all slave zone files with variable `bind_clear_slave_zones`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about TSIG keys to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about using Masters list to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about using views to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about scaling slave zones to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot)) 
+- Added support to enable SELinux with variable `bind_enable_selinux`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support to enable rndc controls with variable `bind_enable_rndc_controls`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support to disable IPv6 support with variable `bind_disable_ipv6`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support to customize BIND global configuration with variable `bind_statements`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support to define BIND server clause with variable `bind_servers`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+
+### Changed
+
+- Variable `bind_dnssec_enable` and `bind_dnssec_validation` true|false results in yes|no in named.conf. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Updated README to add information about adding TSIG keys to ACLs. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Improved performance creating slave zones by creating hashes only when creating master zones. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Reorganized global and view options to align with named.conf in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+
 ## 4.1.0 - 2018-10-05
 
-## Added
+### Added
 
 - (GH-53) Add variable `bind_zone_dir` and `bind_zone_file_mode` for setting the master zone file path and mode, and `bind_extra_include_files` for including arbitrary configuration files into named.conf. (credit: [Brad Durrow](https://github.com/bdurrow))
 - (GH-64) Add variable `bind_query_log` to enable query logging (credit: [Angel Barrera](https://github.com/angelbarrera92))
 
-## Changed
+### Changed
 
 - (GH-55) Fix issue with non-existing file when grepping domain (credit: [Tom Meinlschmidt](https://github.com/tmeinlschmidt))
 - (GH-57) Fix issue with forwarding in subdomain delegations (credit: [Stuart Knight](https://github.com/blofeldthefish))
@@ -34,7 +59,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 
 ## 3.9.1 - 2018-04-22
 
-## Changed
+### Changed
 
 - Allow multi-line `ansible_managed` comment (credit: [Fazle Arefin](https://github.com/fazlearefin))
 - Fix the atrocious implementation of (GH-35)

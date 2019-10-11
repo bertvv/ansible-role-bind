@@ -1,6 +1,12 @@
 # roles/bind/defaults/main.yml
 ---
 
+bind_enable_views: false
+bind_enable_selinux: false
+bind_enable_rndc_controls: false
+bind_disable_ipv6: false
+bind_clear_slave_zones: false
+
 bind_log: "data/named.run"
 
 bind_zone_domains:

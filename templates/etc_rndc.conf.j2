@@ -1,0 +1,20 @@
+//
+// rndc.conf
+//
+{{ ansible_managed | comment('c') }}
+{% for key in bind_tsig_keys %}
+{% if key.name == "rndc-key" %}
+# Start of rndc.conf
+key "{{ key.name }}" {
+  algorithm {{ key.algorithm }};
+  secret "{{ key.secret }}";
+};
+
+options {
+        default-key "rndc-key";
+        default-server {{ ansible_host }};
+        default-port 953;
+};
+{% endif %}
+{% endfor %}
+# End of rndc.conf

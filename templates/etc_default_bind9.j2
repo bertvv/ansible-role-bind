@@ -1,0 +1,14 @@
+//
+// /etc/default/bind9
+//
+{{ ansible_managed | comment('c') }}
+//
+#
+# run resolvconf?
+RESOLVCONF=no
+
+{% if bind_disable_ipv6 is sameas true %}
+OPTIONS="-u bind -4"
+{% else %}
+OPTIONS="-u bind"
+{% endif %}

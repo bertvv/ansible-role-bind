@@ -5,3 +5,8 @@
   service:
     name: "{{ bind_service }}"
     state: reloaded
+
+- name: restart bind
+  service:
+    name: "{{ bind_service }}"
+    state: restarted

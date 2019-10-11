@@ -32,9 +32,15 @@ Variables are not required, unless specified.
 | `bind_allow_query`           | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                 |
 | `bind_allow_recursion`       | `['any']`            | Similar to bind_allow_query, this option applies to recursive queries.                                                       |
 | `bind_check_names`           | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).       |
+| `bind_clear_slave_zones`     | `false`              | Determines if all zone files in the slaves directory should be cleared.                                                      |
+| `bind_controls`              | `[]`                 | A list of access controls for rndc utility, which are dicts with fields.  See example below for fields and usage.            |
 | `bind_dns_keys`              | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
 | `bind_dnssec_enable`         | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`     | `true`               | Is DNSSEC validation enabled                                                                                                 |
+| `bind_disable_ipv6`          | `false`              | Determines if IPv6 support is enabled or disabled in BIND on startup.                                                        |
+| `bind_enable_rndc_controls`  | `false`              | Determines if /etc/rndc.conf is created and /etc/rndc.key removed if it exists.                                              |
+| `bind_enable_selinux`        | `false`              | Determines if selinux is enabled or disabled.                                                                                |
+| `bind_enable_views`          | `false`              | Determines if views are enabled or disabled. When enabled, all zones must be assigned to a view.                             |
 | `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
 | `bind_forward_only`          | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
@@ -42,13 +48,36 @@ Variables are not required, unless specified.
 | `bind_listen_ipv6`           | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                          |
 | `bind_log`                   | `data/named.run`     | Path to the log file                                                                                                         |
 | `bind_other_logs`            | -                    | A list of logging channels to configure, with a separate dict for each domain, with relevant details                         |
-| `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
-| `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
-| `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
+| `bind_masters`               | `[]`                 | A list of master servers for zone transfers or slaves servers to be notified with `also-notify`. See example below.          |
 | `bind_query_log`             | -                    | When defined (e.g. `data/query.log`), this will turn on the query log                                                        |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
-| `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
+| `bind_servers`               | n/a                  | BIND clause that defines behavior when interacting with defined remote servers.                                              |
+| ` - ipaddr`                  | -                    | IP address of remote server.                                                                                                 |
+| ` - key`                     | -                    | Name of TSIG key to send to remote server. TSIG key defined with bind_tsig_keys.                                             |
+| ` - edns`                    | `true`               | Enable/disable support for EDNS (RFC 2671) with remote server.                                                               | 
+| ` - bogus`            x      | `false`              | Ignore requests from remote server.                                                                                          |
+| `bind_statements`            | n/a                  | Additional BIND statements to customize configuration. Leave off ";" at the end.                                             |
+| ` - queries`                 | `[]`                 | A list of addtional statememnts controlling queries. (e.g., "filter-aaaa-on-v4 yes")                                         |
+| ` - transfers`               | `[]`                 | A list of addtional statememnts controlling transfers. (e.g., "transfer-format many-answers")                                |
+| ` - operations`              | `[]`                 | A list of addtional statememnts controlling operations. (e.g., "masterfile-format text")                                     | 
+| ` - security`                | `[]`                 | A list of addtional statememnts controlling security. (e.g., "dnssec-lookaside auto")                                        |
+| ` - statistics`              | `[]`                 | A list of addtional statememnts controlling statistics. (e.g., "zone-statistics yes")                                        |
+| `bind_statistics_channels`   | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
+| `bind_tsig_keys`             | `[]`                 | A list of Transaction Signature (TSIG) keys, which are dicts with fields `name`, `algorithm`, & `secret`. See example below. |
+| `bind_views`                 | n/a                  | A list of views to configure, with a seperate dict for each view, with relevant details.                                     |
+| ` - allow_query`             | `[]`                 | A list of IPs or ACLs allowed to query the zones in the view.                                                                |
+| ` - allow_transfer`          | `[]`                 | A list of IPs or ACLs allowed to do zone transfers from the zones in the view.                                               |
+| ` - allow_notify`            | `[]`                 | A list of IPs or ACLs allowed to send NOTIFY messages to zones in the view.                                                  |
+| ` - also_notify`             | `[]`                 | A list of IPs or masters/slaves defined in `bind_masters` that will receive NOTIFY messages from zones in the view.          |
+| ` - include_files`           | `[]`                 | A list of files that will be included in the named.conf configuration for a specific view.                                   |
+| ` - match_clients`           | `[]`                 | A list of IPs or ACLs of client source IP addresses that can send messages to the view.                                      |
+| ` - match_destination`       | `[]`                 | A list of IPs or ACLs of server destination IP addresses that can receive messages for the view.                             |
+| ` - match_recursive_only`    | -                    | Determines if only recursive queries can access view.                                                                        |
+| ` - notify`                  | -                    | Determines notify behavior when a zone is changed.  Valid choices are `yes`, `no`, or `explicit`.                            |
+| ` - name`                    | -                    | The view name.                                                                                                               |
+| ` - tsig_keys`               | `[]`                 | A list of Transaction Signature keys used exclusively by the view.  Can not match global keys defined by `bind_tsig_keys`.   |
+| ` - recursion`               | -                    | Determines if recursion is enabled for the view.                                                                             |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
@@ -58,6 +87,7 @@ Variables are not required, unless specified.
 | `- hosts`                    | `[]`                 | Host definitions. See below this table for examples.                                                                         |
 | `- ipv6_networks`            | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                               |
 | `- mail_servers`             | `[]`                 | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                           |
+| ` - masters`                 | `[]`                 | A list of masters to use for zone transfers. Must be defined in `bind_masters`. Overrides `bind_zone_master_server_ip`       |
 | `- name_servers`             | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                   |
 | `- name`                     | `example.com`        | The domain name                                                                                                              |
 | `- networks`                 | `['10.0.2']`         | A list of the networks that are part of the domain                                                                           |
@@ -65,6 +95,7 @@ Variables are not required, unless specified.
 | `- services`                 | `[]`                 | A list of services to be advertised by SRV records                                                                           |
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
+| `- view`                     | -                    | The view this zone will exist in. View must be defined in `bind_views`. Same zone can be in multiple views. Examples below.  |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
 | `bind_zone_master_server_ip` | -                    | **(Required)** The IP address of the master DNS server.                                                                      |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
@@ -190,7 +221,294 @@ bind_acls:
       - 10.0.0.0/8
 ```
 
-The names of the ACLs will be added to the `allow-transfer` clause in global options.
+The names of the ACLs will be added to the `allow-transfer` clause in global options if bind_views is not defined.
+
+ACLs can also be paired with TSIG keys as a way to control access to views:
+
+```Yaml
+bind_acls:
+  - name: external_key
+    match_list:
+      - "!key internal.example.com"
+      - "key external.example.com"
+  - name: internal_key
+    match_list:
+      - "!key external.example.com"
+      - "key internal.example.com"
+```
+
+### Transaction Signature (TSIG) keys
+
+```Yaml
+bind_tsig_keys:
+  - name: rndc-key
+    algorithm: hmac-md5
+    secret: "+CsdasdfEsdfasdfsQRZ3Q=="
+  - name: external.example.com 
+    algorithm: hmac-md5
+    secret: "+Cdjlkef9ZTSeixERZ433r=="
+  - name: internal.example.com 
+    algorithm: hmac-md5
+    secret: "+qwfasdf9ZTSeixwawwERW=="
+```
+
+The key secret is a security credential and should be protected as a variable encrypted with ansible-vault.
+
+```Yaml
+bind_tsig_keys:
+  - name: rndc-key
+    algorithm: hmac-md5
+    secret: "{{ vault_rndc_key_secret }}"
+```
+
+bind_tsig_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
+
+[NIST recommends using HMAC-SHA256 instead of HMAC-MD5 for the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final).
+
+
+### Server list
+
+```Yaml
+bind_servers:
+  - name: 192.168.28.63
+    key: internal.example.com
+  - name: 192.168.8.64
+    key: external.example.com 
+```
+
+To use TSIG keys with remote servers, define the key to be used for each remote server in bind_servers 
+
+
+### Masters list
+
+A masters list can be used in two different ways.  First, it can be used with the masters statement in a slave zone to define a list of master servers and the TSIG keys needed to transfer a zone file. Second, it can be used with the also-notify statement to define a list of slave servers with the TSIG keys needed to notify after an update.  Masters lists are defined like this:
+
+```Yaml
+bind_masters:
+  - name: EXTERNAL_MASTERS
+    master_list:
+      - address: 200.100.230.160
+        tsig_key: external.example.com
+
+  - name: INTERNAL_MASTERS
+    master_list:
+      - address: 192.168.8230.160
+
+  - name: AKAMAI_ZTAS
+    master_list:
+      - address: 23.73.133.141
+        tsig_key: external.example.com
+      - address: 23.73.133.237
+        tsig_key: external.example.com
+      - address: 23.73.134.141
+        tsig_key: external.example.com
+      - address: 23.73.134.237
+        tsig_key: external.example.com
+```
+
+In the example above, the first two masters lists are masters a slave server will get zone tranfers from along with a TSIG key, if needed.  The third master is a list of slaves for a cloud DNS service that will be notified after an update.
+
+### View definitions
+
+```Yaml
+bind_views:
+  - name: EXTERNAL
+    allow_query:
+      - external_key
+    allow_transfer:
+      - external_key
+    allow_notify:
+      - external_key
+    also_notify:
+      - AKAMAI_ZTAS
+    match_clients:
+      - external_key
+    match_destinations:
+      - any
+    match_recursive_only: false
+    notify: explicit
+    tsig_keys:
+      - name: external.example.com
+        algorithm: HMAC-SHA256
+        secret: "{{ vault_external_secret }}"
+    recursion: false
+
+  - name: INTERNAL
+    allow_query:
+      - "!key external.example.com"
+      - "key internal.example.com"
+      - 192.168.20.20
+      - 127.0.0.1
+    allow_transfer:
+      - "!key external.example.com"
+      - "key internal.example.com"
+    allow_notify:
+      - "!key external.example.com"
+      - "key internal.example.com"
+    also_notify:
+      - 192.168.12.12 
+    match_clients:
+      - "!key external.example.com"
+      - "key internal.example.com"
+      - 192.168.20.20
+      - 127.0.0.1
+    match_destinations:
+      - any
+    match_recursive_only: false
+    notify: explicit
+    include_files:
+      - /etc/named.extra.zones
+    tsig_keys:
+      - name: internal.example.com
+        algorithm: HMAC-SHA256
+        secret: "{{ vault_internal_secret }}"
+    recursion: false
+```
+
+Above are two common views, internal and external.  The external view controls access with TSIG keys defined previously as ACLs.  It also notifies the Akamai cloud DNS servers by its masters name after any zone changes.  The internal view controls access using TSIG keys and IP addresses and sends notifies by IP.  Each view has its own TSIG key.  [NIST recommends using HMAC-SHA256 as the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final)
+
+For more information on configuring views, read: [Understanding views in BIND 9, by example](https://kb.isc.org/docs/aa-00851) 
+
+For more information on configuring DNS securely, read NIST Special Publication 800-81-2: [Secure Domain Name System (DNS) Deployment Guide](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-81-2.pdf) 
+
+### Minimal variables for a working zone with views
+
+Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+
+| Variable                     | Master | Slave |
+| :---                         | :---:  | :---: |
+| `bind_zone_domains`          | V      | V     |
+| `  - name`                   | V      | V     |
+| `  - view`                   | V      | V     |
+| `  - networks`               | V      | --    |
+| `  - name_servers`           | V      | --    |
+| `  - hosts`                  | V      | --    |
+| `bind_listen_ipv4`           | V      | V     |
+| `bind_allow_query`           | V      | V     |
+
+### Domain definitions for master with view and masters list defined.
+
+```Yaml
+bind_zone_domains:
+  - name: example.com
+    view: EXTERNAL
+    masters: EXTERNAL_MASTER
+    hosts:
+      - name: pub01
+        ip: 192.0.2.1
+        ipv6: 2001:db8::1
+        aliases:
+          - ns
+      - name: '@'
+        ip:
+          - 192.0.2.2
+          - 192.0.2.3
+        ipv6:
+          - 2001:db8::2
+          - 2001:db8::3
+        aliases:
+          - www
+      - name: priv01
+        ip: 10.0.0.1
+    networks:
+      - '192.0.2'
+      - '10'
+      - '172.16'
+    delegate:
+      - zone: foo
+        dns: 192.0.2.1
+    services:
+      - name: _ldap._tcp
+        weight: 100
+        port: 88
+        target: dc001
+```
+
+This domain is configured for the EXTERNAL view.  It will use the masters configuration named EXTERNAL_MASTERS instead of the bind_zone_master_server_ip value.
+
+### Domain definition for slave with view and masters defined. 
+
+```Yaml
+bind_zone_domains: [
+  { name: example.com, view: EXTERNAL, masters: EXTERNAL_MASTERS },
+  { name: test.com, view: EXTERNAL, masters: EXTERNAL_MASTERS },
+  { name: example.com, view: INTERNAL },
+  { name: test.com, view: INTERNAL }
+]
+```
+
+### Scaling slave zones
+
+If you have very large numbers of forward and reverse slave zones in multiple views, you can easily manage them as multiple dicts stored in separate YAML files:
+
+group_vars/all/external_forward_zones.yaml:
+
+```Yaml
+---
+external_forward_zones: [
+  { name: example.com, view: External, masters: EXTERNAL_MASTERS },
+  { name: example.net, view: External, masters: EXTERNAL_MASTERS },
+  { name: example.org, view: External, masters: EXTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/external_reverse_zones.yaml:
+
+```Yaml
+---
+external_reverse_zones: [
+  { name: 16.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  { name: 17.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  { name: 18.24.85.in-addr.arpa, view: External, masters: EXTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/internal_forward_zones.yaml:
+
+```Yaml
+---
+internal_forward_zones: [
+  { name: internal.com, view: Internal, masters: INTERNAL_MASTERS },
+  { name: internal.net, view: Internal, masters: INTERNAL_MASTERS },
+  { name: intenral.org, view: Internal, masters: INTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+group_vars/all/internal_reverse_zones.yaml:
+
+```Yaml
+---
+internal_reverse_zones: [
+  { name: 8.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  { name: 9.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  { name: 10.24.10.in-addr.arpa, view: Internal, masters: INTERNAL_MASTERS },
+  .
+  .
+  .
+```
+
+You can then merge one or more dicts into bind_zone_domains in your playbook:
+
+```Yaml
+---
+- hosts: my_slave_zones
+  become: yes
+  roles:
+    - ansible-role-bind
+
+  pre_tasks:
+  - name: Merge zones dicts
+    set_fact:
+      bind_zone_domains: "{{ external_forward_zones }} + {{ external_reverse_zones }} +
+                          {{ internal_forward_zones }} + {{ internal_reverse_zones }}"
+
+```
 
 ### Binding Keys
 
@@ -373,3 +691,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
 - [jadjay](https://github.com/jadjay)
+- [Robbie Fontenot](https://github.com/WRJFontenot)

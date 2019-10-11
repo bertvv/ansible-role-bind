@@ -1,0 +1,25 @@
+//
+// /etc/sysconfig/named
+//
+{{ ansible_managed | comment('c') }}
+//
+# BIND named process options
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+# OPTIONS="whatever"     --  These additional options will be passed to named
+#                            at startup. Don't add -t here, enable proper
+#                            -chroot.service unit file.
+#                            Use of parameter -c is not supported here. Extend
+#                            systemd named*.service instead. For more
+#                            information please read the following KB article:
+#                            https://access.redhat.com/articles/2986001
+#
+# DISABLE_ZONE_CHECKING  --  By default, service file calls named-checkzone
+#                            utility for every zone to ensure all zones are
+#                            valid before named starts. If you set this option
+#                            to 'yes' then service file doesn't perform those
+#                            checks.
+{% if bind_disable_ipv6 is sameas true %}
+OPTIONS="-4"
+{% else %}
+{% endif %}
