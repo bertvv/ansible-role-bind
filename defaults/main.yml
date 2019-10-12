@@ -7,6 +7,15 @@ bind_enable_rndc_controls: false
 bind_disable_ipv6: false
 bind_clear_slave_zones: false
 
+# List of Transaction Signature keys.
+bind_tsig_keys: []
+# List of additional global option statements for queries, transfers, operations, security, and statistics.
+bind_statements: []
+# List of remote servers with specific behaviors.
+bind_servers: []
+# List of masters for a slave to use or a list of servers to notify with also_notify.
+bind_masters: []
+
 bind_log: "data/named.run"
 
 bind_zone_domains:
