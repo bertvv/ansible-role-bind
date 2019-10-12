@@ -25,7 +25,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: root
+    owner: "{{ bind_owner }}"  
     group: "{{ bind_group }}"
     mode: 0770
     setype: named_cache_t
@@ -39,7 +39,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: root
+    owner: "{{ bind_owner }}"  
     group: "{{ bind_group }}"
     mode: 0770
     setype: named_zone_t
