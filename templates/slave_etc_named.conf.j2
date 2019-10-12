@@ -76,7 +76,6 @@ options {
 {% if bind_forwarders|length > 0 %}
   forwarders { {{ bind_forwarders|join('; ') }}; };
 {% endif %}
-  query-source address {{ ansible_host }};
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
 {% if bind_recursion %}
   allow-recursion { {{ bind_allow_recursion|join('; ') }}; };
@@ -94,8 +93,6 @@ options {
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
 {% endif %}
 {% endif %}
-  notify-source {{ ansible_host }};
-  transfer-source {{ ansible_host }};
 {% if bind_statements.transfers is defined %}
 {% for statements in bind_statements.transfers %}
   {{ statements }};
