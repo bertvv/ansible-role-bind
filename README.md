@@ -52,12 +52,12 @@ Variables are not required, unless specified.
 | `bind_query_log`             | -                    | When defined (e.g. `data/query.log`), this will turn on the query log                                                        |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
-| `bind_servers`               | n/a                  | BIND clause that defines behavior when interacting with defined remote servers.                                              |
+| `bind_servers`               | `[]`                 | BIND clause that defines behavior when interacting with defined remote servers.                                              |
 | ` - ipaddr`                  | -                    | IP address of remote server.                                                                                                 |
 | ` - key`                     | -                    | Name of TSIG key to send to remote server. TSIG key defined with bind_tsig_keys.                                             |
 | ` - edns`                    | `true`               | Enable/disable support for EDNS (RFC 2671) with remote server.                                                               | 
-| ` - bogus`            x      | `false`              | Ignore requests from remote server.                                                                                          |
-| `bind_statements`            | n/a                  | Additional BIND statements to customize configuration. Leave off ";" at the end.                                             |
+| ` - bogus`                   | `false`              | Ignore requests from remote server.                                                                                          |
+| `bind_statements`            | `[]`                 | Additional BIND statements to customize configuration. Leave off ";" at the end.                                             |
 | ` - queries`                 | `[]`                 | A list of addtional statememnts controlling queries. (e.g., "filter-aaaa-on-v4 yes")                                         |
 | ` - transfers`               | `[]`                 | A list of addtional statememnts controlling transfers. (e.g., "transfer-format many-answers")                                |
 | ` - operations`              | `[]`                 | A list of addtional statememnts controlling operations. (e.g., "masterfile-format text")                                     | 
