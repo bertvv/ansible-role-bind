@@ -15,6 +15,7 @@ key "{{ key.name }}" {
 {% endfor %}
 {% endif %}
 
+{% if bind_acls is defined %}
 {% for acl in bind_acls %}
 acl "{{ acl.name }}" {
 {% for match in acl.match_list %}
@@ -22,9 +23,10 @@ acl "{{ acl.name }}" {
 {% endfor %}
 };
 {% endfor %}
+{% endif %}
 
-controls {
 {% if bind_controls is defined %}
+controls {
 {% for control in bind_controls %}
   inet {{ control.inet }} port {{ control.port }}
     allow {
@@ -41,21 +43,33 @@ controls {
 {% endif %}
   ;
 {% endfor %}
-{% endif %}
 };
+{% endif %}
 
 logging {
-	channel dns_syslog {
-	syslog local5;
-	severity info;
-};
-	channel messages {
-	syslog;
-	severity info;
-};
-	category default { messages; };
-	category notify  { null; };
-	category queries { dns_syslog; };
+  channel default_debug {
+    file "{{ bind_log }}";
+    severity dynamic;
+    print-time yes;
+  };
+{% if bind_query_log is defined %}
+  channel querylog {
+    file "{{ bind_query_log }}" versions 600 size 20m;
+    severity dynamic;
+    print-time yes;
+  };
+  category queries { querylog; };
+{% endif %}
+{% if bind_other_logs is defined %}
+{% for log in bind_other_logs %}
+  channel {{ log.name }} {
+    file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    severity dynamic;
+    print-time yes;
+  };
+  category "{{ log.name }}" { "{{ log.name }}"; };
+{% endfor %}
+{% endif %}
 };
 
 {% if bind_statistics_channels %}
@@ -100,21 +114,19 @@ options {
 {% endif %}
 
   /* Operations */
+  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
+  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
+  directory   "{{ bind_dir }}";
+  dump-file   "{{ bind_dir }}/data/cache_dump.db";
+  memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
+  session-keyfile "/run/named/session.key";
+  pid-file "/run/named/named.pid";
 {% if bind_check_names is defined %}
   check-names {{ bind_check_names }};
 {% endif %}
-  directory   "{{ bind_dir }}";
-  dump-file   "{{ bind_dir }}/data/cache_dump.db";
-  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
-  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
-  memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
-  pid-file "/run/named/named.pid";
 {% if bind_query_log is defined %}
   querylog yes;
-{% else %}
-  querylog no;
 {% endif %}
-  session-keyfile "/run/named/session.key";
 {% if bind_statements.operations is defined %}
 {% for statements in bind_statements.operations %}
   {{ statements }};
@@ -123,9 +135,10 @@ options {
 
   /* Security */
   bindkeys-file "/etc/named.iscdlv.key";
+  managed-keys-directory "{{ bind_dir }}/dynamic";
   dnssec-enable {% if bind_dnssec_enable %}yes{% else %}no{% endif %};
   dnssec-validation {% if bind_dnssec_validation %}yes{% else %}no{% endif %};
-  managed-keys-directory "{{ bind_dir }}/dynamic";
+  dnssec-lookaside {% if bind_dnssec_validation %}auto{% else %}no{% endif %};
 {% if bind_statements.security is defined %}
 {% for statements in bind_statements.security %}
   {{ statements }};
@@ -142,7 +155,6 @@ options {
 
 }; # end GLOBAL options
 
-
 {% if bind_servers is defined %}
 {% for bind_server in bind_servers %}
 server {{ bind_server.ipaddr }} {
@@ -158,7 +170,6 @@ server {{ bind_server.ipaddr }} {
 };
 {% endfor %}
 {% endif %}
-
 
 {% if bind_masters is defined %}
 {% for bind_master in bind_masters %}

@@ -5,7 +5,8 @@ bind_packages:
   - python-netaddr
   - bind9
   - bind9utils
-  - python-selinux
+#  - selinux
+#  - python-selinux
 
 bind_service: bind9
 
