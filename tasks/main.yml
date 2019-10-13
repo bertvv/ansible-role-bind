@@ -59,10 +59,16 @@
   include_tasks: common.yml
 
 - name: Set up the machine as a master DNS server
+  vars:
+    is_master: true
+    is_slave: false
   include_tasks: master.yml
   when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
 
 - name: Set up the machine as a slave DNS server
+  vars:
+    is_master: false
+    is_slave: true
   include_tasks: slave.yml
   when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
 

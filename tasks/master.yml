@@ -72,7 +72,7 @@
 
 - name: Master | Main BIND config file (master)
   template:
-    src: master_etc_named.conf.j2
+    src: etc_named.conf.j2
     dest: "{{ bind_config }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
