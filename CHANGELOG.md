@@ -4,30 +4,33 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
-## 4.2.0 - 2019-10-11
+## 4.2.0 - 2019-10-12
 
 ### Added
 
-- Added support for DNS views. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added support for Transaction Signature (TSIG) keys. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added support for masters list/clause which can be used with both masters statement and also-notify statement. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added option to clear all slave zone files with variable `bind_clear_slave_zones`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support for DNS views with variables `bind_views` and `bind_enable_views`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support for Transaction Signature (TSIG) keys with variable `bind_tsig_keys`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support for `masters` clause with variable `bind_masters` (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+(https://github.com/WRJFontenot))
+- Added support for `server` clause with variable `bind_servers`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about using DNS views to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Added information about TSIG keys to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added information about using Masters list to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added information about using views to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about using `masters` clause to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added information about using `server` clause to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Added information about scaling slave zones to README. (credit: [Robbie Fontenot](https://github.com/WRJFontenot)) 
+- Added option to clear all slave zone files with variable `bind_clear_slave_zones`. (credit: [Robbie Fontenot]
 - Added support to enable SELinux with variable `bind_enable_selinux`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Added support to enable rndc controls with variable `bind_enable_rndc_controls`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Added support to disable IPv6 support with variable `bind_disable_ipv6`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added support to customize BIND global configuration with variable `bind_statements`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Added support to define BIND server clause with variable `bind_servers`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Added support to customize BIND global options with variable `bind_statements`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 
 ### Changed
 
-- Variable `bind_dnssec_enable` and `bind_dnssec_validation` true|false results in yes|no in named.conf. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Updated README to add information about adding TSIG keys to ACLs. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Setting variables `bind_dnssec_enable` and `bind_dnssec_validation` true|false now results in yes|no in named.conf. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- If `bind_dnssec_validation` is `true`, `bind_dnssec_lookaside` is added and set to `auto`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Improved performance creating slave zones by creating hashes only when creating master zones. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Reorganized global and view options to align with named.conf in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Merged master and slave named.conf template files into one template file. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 
 ## 4.1.0 - 2018-10-05
 
