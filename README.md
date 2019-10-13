@@ -75,7 +75,7 @@ Variables are not required, unless specified.
 | ` - match_destination`       | `[]`                 | A list of IPs or ACLs of server destination IP addresses that can receive messages for the view.                             |
 | ` - match_recursive_only`    | -                    | Determines if only recursive queries can access view.                                                                        |
 | ` - notify`                  | -                    | Determines notify behavior when a zone is changed.  Valid choices are `yes`, `no`, or `explicit`.                            |
-| ` - name`                    | -                    | The view name.                                                                                                               |
+| ` - name`                    | `default`            | The view name.                                                                                                               |
 | ` - tsig_keys`               | `[]`                 | A list of Transaction Signature keys used exclusively by the view.  Can not match global keys defined by `bind_tsig_keys`.   |
 | ` - recursion`               | -                    | Determines if recursion is enabled for the view.                                                                             |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
@@ -261,22 +261,30 @@ bind_tsig_keys:
     secret: "{{ vault_rndc_key_secret }}"
 ```
 
-bind_tsig_keys defines global TSIG keys only. TSIG keys used by views must be defined within bind_views.
+`bind_tsig_keys` defines global TSIG keys only. TSIG keys used by views must be defined within `bind_views`.
+
+TSIG keys are used to secure queries, DDNS updates, and zone transfers between BIND servers.  See [Securing zone transfers with TSIG](http://ddiguru.com/blog/45-dns/42-securing-zone-transfers-with-tsig) for more information.
 
 [NIST recommends using HMAC-SHA256 instead of HMAC-MD5 for the TSIG algorithm](https://csrc.nist.gov/publications/detail/sp/800-81/2/final).
-
 
 ### Server list
 
 ```Yaml
 bind_servers:
-  - name: 192.168.28.63
-    key: internal.example.com
   - name: 192.168.8.64
     key: external.example.com 
+  - name: 192.168.28.63
+    key: internal.example.com
+    edns: false
+  - name: 172.16.1.6
+    key: badserver.example.com
+    bogus: true
 ```
 
-To use TSIG keys with remote servers, define the key to be used for each remote server in bind_servers 
+The `server` statement defines characteristics to be associated with a remote name server. To send TSIG keys to remote BIND servers, define the key to be used for each remote BIND server in bind_servers.  Only one key is supported per server.  hmac-md5 TSIG keys are not supported by Microsoft Active Directory DNS servers.
+
+`edns` enable|disable Extension mechanisms for DNS (EDNS) [RFC 6891](https://tools.ietf.org/html/rfc6891).
+`bogus` is used to prevent queries being sent to remote servers with bad data.
 
 
 ### Masters list
