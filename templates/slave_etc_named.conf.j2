@@ -193,12 +193,12 @@ include "{{ file }}";
 {% for bind_zone in bind_zone_domains %}
 zone "{{ bind_zone.name }}" IN {
   type slave;
+  file "slaves/{{ bind_zone.name }}";
 {% if bind_zone.masters is defined %}
   masters { {{ bind_zone.masters }}; };
 {% else %}
   masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-  file "slaves/{{ bind_zone.name }}";
 {% if bind_zone.delegate is defined %}
   forwarders {};
 {% endif %}
@@ -208,12 +208,12 @@ zone "{{ bind_zone.name }}" IN {
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type slave;
+  file "slaves/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% if bind_zone.masters is defined %}
   masters { {{ bind_zone.masters }}; };
 {% else %}
   masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-  file "slaves/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 };
 {% endfor %}
 {% endif %}
@@ -222,12 +222,12 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type slave;
+  file "slaves/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% if bind_zone.masters is defined %}
   masters { {{ bind_zone.masters }}; };
 {% else %}
   masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-  file "slaves/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 };
 {% endfor %}
 {% endif %}
@@ -302,12 +302,12 @@ view "{{ bind_view.name }}" {
 {% if bind_zone.view is defined and bind_zone.view == bind_view.name %}
   zone "{{ bind_zone.name }}" IN {
     type slave;
+    file "slaves/{{ bind_view.name }}_{{ bind_zone.name }}";
 {% if bind_zone.masters is defined %}
     masters { {{ bind_zone.masters }}; };
 {% else %}
     masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-    file "slaves/{{ bind_view.name }}_{{ bind_zone.name }}";
 {% if bind_zone.delegate is defined %}
     forwarders {};
 {% endif %}
@@ -317,12 +317,12 @@ view "{{ bind_view.name }}" {
 {% for network in bind_zone.networks %}
   zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
     type slave;
+    file "slaves/{{ bind_view.name }}_{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% if bind_zone.masters is defined %}
     masters { {{ bind_zone.masters }}; };
 {% else %}
     masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-    file "slaves/{{ bind_view.name }}_{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   };
 {% endfor %}
 {% endif %}
@@ -331,12 +331,12 @@ view "{{ bind_view.name }}" {
 {% for network in bind_zone.ipv6_networks %}
   zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
     type slave;
+    file "slaves/{{ bind_view.name }}_{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% if bind_zone.masters is defined %}
     masters { {{ bind_zone.masters }}; };
 {% else %}
     masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
-    file "slaves/{{ bind_view.name }}_{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   };
 {% endfor %}
 {% endif %}
@@ -344,7 +344,6 @@ view "{{ bind_view.name }}" {
 {% endfor %}
 
 }; # end {{ bind_view.name }} view
-
 
 {% endfor %}
 {% endif %}

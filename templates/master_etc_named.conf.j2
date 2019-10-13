@@ -323,7 +323,7 @@ view "{{ bind_view.name }}" {
     allow-update { {{ bind_zone.allow_update|join(';') }}; };
 {% else %}
     allow-update { none; };
-{% endif %}							 
+{% endif %}
 {% if bind_zone.delegate is defined %}
     forwarders {};
 {% endif %}
@@ -368,7 +368,6 @@ view "{{ bind_view.name }}" {
 {% endfor %}
 
 }; # end {{ bind_view.name }} view
-
 
 {% endfor %}
 {% endif %}

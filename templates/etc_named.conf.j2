@@ -345,89 +345,89 @@ view "{{ bind_view.name }}" {
 
 {% for bind_zone in bind_zone_domains %}
 {% if bind_zone.view is defined and bind_zone.view == bind_view.name %}
-zone "{{ bind_zone.name }}" IN {
+  zone "{{ bind_zone.name }}" IN {
 {% if is_master %}
-  type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
-  notify yes;
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
+    notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
 {% else %}
-  allow-update { none; };
+    allow-update { none; };
 {% endif %}
 {% endif %}
 {% if is_slave %}
-  type slave;
-  file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
+    type slave;
+    file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ bind_zone.name }}";
 {% if bind_zone.masters is defined %}
-  masters { {{ bind_zone.masters }}; };
+    masters { {{ bind_zone.masters }}; };
 {% else %}
-  masters { {{ bind_zone_master_server_ip }}; };
+    masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
 {% endif %}
 {% if bind_zone.delegate is defined %}
-  forwarders {};
+    forwarders {};
 {% endif %}
-};
+  };
 
 {% if bind_zone.networks is defined %}
 {% for network in bind_zone.networks %}
-zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
+  zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
 {% if is_master %}
-  type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
-  notify yes;
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+    notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
 {% else %}
-  allow-update { none; };
+    allow-update { none; };
 {% endif %}
 {% endif %}
 {% if is_slave %}
-  type slave;
-  file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+    type slave;
+    file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 {% if bind_zone.masters is defined %}
-  masters { {{ bind_zone.masters }}; };
+    masters { {{ bind_zone.masters }}; };
 {% else %}
-  masters { {{ bind_zone_master_server_ip }}; };
+    masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
 {% endif %}
-};
+  };
 {% endfor %}
 {% endif %}
 
 {% if bind_zone.ipv6_networks is defined %}
 {% for network in bind_zone.ipv6_networks %}
-zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+  zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
 {% if is_master %}
-  type master;
-  file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
-  notify yes;
+    type master;
+    file "{{ bind_zone_dir }}/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+    notify yes;
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join(';') }}; };
+    also-notify  { {{ bind_zone.also_notify|join(';') }}; };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
-  allow-update { {{ bind_zone.allow_update|join(';') }}; };
+    allow-update { {{ bind_zone.allow_update|join(';') }}; };
 {% else %}
-  allow-update { none; };
+    allow-update { none; };
 {% endif %}
 {% endif %}
 {% if is_slave %}
-  type slave;
-  file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+    type slave;
+    file "slaves/{% if bind_enable_views is sameas true %}{{ bind_zone.view }}_{% endif %}{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% if bind_zone.masters is defined %}
-  masters { {{ bind_zone.masters }}; };
+    masters { {{ bind_zone.masters }}; };
 {% else %}
-  masters { {{ bind_zone_master_server_ip }}; };
+    masters { {{ bind_zone_master_server_ip }}; };
 {% endif %}
 {% endif %}
-};
+  };
 {% endfor %}
 {% endif %}
 {% endif %}
