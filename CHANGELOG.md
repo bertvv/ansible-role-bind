@@ -29,7 +29,7 @@ This file adheres to the guidelines of [http://keepachangelog.com/](http://keepa
 - Setting variables `bind_dnssec_enable` and `bind_dnssec_validation` true|false now results in yes|no in named.conf. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - If `bind_dnssec_validation` is `true`, `bind_dnssec_lookaside` is added and set to `auto`. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Improved performance creating slave zones by creating hashes only when creating master zones. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
-- Reorganized global and view options to align with named.conf in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
+- Reorganized global and view options to follow recommended named.conf structure in [http://www.zytrax.com/books/dns/ch7/](http://www.zytrax.com/books/dns/ch7/) (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 - Merged master and slave named.conf template files into one template file. (credit: [Robbie Fontenot](https://github.com/WRJFontenot))
 
 ## 4.1.0 - 2018-10-05
