@@ -42,6 +42,9 @@
   check_mode: false
   tags: bind
 
+- name: Perform common BIND configurations
+  include_tasks: common.yml
+
 - name: Set up the machine as a master DNS server
   include_tasks: master.yml
   when: bind_zone_master_server_ip in ansible_all_ipv4_addresses

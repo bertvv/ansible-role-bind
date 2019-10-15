@@ -11,6 +11,10 @@ bind_service: bind9
 # Main config file
 bind_config: /etc/bind/named.conf
 
+# BIND Options
+bind_options: /etc/default/bind9 
+bind_options_template: etc_default_bind9.j2
+
 # Localhost zone
 bind_default_zone_files:
   - /etc/bind/named.conf.default-zones

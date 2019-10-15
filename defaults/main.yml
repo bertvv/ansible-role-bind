@@ -1,6 +1,8 @@
 # roles/bind/defaults/main.yml
 ---
 
+bind_disable_ipv6: false
+
 bind_log: "data/named.run"
 
 bind_zone_domains:

@@ -35,6 +35,7 @@ Variables are not required, unless specified.
 | `bind_dns_keys`              | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
 | `bind_dnssec_enable`         | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`     | `true`               | Is DNSSEC validation enabled                                                                                                 |
+| `bind_disable_ipv6`          | `false`              | Determines if IPv6 support is enabled or disabled in BIND via startup options.                                               |
 | `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
 | `bind_forward_only`          | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
@@ -42,9 +43,6 @@ Variables are not required, unless specified.
 | `bind_listen_ipv6`           | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                          |
 | `bind_log`                   | `data/named.run`     | Path to the log file                                                                                                         |
 | `bind_other_logs`            | -                    | A list of logging channels to configure, with a separate dict for each domain, with relevant details                         |
-| `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
-| `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
-| `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
 | `bind_query_log`             | -                    | When defined (e.g. `data/query.log`), this will turn on the query log                                                        |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |

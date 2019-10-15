@@ -11,6 +11,10 @@ bind_service: named
 # Main config file
 bind_config: /etc/named.conf
 
+# BIND Options
+bind_options: /etc/sysconfig/named
+bind_options_template: etc_sysconfig_named.j2
+
 # Zone files included in the installation
 bind_default_zone_files:
   - /etc/named.root.key

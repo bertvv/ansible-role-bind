@@ -1,0 +1,15 @@
+# roles/bind/tasks/common.yml
+# Common configuration tasks for master/slave BIND servers
+---
+
+- name: Common | Configure BIND options to disable IPv6 (common)
+  template:
+    src: "{{ bind_options_template }}"
+    dest: "{{ bind_options }}" 
+    owner: root    
+    group: root
+    mode: '0644'
+    setype: named_conf_t
+  notify: restart bind
+  tags: bind
+  when: bind_disable_ipv6
