@@ -2,7 +2,6 @@
 ---
 
 bind_packages:
-  - python-netaddr
   - bind9
   - bind9utils
 
