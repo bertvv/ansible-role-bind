@@ -5,13 +5,20 @@ env:
   matrix:
     - DISTRIBUTION: centos
       VERSION: 7
+    - DISTRIBUTION: centos
+      VERSION: 8
+    - DISTRIBUTION: oraclelinux
+      VERSION: 7
+    - DISTRIBUTION: oraclelinux
+      VERSION: 8
     - DISTRIBUTION: ubuntu
       VERSION: 16.04
     - DISTRIBUTION: ubuntu
       VERSION: 18.04
     - DISTRIBUTION: debian
       VERSION: 9
-
+    - DISTRIBUTION: debian
+      VERSION: 10
 services:
   - docker
 
