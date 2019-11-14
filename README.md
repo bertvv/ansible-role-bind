@@ -83,7 +83,7 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | :---                         | :---:  | :---: |
 | `bind_zone_domains`          | V      | V     |
 | `  - name`                   | V      | V     |
-| `  - networks`               | V      | --    |
+| `  - networks`               | V      | V     |
 | `  - name_servers`           | V      | --    |
 | `  - hosts`                  | V      | --    |
 | `bind_listen_ipv4`           | V      | V     |
