@@ -36,7 +36,6 @@ options {
 
   dnssec-enable {{ bind_dnssec_enable }};
   dnssec-validation {{ bind_dnssec_validation }};
-  dnssec-lookaside auto;
 
   /* Path to ISC DLV key */
   bindkeys-file "/etc/named.iscdlv.key";
