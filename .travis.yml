@@ -5,6 +5,8 @@ env:
   matrix:
     - DISTRIBUTION: centos
       VERSION: 7
+    - DISTRIBUTION: centos
+      VERSION: 8
     - DISTRIBUTION: ubuntu
       VERSION: 16.04
     - DISTRIBUTION: ubuntu

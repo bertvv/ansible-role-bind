@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
 
-An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains on EL7/8 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -366,6 +366,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Jörg Eichhorn](https://github.com/jeichhorn)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)

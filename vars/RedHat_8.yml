@@ -1,0 +1,26 @@
+# roles/bind/vars/RedHat.yml
+---
+
+bind_packages:
+  - python3-netaddr
+  - bind
+  - bind-utils
+
+bind_service: named
+
+# Main config file
+bind_config: /etc/named.conf
+
+# Zone files included in the installation
+bind_default_zone_files:
+  - /etc/named.root.key
+  - /etc/named.rfc1912.zones
+
+# Directory with run-time stuff
+bind_dir: /var/named
+bind_conf_dir: "/etc/named/"
+auth_file: "auth_transfer.conf"
+bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
+
+bind_owner: root
+bind_group: named
