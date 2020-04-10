@@ -18,7 +18,7 @@
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': item.hosts|default([])}) %}
+{% set _ = _zone_data.update({'hosts': item.bind_hosts|default([])}) %}
 {% set _ = _zone_data.update({'delegate': item.delegate|default([])}) %}
 {% set _ = _zone_data.update({'services': item.services|default([])}) %}
 {% set _ = _zone_data.update({'text': item.text|default([])}) %}

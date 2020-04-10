@@ -55,7 +55,7 @@ Variables are not required, unless specified.
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
 | `- hostmaster_email`         | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                  |
-| `- hosts`                    | `[]`                 | Host definitions. See below this table for examples.                                                                         |
+| `- bind_hosts`                    | `[]`                 | Host definitions. See below this table for examples.                                                                         |
 | `- ipv6_networks`            | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                               |
 | `- mail_servers`             | `[]`                 | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                           |
 | `- name_servers`             | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                   |
@@ -85,7 +85,7 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | `  - name`                   | V      | V     |
 | `  - networks`               | V      | V     |
 | `  - name_servers`           | V      | --    |
-| `  - hosts`                  | V      | --    |
+| `  - bind_hosts`                  | V      | --    |
 | `bind_listen_ipv4`           | V      | V     |
 | `bind_allow_query`           | V      | V     |
 
@@ -94,7 +94,7 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 ```Yaml
 bind_zone_domains:
   - name: mydomain.com
-    hosts:
+    bind_hosts:
       - name: pub01
         ip: 192.0.2.1
         ipv6: 2001:db8::1
@@ -152,7 +152,7 @@ bind_zone_domains:
 
 ### Hosts
 
-Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip`,  `aliases` and `sshfp`. Aliases can be CNAME (default) or DNAME records.
+Host names that this DNS server should resolve can be specified in `bind_hosts` as a list of dicts with fields `name`, `ip`,  `aliases` and `sshfp`. Aliases can be CNAME (default) or DNAME records.
 
 To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
