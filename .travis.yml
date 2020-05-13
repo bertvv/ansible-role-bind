@@ -12,7 +12,7 @@ install:
   # Install dependencies for Molecule test
   - python3 -m pip install ansible
   - python3 -m pip install pytest
-  - python3 -m pip install testinfra
+  - python3 -m pip install netaddr
   - python3 -m pip install molecule
   - python3 -m pip install docker
 
