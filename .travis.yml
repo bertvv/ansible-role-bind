@@ -1,42 +1,28 @@
 ---
+language: python
+
+# Use the new container infrastructure
 sudo: required
 
-env:
-  matrix:
-    - DISTRIBUTION: centos
-      VERSION: 7
-    - DISTRIBUTION: ubuntu
-      VERSION: 16.04
-    - DISTRIBUTION: ubuntu
-      VERSION: 18.04
-    - DISTRIBUTION: debian
-      VERSION: 9
-
+#Enable docker support
 services:
   - docker
 
-before_install:
-  # Install latest Git
-  - sudo apt-get update
-  - sudo apt-get install --only-upgrade git
-  # Allow fetching other branches than master
-  - git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-  # Fetch the branch with test code
-  - git fetch origin docker-tests
-  - git worktree add docker-tests origin/docker-tests
+install:
+  # Install dependencies for Molecule test
+  - python3 -m pip install ansible
+  - python3 -m pip install pytest
+  - python3 -m pip install testinfra
+  - python3 -m pip install molecule
+  - python3 -m pip install docker
+
+  # Check ansible and molecule version
+  - ansible --version
+  - molecule --version
+
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' >ansible.cfg
 
 script:
-  # Running the test script the first time will set up the master DNS server
-  # with IP 172.17.0.2. Running it the second time sets up the slave DNS
-  # server with IP 172.17.0.3.
-  - ./docker-tests/docker-tests.sh
-  - ./docker-tests/docker-tests.sh
+  - molecule test 
 
-  # Run functional tests on both master and slave server
-  - SUT_IP=172.17.0.2 ./docker-tests/functional-tests.sh
-  # Ensure the slave gets the chance to receive zone updates from the master
-  - sleep 6s
-  - SUT_IP=172.17.0.3 ./docker-tests/functional-tests.sh
-
-notifications:
-  webhooks: https://galaxy.ansible.com/api/v1/notifications/

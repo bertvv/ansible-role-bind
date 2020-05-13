@@ -1,0 +1,14 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  become: true
+  hosts: all
+  tasks:
+  - name: "Run test bats"
+    shell: SUT_IP=172.17.0.2 /functional-tests.sh
+    register: shell_result
+  
+  - name: "Display bats results"
+    debug:
+      var: shell_result.stdout_lines
