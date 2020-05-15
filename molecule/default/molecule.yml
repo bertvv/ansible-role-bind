@@ -18,7 +18,7 @@ platforms:
   - name: ns1
     hostname: ns1
     #Specify which image should be used. Geerlingguys images are Ansible compatible and have Systemd installed
-    image: "geerlingguy/docker-ubuntu1804-ansible:latest"
+    image: "geerlingguy/docker-${DISTRIBUTION}${VERSION}-ansible:latest"
     #Command to execute when the container starts
     command: ""
     #Volumes to mount within the container. Important to enable systemd
@@ -33,19 +33,8 @@ platforms:
       container: docker
   - name: ns2
     hostname: ns2
-    image: "geerlingguy/docker-debian9-ansible:latest"
+    image: "geerlingguy/docker-${DISTRIBUTION}${VERSION}-ansible:latest"
     command: ""
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    privileged: true
-    tty: True 
-    environment:
-      container: docker
-
-  - name: ns3
-    hostname: ns3
-    image: "geerlingguy/docker-centos7-ansible:latest"
-    command: "/usr/sbin/init"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true

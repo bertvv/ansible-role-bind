@@ -4,6 +4,17 @@ language: python
 # Use the new container infrastructure
 sudo: required
 
+env:
+  matrix:
+    - DISTRIBUTION: centos
+      VERSION: 7
+    - DISTRIBUTION: ubuntu
+      VERSION: 16.04
+    - DISTRIBUTION: ubuntu
+      VERSION: 18.04
+    - DISTRIBUTION: debian
+      VERSION: 9
+
 #Enable docker support
 services:
   - docker
@@ -24,5 +35,5 @@ install:
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
 script:
-  - molecule test 
+  - DISTRIBUTION=$DISTRIBUTION VERSION=$VERSION molecule test 
 

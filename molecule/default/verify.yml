@@ -23,11 +23,6 @@
     register: shell_result2
     when: ansible_facts['hostname'] == 'ns2' 
 
-  - name: "Run test bats against NS3"
-    shell: SUT_IP=172.17.0.4 /functional-tests.sh
-    register: shell_result3
-    when: ansible_facts['hostname'] == 'ns3' 
-
   - name: "Display bats results of NS1"
     debug:
       var: shell_result.stdout_lines
@@ -36,7 +31,4 @@
     debug:
       var: shell_result2.stdout_lines
 
-  - name: "Display bats results of NS3"
-    debug:
-      var: shell_result3.stdout_lines
 
