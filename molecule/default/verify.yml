@@ -5,10 +5,22 @@
   become: true
   hosts: all
   tasks:
-  - name: "Run test bats"
+  - name: "Run test bats against NS1"
     shell: SUT_IP=172.17.0.2 /functional-tests.sh
     register: shell_result
-  
-  - name: "Display bats results"
+    when: ansible_facts['hostname'] == 'ns1'
+
+  - name: "Run test bats against NS2"
+    shell: SUT_IP=172.17.0.3 /functional-tests.sh
+    register: shell_result2
+    when: ansible_facts['hostname'] == 'ns2' 
+
+
+  - name: "Display bats results of NS1"
     debug:
       var: shell_result.stdout_lines
+
+  - name: "Display bats results of NS2"
+    debug:
+      var: shell_result2.stdout_lines
+

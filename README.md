@@ -1,7 +1,6 @@
 # Ansible role `bind`
 
 [![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
-[![Build Status](https://travis-ci.org/RobinOphalvens/ansible-role-bind.svg?branch=master)](https://travis-ci.org/RobinOphalvens/ansible-role-bind)
 
 An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
 
@@ -342,13 +341,13 @@ Testing 192.168.56.53
 ```
 ### Running Molecule tests
 
-Molecule handles the complexity and lifecyle of Docker containers, for testing purposes,by allowing developers to specify which containers should be created in .yaml files. This Molecule configuration will create two Centos 7 containers, one master and one slave, and then runs the role on top of them. To test the containers, a verify playbook runs the same automated acceptance BATS as specified above. 
+Molecule handles the complexity and lifecyle of Docker containers, for testing purposes,by allowing developers to specify which containers should be created in .yaml files. This Molecule configuration will create two Centos 7 containers, one master and one slave, and then runs the role on top of them. To test the containers, a verify playbook runs the same automated acceptance BATS as specified above. This whole process is automated with a single command. 
 
 #### Requirements and installation
 
 1. Docker should be installed on the system
 2. As recommended by Molecule, create a python virtual environment
-3. Install Molecule and the Docker driver with `python3 -m pip install molecule docker netaddr`
+3. Install Molecule, the Docker driver and python-netaddr with `python3 -m pip install molecule docker netaddr`
 4. Navigate to the root of the role directory and run `molecule test`
 
 Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host {HOSTNAME}`. 
