@@ -5,6 +5,14 @@
   become: true
   hosts: all
   tasks:
+
+  - name: "Ensure dnsutils and curl is present on the system"
+    apt:
+      pkg:
+        - dnsutils
+        - curl
+    when: ansible_facts['os_family'] == 'Debian'
+
   - name: "Run test bats against NS1"
     shell: SUT_IP=172.17.0.2 /functional-tests.sh
     register: shell_result
