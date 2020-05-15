@@ -385,3 +385,4 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
 - [jadjay](https://github.com/jadjay)
+- [Robin Ophalvens](https://github.com/RobinOphalvens)
