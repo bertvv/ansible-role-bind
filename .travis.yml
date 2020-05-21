@@ -19,7 +19,7 @@ services:
 
 install:
   # Install dependencies for Molecule test
-  - python3 -m pip install molecule yamllint ansible-lint docker
+  - python3 -m pip install molecule yamllint ansible-lint docker netaddr
 
   # Check ansible and molecule version
   - ansible --version
