@@ -31,7 +31,6 @@ platforms:
     tty: True
     environment:
       container: docker
-    pre_build_image: true
 
   - name: ns2
     hostname: ns2
@@ -43,7 +42,6 @@ platforms:
     tty: True 
     environment:
       container: docker
-    pre_build_image: true
 provisioner:
   name: ansible
 #Runs the verify.yml playbook. Testinfra is also a supported method. Check the Molecule documention for more information. 
