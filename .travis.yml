@@ -5,15 +5,13 @@ language: python
 sudo: required
 
 env:
+  global:
+    - ROLE_NAME: bind
   matrix:
-    - DISTRIBUTION: centos
-      VERSION: 7
-    - DISTRIBUTION: ubuntu
-      VERSION: 1604
-    - DISTRIBUTION: ubuntu
-      VERSION: 1804
-    - DISTRIBUTION: debian
-      VERSION: 9
+    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: debian9
+    - MOLECULE_DISTRO: ubuntu1604
+    - MOLECULE_DISTRO: ubuntu1804
 
 #Enable docker support
 services:
@@ -21,11 +19,7 @@ services:
 
 install:
   # Install dependencies for Molecule test
-  - python3 -m pip install ansible
-  - python3 -m pip install pytest
-  - python3 -m pip install netaddr
-  - python3 -m pip install molecule
-  - python3 -m pip install docker
+  - python3 -m pip install molecule yamllint ansible-lint docker
 
   # Check ansible and molecule version
   - ansible --version
@@ -34,6 +28,15 @@ install:
   # Create ansible.cfg with correct roles_path
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
-script:
-  - DISTRIBUTION=$DISTRIBUTION VERSION=$VERSION molecule test 
+before_script:
+  #Renames ansible-role-bind to bertvv.bind to make it match with Ansible Galaxy
+  - cd ../
+  - mv ansible-role-$ROLE_NAME bertvv.$ROLE_NAME
+  - cd bertvv.$ROLE_NAME
 
+script:
+  #Run molecule test
+  - molecule test 
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

@@ -113,10 +113,8 @@
             text:
               - 'some text'
               - 'more text'
-  tasks:
-    - name: "Include ansible-role-bind"
-      include_role:
-        name: "ansible-role-bind"
+  roles:
+    - role: bertvv.bind
   post_tasks:
     - name: "Transfer bats to container"
       copy:
