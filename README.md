@@ -347,11 +347,18 @@ Molecule handles the complexity and lifecyle of Docker containers, for testing p
 
 1. Docker should be installed on the system
 2. As recommended by Molecule, create a python virtual environment
-3. Install Molecule, the Docker driver and python-netaddr with `python3 -m pip install molecule docker netaddr`
+3. Install the software tools `python3 -m pip install molecule docker netaddr yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
 
 Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host {HOSTNAME}`. 
 
+The default config will run Molecule with 2 Centos 7 containers. This can be modified by setting the `MOLECULE_DISTRO` varible with the command. 
+
+The supported distros are centos7, ubuntu1604, ubuntu1804 and debian9
+
+``` bash
+MOLECULE_DISTRO=debian9 molecule test
+```
 ## License
 
 BSD
