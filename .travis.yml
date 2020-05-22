@@ -8,11 +8,15 @@ env:
   global:
     - ROLE_NAME: bind
   matrix:
+    - MOLECULE_DISTRO: centos6
     - MOLECULE_DISTRO: centos7
     - MOLECULE_DISTRO: centos8
+    - MOLECULE_DISTRO: debian8
     - MOLECULE_DISTRO: debian9
+    - MOLECULE_DISTRO: debian10
     - MOLECULE_DISTRO: ubuntu1604
     - MOLECULE_DISTRO: ubuntu1804
+    - MOLECULE_DISTRO: ubuntu2004
 
 # Enable docker support
 services:

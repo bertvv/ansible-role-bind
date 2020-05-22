@@ -2,9 +2,8 @@
 galaxy_info:
   author: Bert Van Vreckem
   description: >
-   Sets up ISC BIND on RHEL/CentOS 6/7, Ubuntu 16.04/18.04 LTS (Xenial/Bionic),
-   or Arch Linux as an authoritative DNS server for one or more domains (master
-   and/or slave).
+   Sets up ISC BIND as an authoritative DNS server for one or more domains
+   (primary and/or secondary).
   license: BSD
   min_ansible_version: 2.7
   platforms:
@@ -17,10 +16,12 @@ galaxy_info:
       versions:
         - xenial
         - bionic
+        - focal
     - name: Debian
       versions:
         - jessie
         - stretch
+        - buster
     - name: ArchLinux
       versions:
         - any
