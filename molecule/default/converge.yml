@@ -115,18 +115,3 @@
               - 'more text'
   roles:
     - role: bertvv.bind
-  post_tasks:
-    - name: "Transfer bats to container"
-      copy:
-        src: dns.bats
-        dest: /dns.bats
-        owner: root
-        group: root
-        mode: 773
-    - name: "Transfer script to container"
-      copy:
-        src: functional-tests.sh
-        dest: /functional-tests.sh
-        owner: root
-        group: root
-        mode: 773

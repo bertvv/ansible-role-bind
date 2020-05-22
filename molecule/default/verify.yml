@@ -1,30 +1,9 @@
 ---
 - name: Verify
-  become: true
   hosts: all
   tasks:
-
-  - name: "Ensure dnsutils and curl is present on the system"
-    apt:
-      pkg:
-        - dnsutils
-        - curl
-    when: ansible_facts['os_family'] == 'Debian'
-
-  - name: "Run test bats against NS1"
-    shell: SUT_IP=172.17.0.2 /functional-tests.sh
-    register: shell_result
-    when: ansible_facts['hostname'] == 'ns1'
-
-  - name: "Run test bats against NS2"
-    shell: SUT_IP=172.17.0.3 /functional-tests.sh
-    register: shell_result2
-    when: ansible_facts['hostname'] == 'ns2'
-
-  - name: "Display bats results of NS1"
-    debug:
-      var: shell_result.stdout_lines
-
-  - name: "Display bats results of NS2"
-    debug:
-      var: shell_result2.stdout_lines
+    # We run the BATS tests from the localhost, since they are black box tests
+    - name: "Run BATS tests for {{ ansible_hostname }}"
+      shell: SUT_IP={{ ansible_default_ipv4.address }} bats {{ playbook_dir }}/files/dns.bats
+      delegate_to: localhost
+      changed_when: false
