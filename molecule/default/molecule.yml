@@ -6,6 +6,13 @@ driver:
   # Specifies the driver that should be used. Podman should also work
   name: docker
 
+# Linting with yamllint and ansible-lint
+# verify.yml is skipped because it uses the shell: module, which would trigger
+# a linting error.
+lint: |
+  yamllint .
+  ansible-lint --exclude=molecule/default/verify.yml
+
 platforms:
   # Set name and hostname
   - name: ns1
@@ -41,7 +48,6 @@ platforms:
 provisioner:
   name: ansible
 
-# Runs the verify.yml playbook. Testinfra is also a supported method. Check the
-# Molecule documention for more information.
+# Runs the verify.yml playbook
 verifier:
   name: ansible
