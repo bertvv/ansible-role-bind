@@ -1,0 +1,9 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    # We run the BATS tests from the localhost, since they are black box tests
+    - name: "Run BATS tests for {{ ansible_hostname }}"
+      shell: SUT_IP={{ ansible_default_ipv4.address }} bats {{ playbook_dir }}/files/dns.bats
+      delegate_to: localhost
+      changed_when: false

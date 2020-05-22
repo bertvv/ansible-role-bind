@@ -64,7 +64,11 @@ logging {
   };
 {% if bind_query_log is defined %}
   channel querylog {
-    file "{{ bind_query_log }}" versions 600 size 20m;
+    {% if bind_query_log.file is defined %}
+      file "{{ bind_query_log.file }}" versions {{ bind_query_log.versions }} size {{ bind_query_log.size }};
+    {% else %}
+      file "{{ bind_query_log }}" versions 600 size 20m;
+    {% endif %}
     severity dynamic;
     print-time yes;
   };

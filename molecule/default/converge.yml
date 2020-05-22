@@ -1,0 +1,117 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    bind_zone_dir: /var/local/named-zones
+    bind_zone_file_mode: '0660'
+    bind_allow_query:
+      - any
+    bind_listen_ipv4:
+      - any
+    bind_listen_ipv6:
+      - any
+    bind_acls:
+      - name: acl1
+        match_list:
+          - 172.17.0.0/16
+    bind_forwarders:
+      - '8.8.8.8'
+      - '8.8.4.4'
+    bind_recursion: true
+    bind_query_log: 'data/query.log'
+    bind_check_names: 'master ignore'
+    bind_zone_master_server_ip: 172.17.0.2
+    bind_zone_minimum_ttl: "2D"
+    bind_zone_ttl: "2W"
+    bind_zone_time_to_refresh: "2D"
+    bind_zone_time_to_retry: "2H"
+    bind_zone_time_to_expire: "2W"
+    bind_zone_domains:
+      - name: 'example.com'
+        networks:
+          - '192.0.2'
+        ipv6_networks:
+          - '2001:db9::/48'
+        name_servers:
+          - ns1.acme-inc.com.
+          - ns2.acme-inc.com.
+        hostmaster_email: admin
+        hosts:
+          - name: srv001
+            ip: 192.0.2.1
+            ipv6: '2001:db9::1'
+            aliases:
+              - www
+          - name: srv002
+            ip: 192.0.2.2
+            ipv6: '2001:db9::2'
+          - name: mail001
+            ip: 192.0.2.10
+            ipv6: '2001:db9::3'
+        mail_servers:
+          - name: mail001
+            preference: 10
+      - name: 'acme-inc.com'
+        networks:
+          - '172.17'
+          - '10'
+        ipv6_networks:
+          - '2001:db8::/48'
+        name_servers:
+          - ns1
+          - ns2
+        hosts:
+          - name: ns1
+            ip: 172.17.0.2
+          - name: ns2
+            ip: 172.17.0.3
+          - name: srv001
+            ip: 172.17.1.1
+            ipv6: 2001:db8::1
+            aliases:
+              - www
+          - name: srv002
+            ip: 172.17.1.2
+            ipv6: 2001:db8::2
+            aliases:
+              - mysql
+          - name: mail001
+            ip: 172.17.2.1
+            ipv6: 2001:db8::d:1
+            aliases:
+              - smtp
+              - mail-in
+          - name: mail002
+            ip: 172.17.2.2
+            ipv6: 2001:db8::d:2
+          - name: mail003
+            ip: 172.17.2.3
+            ipv6: 2001:db8::d:3
+            aliases:
+              - imap
+              - mail-out
+          - name: srv010
+            ip: 10.0.0.10
+          - name: srv011
+            ip: 10.0.0.11
+          - name: srv012
+            ip: 10.0.0.12
+        mail_servers:
+          - name: mail001
+            preference: 10
+          - name: mail002
+            preference: 20
+        services:
+          - name: _ldap._tcp
+            weight: 100
+            port: 88
+            target: srv010
+        text:
+          - name: _kerberos
+            text: KERBEROS.ACME-INC.COM
+          - name: '@'
+            text:
+              - 'some text'
+              - 'more text'
+  roles:
+    - role: bertvv.bind
