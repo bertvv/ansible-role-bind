@@ -2,7 +2,7 @@
 ---
 
 bind_packages:
-  - python-netaddr
+  - "{{ ( ansible_distribution_major_version == '8' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
   - bind
   - bind-utils
 

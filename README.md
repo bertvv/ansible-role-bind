@@ -45,7 +45,7 @@ Variables are not required, unless specified.
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
-| `bind_query_log`             | -                    | A dict with fields `file` (e.g. `data/query.log`), `versions`, `size`, when defined this will turn on the query log                                                        |
+| `bind_query_log`             | -                    | A dict with fields `file` (e.g. `data/query.log`), `versions`, `size`, when defined this will turn on the query log          |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
@@ -82,10 +82,10 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
 | `bind_zone_domains`          | V      | V     |
-| `- name`                   | V      | V     |
-| `- networks`               | V      | V     |
-| `- name_servers`           | V      | --    |
-| `- hosts`                  | V      | --    |
+| `- name`                     | V      | V     |
+| `- networks`                 | V      | V     |
+| `- name_servers`             | V      | --    |
+| `- hosts`                    | V      | --    |
 | `bind_listen_ipv4`           | V      | V     |
 | `bind_allow_query`           | V      | V     |
 
@@ -297,6 +297,7 @@ Contributors:
 - [Jose Taas](https://github.com/josetaas)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
