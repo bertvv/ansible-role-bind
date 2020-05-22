@@ -118,7 +118,6 @@
   post_tasks:
     - name: "Transfer bats to container"
       copy:
-              #src: /home/robin/Projects/ansible-role-bind/files/dns.bats
         src: dns.bats
         dest: /dns.bats
         owner: root
@@ -126,10 +125,8 @@
         mode: 773
     - name: "Transfer script to container"
       copy:
-              #src: /home/robin/Projects/ansible-role-bind/files/functional-tests.sh
         src: functional-tests.sh
         dest: /functional-tests.sh
         owner: root
         group: root
         mode: 773
-
