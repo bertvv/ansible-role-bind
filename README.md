@@ -371,9 +371,15 @@ Issues, feature requests, ideas, suggestions, etc. can be posted in the Issues s
 
 Pull requests are also very welcome. Please create a topic branch for your proposed changes. If you don't, this will create conflicts in your fork after the merge. Don't hesitate to add yourself to the contributor list below in your PR!
 
+Maintainers:
+
+- [Bert Van Vreckem](https://github.com/bertvv/)
+- [Stuart Knight](https://github.com/blofeldthefish)
+
+Contributors:
+
 - [Angel Barrera](https://github.com/angelbarrera92)
 - [B. Verschueren](https://github.com/bverschueren)
-- [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
 - [Brad Durrow](https://github.com/bdurrow)
 - [Christopher Hicks](http://www.chicks.net/)
 - [David J. Haines](https://github.com/dhaines)
@@ -389,7 +395,6 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 - [Peter Janes](https://github.com/peterjanes)
 - [Rafael Bodill](https://github.com/rafi)
 - [Romuald](https://github.com/rds13)
-- [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
 - [jadjay](https://github.com/jadjay)
 - [Robin Ophalvens](https://github.com/RobinOphalvens)
