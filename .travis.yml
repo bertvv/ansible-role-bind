@@ -18,7 +18,8 @@ services:
   - docker
 
 install:
-  - apt install bats curl dnsutils
+  - sudo apt-get update
+  - sudo apt-get install bats curl dnsutils
   # Install dependencies for Molecule test
   - python3 -m pip install molecule yamllint ansible-lint docker netaddr
   # Check ansible and molecule version
