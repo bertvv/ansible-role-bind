@@ -38,12 +38,12 @@ options {
   dnssec-validation {{ bind_dnssec_validation }};
 
   /* Path to ISC DLV key */
-  bindkeys-file "/etc/named.iscdlv.key";
+  bindkeys-file "{{ bind_bindkeys_file }}";
 
   managed-keys-directory "{{ bind_dir }}/dynamic";
 
-  pid-file "/run/named/named.pid";
-  session-keyfile "/run/named/session.key";
+  pid-file "{{ bind_pid_file }}";
+  session-keyfile "{{ bind_session_keyfile }}";
 {% if bind_query_log is defined %}
 
   querylog yes;

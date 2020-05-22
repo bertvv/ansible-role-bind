@@ -22,3 +22,11 @@ bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
 
 bind_owner: root
 bind_group: named
+
+bind_bindkeys_file: "/etc/named.iscdlv.key"
+bind_pid_file: "/run/named/pid"
+bind_session_keyfile: "/run/named/session.key"
+
+# Custom location for zone files
+bind_zone_dir: "{{ bind_dir }}"
+bind_slave_dir: "{{ bind_dir }}/slaves"

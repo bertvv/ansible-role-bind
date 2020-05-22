@@ -7,6 +7,17 @@ galaxy_info:
   license: BSD
   min_ansible_version: 2.7
   platforms:
+    - name: ArchLinux
+      versions:
+        - any
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - buster
+    - name: FreeBSD
+      versions:
+        - any
     - name: EL
       versions:
         - 6
@@ -17,14 +28,6 @@ galaxy_info:
         - xenial
         - bionic
         - focal
-    - name: Debian
-      versions:
-        - jessie
-        - stretch
-        - buster
-    - name: ArchLinux
-      versions:
-        - any
   galaxy_tags:
     - networking
     - system

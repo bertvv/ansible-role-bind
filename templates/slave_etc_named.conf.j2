@@ -35,12 +35,12 @@ options {
   dnssec-validation {{ bind_dnssec_validation }};
 
   /* Path to ISC DLV key */
-  bindkeys-file "/etc/named.iscdlv.key";
+  bindkeys-file "{{ bind_bindkeys_file }}";
 
   managed-keys-directory "{{ bind_dir }}/dynamic";
 
-  pid-file "/run/named/named.pid";
-  session-keyfile "/run/named/session.key";
+  pid-file "{{ bind_pid_file }}";
+  session-keyfile "{{ bind_session_keyfile }}";
 
 {% if bind_query_log is defined %}
   querylog yes;
@@ -85,7 +85,7 @@ include "{{ file }}";
 zone "{{ bind_zone.name }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "slaves/{{ bind_zone.name }}";
+  file "{{ bind_slave_dir }}/{{ bind_zone.name }}";
 {% if bind_zone.delegate is defined %}
   forwarders {};
 {% endif %}
@@ -96,7 +96,7 @@ zone "{{ bind_zone.name }}" IN {
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "slaves/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+  file "{{ bind_slave_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 };
 {% endfor %}
 {% endif %}
@@ -106,7 +106,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type slave;
   masters { {{ bind_zone_master_server_ip }}; };
-  file "slaves/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  file "{{ bind_slave_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 };
 {% endfor %}
 {% endif %}
