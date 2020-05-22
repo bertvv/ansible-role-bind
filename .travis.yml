@@ -1,42 +1,49 @@
 ---
+language: python
+
+# Use the new container infrastructure
 sudo: required
 
 env:
+  global:
+    - ROLE_NAME: bind
   matrix:
-    - DISTRIBUTION: centos
-      VERSION: 7
-    - DISTRIBUTION: ubuntu
-      VERSION: 16.04
-    - DISTRIBUTION: ubuntu
-      VERSION: 18.04
-    - DISTRIBUTION: debian
-      VERSION: 9
+    - MOLECULE_DISTRO: centos6
+    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: centos8
+    - MOLECULE_DISTRO: debian8
+    - MOLECULE_DISTRO: debian9
+    - MOLECULE_DISTRO: debian10
+    - MOLECULE_DISTRO: ubuntu1604
+    - MOLECULE_DISTRO: ubuntu1804
+    - MOLECULE_DISTRO: ubuntu2004
 
+# Enable docker support
 services:
   - docker
 
-before_install:
-  # Install latest Git
+install:
   - sudo apt-get update
-  - sudo apt-get install --only-upgrade git
-  # Allow fetching other branches than master
-  - git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
-  # Fetch the branch with test code
-  - git fetch origin docker-tests
-  - git worktree add docker-tests origin/docker-tests
+  - sudo apt-get install bats curl dnsutils
+  # Install dependencies for Molecule test
+  - python3 -m pip install molecule yamllint ansible-lint docker netaddr
+  # Check ansible and molecule version
+  - ansible --version
+  - molecule --version
+
+  # Create ansible.cfg with correct roles_path
+  - printf '[defaults]\nroles_path=../' >ansible.cfg
+
+before_script:
+  # Renames ansible-role-bind to bertvv.bind to make it match with Ansible
+  # Galaxy
+  - cd ../
+  - mv ansible-role-$ROLE_NAME bertvv.$ROLE_NAME
+  - cd bertvv.$ROLE_NAME
 
 script:
-  # Running the test script the first time will set up the master DNS server
-  # with IP 172.17.0.2. Running it the second time sets up the slave DNS
-  # server with IP 172.17.0.3.
-  - ./docker-tests/docker-tests.sh
-  - ./docker-tests/docker-tests.sh
-
-  # Run functional tests on both master and slave server
-  - SUT_IP=172.17.0.2 ./docker-tests/functional-tests.sh
-  # Ensure the slave gets the chance to receive zone updates from the master
-  - sleep 6s
-  - SUT_IP=172.17.0.3 ./docker-tests/functional-tests.sh
+  # Run molecule test
+  - molecule test
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/

@@ -58,7 +58,7 @@
     dest: "{{ bind_conf_dir }}/{{ auth_file }}"
     mode: 0640
     owner: root
-    group: bind
+    group: "{{ bind_group }}"
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
 
 - name: Start BIND service
