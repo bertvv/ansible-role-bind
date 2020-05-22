@@ -300,6 +300,7 @@ Contributors:
 - [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
+- [psa](https://github.com/psa)
 - [Rafael Bodill](https://github.com/rafi)
 - [Robin Ophalvens](https://github.com/RobinOphalvens)
 - [Romuald](https://github.com/rds13)
