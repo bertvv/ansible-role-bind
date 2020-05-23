@@ -96,6 +96,7 @@ include "{{ file }}";
 
 {% if bind_zone_domains is defined %}
 {% for bind_zone in bind_zone_domains %}
+{% if bind_create_forward_zones %}
 zone "{{ bind_zone.name }}" IN {
   type master;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
@@ -112,8 +113,10 @@ zone "{{ bind_zone.name }}" IN {
   forwarders {};
 {% endif %}
 };
+{% endif %}
 
 {% if bind_zone.networks is defined %}
+{% if bind_create_reverse_zones %}
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type master;
@@ -130,8 +133,10 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 };
 {% endfor %}
 {% endif %}
+{% endif %}
 
 {% if bind_zone.ipv6_networks is defined %}
+{% if bind_create_reverse_zones %}
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type master;
@@ -147,6 +152,7 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% endif %}
 };
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endfor %}
 {% endif %}

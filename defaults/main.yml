@@ -59,6 +59,9 @@ bind_dnssec_validation: true
 
 bind_extra_include_files: []
 
+bind_create_forward_zones: true
+bind_create_reverse_zones: true
+
 # SOA information
 bind_zone_ttl: "1W"
 bind_zone_time_to_refresh: "1D"
