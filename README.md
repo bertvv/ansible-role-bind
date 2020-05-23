@@ -20,12 +20,14 @@ See the [change log](CHANGELOG.md) for notable changes between versions.
 
 ## Supported platforms
 
-This role can be used on several platforms, see [meta/main.yml](meta/main.yml) for an updated list. We strive to set up automated tests for each supported platform, but this is not always possible. A few remarks:
+This role can be used on several platforms, see [meta/main.yml](meta/main.yml) for an updated list. We strive to set up automated tests for each supported platform (see [.travis.yml](.travis.yml)), but this is not always possible.
 
-- **Arch Linux** should work, but is not included in automated tests
-- The same goes for **FreeBSD**
-- **CentOS 6** should work, but idempotence tests fail (at the time of the release of v4.2.0 of this role)
-- **Ubuntu 16.04** should also work, but automated tests result in a timeout
+A few remarks on supported roles that are not included in automated tests
+
+- **Arch Linux** should work, but at this time, it's not possible to test the role on this distro.
+- The same goes for **FreeBSD**.
+- **CentOS 6** should work, but idempotence tests fail (at the time of the release of v4.2.0 of this role), even if BIND is installed correctly and acceptance tests succeed.
+- **Ubuntu 16.04** should also work, but automated tests on Travis CI result in a timeout (at the time of the release of v4.2.0 of this role), while succeeding in a local test environment.
 
 ## Requirements
 
