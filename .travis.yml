@@ -8,7 +8,6 @@ env:
   global:
     - ROLE_NAME: bind
   matrix:
-    - MOLECULE_DISTRO: centos6
     - MOLECULE_DISTRO: centos7
     - MOLECULE_DISTRO: centos8
     - MOLECULE_DISTRO: debian8
