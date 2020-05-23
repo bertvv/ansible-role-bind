@@ -18,6 +18,15 @@ If you like/use this role, please consider giving it a star and rating it on the
 
 See the [change log](CHANGELOG.md) for notable changes between versions.
 
+## Supported platforms
+
+This role can be used on several platforms, see [meta/main.yml](meta/main.yml) for an updated list. We strive to set up automated tests for each supported platform, but this is not always possible. A few remarks:
+
+- **Arch Linux** should work, but is not included in automated tests
+- The same goes for **FreeBSD**
+- **CentOS 6** should work, but idempotence tests fail (at the time of the release of v4.2.0 of this role)
+- **Ubuntu 16.04** should also work, but automated tests result in a timeout
+
 ## Requirements
 
 - **The package `python-ipaddr` should be installed on the management node** (since v3.7.0)
@@ -35,7 +44,7 @@ Variables are not required, unless specified.
 | `bind_dns_keys`              | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
 | `bind_dnssec_enable`         | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`     | `true`               | Is DNSSEC validation enabled                                                                                                 |
-| `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
+| `bind_extra_include_files`   | `[]`                 | A list of custom config files to be included from the main config file                                                       |
 | `bind_forward_only`          | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
 | `bind_listen_ipv4`           | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.             |
