@@ -290,6 +290,7 @@ Contributors:
 - [Brad Durrow](https://github.com/bdurrow)
 - [Christopher Hicks](http://www.chicks.net/)
 - [David J. Haines](https://github.com/dhaines)
+- [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
 - [Guillaume Darmont](https://github.com/gdarmont)

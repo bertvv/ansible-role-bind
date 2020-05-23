@@ -32,6 +32,7 @@ An update that's been long overdue. Several PRs with new features were merged!
 - (GH-89) Add missing `allow-recursion` parameter for bind slaves, allowing them to handle recursion correctly (credit: [Lennart Weller](https://github.com/lhw))
 - (GH-91) Ensure the directory for cached slave zones is created (credit: [Otto Sabart](https://github.com/seberm))
 - (GH-99) Use `bind_group` variable instead of hard-coded value (credit: [Boris Momčilović](https://github.com/kornrunner))
+- (GH-114,115) Fix error with scenario in conjunction with a dhcp shared secret key to provide dynamic dns updates. (credit: [Fabio Rocha](https://github.com/frock81))
 
 ## Removed
 
