@@ -53,6 +53,8 @@ Variables are not required, unless specified.
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
+| `- create_forward_zones`     | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
+| `- create_reverse_zones`     | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)            |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
 | `- hostmaster_email`         | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                  |
 | `- hosts`                    | `[]`                 | Host definitions. See below this table for examples.                                                                         |
@@ -93,18 +95,19 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 
 ```Yaml
 bind_zone_domains:
-  - name: mydomain.com
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
     hosts:
       - name: pub01
         ip: 192.0.2.1
         ipv6: 2001:db8::1
         aliases:
           - ns
-      - name: '@'
+      - name: '@'                # Enables "http://mydomain.com/"
         ip:
-          - 192.0.2.2
-          - 192.0.2.3
-        sshfp:
+          - 192.0.2.2            # Multiple IP addresses for a single host
+          - 192.0.2.3            #   results in DNS round robin
+        sshfp:                   # Secure shell fingerprint
           - "3 1 1262006f9a45bb36b1aa14f45f354b694b77d7c3"
           - "3 2 e5921564252fe10d2dbafeb243733ed8b1d165b8fa6d5a0e29198e5793f0623b"
         ipv6:
@@ -112,12 +115,12 @@ bind_zone_domains:
           - 2001:db8::3
         aliases:
           - www
-      - name: priv01
-        ip: 10.0.0.1
+      - name: priv01             # This IP is in another subnet, will result in
+        ip: 10.0.0.1             #   multiple reverse zones
       - name: mydomain.net.
         aliases:
           - name: sub01
-            type: DNAME
+            type: DNAME          # Example of a DNAME alias record
     networks:
       - '192.0.2'
       - '10'
@@ -130,8 +133,8 @@ bind_zone_domains:
         weight: 100
         port: 88
         target: dc001
-    naptr:
-      - name: "sip"
+    naptr:                       # Name Authority Pointer record, used for IP
+      - name: "sip"              #   telephony
         order: 100
         pref: 10
         flags: "S"
