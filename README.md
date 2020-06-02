@@ -60,6 +60,7 @@ Variables are not required, unless specified.
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
+| `bind_transfer_key_name`     | -                    | The name of a TSIG key that should be used to sign XFR requests from the client                                              |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
@@ -223,6 +224,16 @@ bind_extra_include_files:
 
 This will be set in a file *"{{ bind_auth_file }}* (e.g. /etc/bind/auth_transfer.conf for debian) which have to be added in the list variable **bind_extra_include_files**
 
+### Using TSIG for zone transfer (XFR) authorization
+
+To authorize the transfer of zone between master & slave based on a TSIG key, set the name in the variable `bind_transfer_key_name`:
+
+```Yaml
+bind_transfer_key_name: master_key
+```
+
+A check will be performed to ensure the key is actually present in the `bind_dns_keys` dictionary. This will add a server statement for the `bind_zone_master_ip` in `bind_auth_file` on a slave containing the specified key.
+
 ## Dependencies
 
 No dependencies.
@@ -326,3 +337,4 @@ Contributors:
 - [Robin Ophalvens](https://github.com/RobinOphalvens)
 - [Romuald](https://github.com/rds13)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
+- [Jascha Sticher](https://github.com/itbane)
