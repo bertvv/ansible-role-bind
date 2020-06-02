@@ -7,6 +7,5 @@ server {{ ansible_default_ipv4.address }} {
 key {{ mykey.name }} {
   algorithm {{ mykey.algorithm }};
   secret "{{ mykey.secret }}";
-{% endfor %}
 };
-
+{% endfor %}
