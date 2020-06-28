@@ -48,6 +48,11 @@ options {
 
   querylog yes;
 {% endif %}
+{% if bind_dns64 is defined %}
+  dns64 64:ff9b::/96 {
+    clients { "{{ bind_dns64_clients }}" };
+  };
+{% endif %}
 };
 
 {% if bind_statistics_channels %}
