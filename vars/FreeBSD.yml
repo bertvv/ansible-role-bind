@@ -1,0 +1,32 @@
+# roles/bind/vars/Debian.yml
+---
+
+bind_packages:
+  - py36-netaddr
+  - bind911
+
+bind_service: named
+
+# Main config file
+bind_config: /usr/local/etc/namedb/named.conf
+
+# Localhost zone
+bind_default_zone_files:
+  - /usr/local/etc/namedb/named.conf.default-zones
+
+# Directory with run-time stuff
+bind_dir: /var/cache/named
+bind_conf_dir: "/usr/local/etc/namedb/"
+auth_file: "auth_transfer.conf"
+bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
+
+bind_owner: bind
+bind_group: bind
+
+bind_bindkeys_file: "/usr/local/etc/namedb/bind.keys"
+bind_pid_file: "/var/run/named/named.pid"
+bind_session_keyfile: "/var/run/named/session.key"
+
+# Custom location for master zone files
+bind_zone_dir: "{{ bind_dir }}/master"
+bind_slave_dir: "{{ bind_dir }}/slave"

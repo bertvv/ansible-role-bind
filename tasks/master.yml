@@ -95,6 +95,7 @@
     - "{{ bind_zone_domains }}"
   loop_control:
     label: "{{ item.name }}"
+  when: item.create_forward_zones is not defined or item.create_forward_zones
   notify: reload bind
   tags: bind
 
@@ -114,6 +115,7 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
+  when: item.create_reverse_zones is not defined or item.create_reverse_zones
   notify: reload bind
   tags: bind
 
@@ -133,5 +135,6 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
+  when: item.create_reverse_zones is not defined or item.create_reverse_zones
   notify: reload bind
   tags: bind

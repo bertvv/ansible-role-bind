@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bertvv/ansible-role-bind.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-bind)
 
-An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains on EL7 or Ubuntu Server. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up BIND ISC as an **authoritative-only** DNS server for multiple domains. Specifically, the responsibilities of this role are to:
 
 - install BIND
 - set up the main configuration file
@@ -14,9 +14,20 @@ This role supports multiple forward and reverse zones, including for IPv6. Altho
 
 Configuring the firewall is not a concern of this role, so you should do this using another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base/)).
 
-If you like/use this role, please consider giving it a star. Thanks!
+If you like/use this role, please consider giving it a star and rating it on the role's [Ansible Galaxy page](https://galaxy.ansible.com/bertvv/bind). Thanks!
 
 See the [change log](CHANGELOG.md) for notable changes between versions.
+
+## Supported platforms
+
+This role can be used on several platforms, see [meta/main.yml](meta/main.yml) for an updated list. We strive to set up automated tests for each supported platform (see [.travis.yml](.travis.yml)), but this is not always possible.
+
+A few remarks on supported roles that are not included in automated tests
+
+- **Arch Linux** should work, but at this time, it's not possible to test the role on this distro.
+- The same goes for **FreeBSD**.
+- **CentOS 6** should work, but idempotence tests fail (at the time of the release of v4.2.0 of this role), even if BIND is installed correctly and acceptance tests succeed.
+- **Ubuntu 16.04** should also work, but automated tests on Travis CI result in a timeout (at the time of the release of v4.2.0 of this role), while succeeding in a local test environment.
 
 ## Requirements
 
@@ -35,7 +46,7 @@ Variables are not required, unless specified.
 | `bind_dns_keys`              | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
 | `bind_dnssec_enable`         | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`     | `true`               | Is DNSSEC validation enabled                                                                                                 |
-| `bind_extra_include_files`   | `[]`                 |                                                                                                                              |
+| `bind_extra_include_files`   | `[]`                 | A list of custom config files to be included from the main config file                                                       |
 | `bind_forward_only`          | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
 | `bind_listen_ipv4`           | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.             |
@@ -45,7 +56,7 @@ Variables are not required, unless specified.
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
-| `bind_query_log`             | -                    | When defined (e.g. `data/query.log`), this will turn on the query log                                                        |
+| `bind_query_log`             | -                    | A dict with fields `file` (e.g. `data/query.log`), `versions`, `size`, when defined this will turn on the query log          |
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
@@ -53,6 +64,8 @@ Variables are not required, unless specified.
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
+| `- create_forward_zones`     | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
+| `- create_reverse_zones`     | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)            |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
 | `- hostmaster_email`         | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                  |
 | `- hosts`                    | `[]`                 | Host definitions. See below this table for examples.                                                                         |
@@ -82,10 +95,10 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
 | `bind_zone_domains`          | V      | V     |
-| `  - name`                   | V      | V     |
-| `  - networks`               | V      | V     |
-| `  - name_servers`           | V      | --    |
-| `  - hosts`                  | V      | --    |
+| `- name`                     | V      | V     |
+| `- networks`                 | V      | V     |
+| `- name_servers`             | V      | --    |
+| `- hosts`                    | V      | --    |
 | `bind_listen_ipv4`           | V      | V     |
 | `bind_allow_query`           | V      | V     |
 
@@ -93,18 +106,19 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 
 ```Yaml
 bind_zone_domains:
-  - name: mydomain.com
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
     hosts:
       - name: pub01
         ip: 192.0.2.1
         ipv6: 2001:db8::1
         aliases:
           - ns
-      - name: '@'
+      - name: '@'                # Enables "http://mydomain.com/"
         ip:
-          - 192.0.2.2
-          - 192.0.2.3
-        sshfp:
+          - 192.0.2.2            # Multiple IP addresses for a single host
+          - 192.0.2.3            #   results in DNS round robin
+        sshfp:                   # Secure shell fingerprint
           - "3 1 1262006f9a45bb36b1aa14f45f354b694b77d7c3"
           - "3 2 e5921564252fe10d2dbafeb243733ed8b1d165b8fa6d5a0e29198e5793f0623b"
         ipv6:
@@ -112,12 +126,12 @@ bind_zone_domains:
           - 2001:db8::3
         aliases:
           - www
-      - name: priv01
-        ip: 10.0.0.1
+      - name: priv01             # This IP is in another subnet, will result in
+        ip: 10.0.0.1             #   multiple reverse zones
       - name: mydomain.net.
         aliases:
           - name: sub01
-            type: DNAME
+            type: DNAME          # Example of a DNAME alias record
     networks:
       - '192.0.2'
       - '10'
@@ -130,8 +144,8 @@ bind_zone_domains:
         weight: 100
         port: 88
         target: dc001
-    naptr:
-      - name: "sip"
+    naptr:                       # Name Authority Pointer record, used for IP
+      - name: "sip"              #   telephony
         order: 100
         pref: 10
         flags: "S"
@@ -154,7 +168,7 @@ bind_zone_domains:
 
 Host names that this DNS server should resolve can be specified in `hosts` as a list of dicts with fields `name`, `ip`,  `aliases` and `sshfp`. Aliases can be CNAME (default) or DNAME records.
 
-To allow to surf to http://example.com/, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
+To allow to surf to `http://example.com/`, set the host name of your web server to `'@'` (must be quoted!). In BIND syntax, `@` indicates the domain name itself.
 
 If you want to specify multiple IP addresses for a host, add entries to `bind_zone_hosts` with the same name (e.g. `priv01` in the code snippet). This results in multiple A/AAAA records for that host and allows [DNS round robin](http://www.zytrax.com/books/dns/ch9/rr.html), a simple load balancing technique. The order in which the IP addresses are returned can be configured with role variable `bind_rrset_order`.
 
@@ -170,7 +184,7 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 To delegate a zone to a DNS, it is enough to create a `NS` record (under delegate) which is the equivalent of:
 
-```
+```text
 foo IN NS 192.0.2.1
 ```
 
@@ -203,142 +217,66 @@ bind_dns_keys:
     secret: "azertyAZERTY123456"
 bind_extra_include_files:
   - "{{ bind_auth_file }}"
-
 ```
+
 **tip**: Extra include file must be set as an ansible variable because file is OS dependant
 
 This will be set in a file *"{{ bind_auth_file }}* (e.g. /etc/bind/auth_transfer.conf for debian) which have to be added in the list variable **bind_extra_include_files**
 
 ## Dependencies
 
-No dependencies. If you want to configure the firewall, do this through another role (e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base)).
+No dependencies.
 
 ## Example Playbook
 
-See the test playbook [test.yml](https://github.com/bertvv/ansible-role-bind/blob/docker-tests/test.yml) for an elaborate example that showcases most features.
+See the test playbook [converge.yml](molecule/default/converge.yml) for an elaborate example that showcases most features.
 
 ## Testing
 
-There are two test environments for this role, one based on Vagrant, the other on Docker. The latter powers the Travis-CI tests. The tests are kept in a separate (orphan) branch so as not to clutter the actual code of the role. [git-worktree(1)](https://git-scm.com/docs/git-worktree) is used to include the test code into the working directory. Remark that this requires at least Git v2.5.0.
+This role is tested using [Ansible Molecule](https://molecule.readthedocs.io/). Tests are launched automatically on [Travis CI](https://travis-ci.org/bertvv/ansible-role-bind) after each commit and PR.
 
-### Running Docker tests
+This Molecule configuration will:
 
-1. Fetch the test branch: `git fetch origin docker-tests`
-2. Create a Git worktree for the test code: `git worktree add docker-tests docker-tests`. This will create a directory `docker-tests/`
+- Run Yamllint and Ansible Lint
+- Create two Docker containers, one primary (`ns1`) and one secondary (`ns2`) DNS server
+- Run a syntax check
+- Apply the role with a [test playbook](molecule/default/converge.yml)
+- Run acceptance tests with [BATS](https://github.com/bats-core/bats-core/)
 
-The script `docker-tests.sh` will create a Docker container, and apply this role from a playbook `test.yml`. The Docker images are configured for testing Ansible roles and are published at <https://hub.docker.com/r/bertvv/ansible-testing/>. There are images available for several distributions and versions. The distribution and version should be specified outside the script using environment variables:
+This process is repeated for the supported Linux distributions.
 
-```
-DISTRIBUTION=centos VERSION=7 ./docker-tests/docker-tests.sh
-```
+### Local test environment
 
-The specific combinations of distributions and versions that are supported by this role are specified in `.travis.yml`.
+If you want to set up a local test environment, you can use this reproducible setup based on Vagrant+VirtualBox: <https://github.com/bertvv/ansible-testenv>. Steps to install the necessary tools manually:
 
-The first time the test script is run, a container will be created that is assigned the IP address 172.17.0.2. This will be the master DNS-server. The server is still running after the script finishes and can be queried from the command line, e.g.:
+1. Docker and BATS should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
+2. As recommended by Molecule, create a python virtual environment
+3. Install the software tools `python3 -m pip install molecule docker netaddr yamllint ansible-lint`
+4. Navigate to the root of the role directory and run `molecule test`
 
-```
-$ dig @172.17.0.2 www.acme-inc.com +short
-srv001.acme-inc.com.
-172.17.1.1
-```
+Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host HOSTNAME`.
 
-If you run the script again, a new container is launched with IP address 172.17.0.3 that will be set up as a slave DNS-server. After a few seconds, it will have received updates from the master server and can be queried as well.
+The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`). You can use any of his images, but only the distributions mentioned in [meta/main.yml](meta/main.yml) are supported.
 
-```
-$ dig @172.17.0.3 www.acme-inc.com +short
-srv001.acme-inc.com.
-172.17.1.1
-```
+The default config will start two Centos 7 containers (the primary supported platform at this time). Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
 
-The script `docker-tests/functional-tests.sh` will run a [BATS](https://github.com/sstephenson/bats) test suite, `dns.bats` that performs a number of different queries. Specify the server IP address as the environment variable `${SUT_IP}` (short for System Under Test).
-
-```
-$ SUT_IP=172.17.0.2 ./docker-tests/functional-tests.sh
-### Using BATS executable at: /usr/local/bin/bats
-### Running test /home/bert/CfgMgmt/roles/bind/tests/dns.bats
- ✓ Forward lookups public servers
- ✓ Reverse lookups
- ✓ Alias lookups public servers
- ✓ IPv6 forward lookups
- ✓ NS record lookup
- ✓ Mail server lookup
- ✓ Service record lookup
- ✓ TXT record lookup
-
-8 tests, 0 failures
-$ SUT_IP=172.17.0.3 ./docker-tests/functional-tests.sh
-[...]
+``` bash
+MOLECULE_DISTRO=debian9 molecule test
 ```
 
-### Running Vagrant tests
+or
 
-1. Fetch the tests branch: `git fetch origin vagrant-tests`
-2. Create a Git worktree for the test code: `git worktree add vagrant-tests vagrant-tests`. This will create a directory `vagrant-tests/`.
-3. `cd vagrant-tests/`
-4. `vagrant up` will then create two VMs and apply a test playbook (`test.yml`).
-
-The command `vagrant up` results in a setup with *two* DNS servers, a master and a slave, set up according to playbook `test.yml`.
-
-| **Hostname**     | **ip**        |
-| :---             | :---          |
-| `testbindmaster` | 192.168.56.53 |
-| `testbindslave`  | 192.168.56.54 |
-
-IP addresses are in the subnet of the default VirtualBox Host Only network interface (192.168.56.0/24). You should be able to query the servers from your host system. For example, to verify if the slave is updated correctly, you can do the following:
-
-```ShellSession
-$ dig @192.168.56.54 ns1.example.com +short
-testbindmaster.example.com.
-192.168.56.53
-$ dig @192.168.56.54 example.com www.example.com +short
-web.example.com.
-192.168.56.20
-192.168.56.21
-$ dig @192.168.56.54 MX example.com +short
-10 mail.example.com.
-
+``` bash
+MOLECULE_DISTRO=debian9 molecule converge
 ```
 
-An automated acceptance test written in [BATS](https://github.com/sstephenson/bats.git) is provided that checks most settings specified in `vagrant-tests/test.yml`. You can run it by executing the shell script `vagrant-tests/runtests.sh`. The script can be run on either your host system (assuming you have a Bash shell), or one of the VMs. The script will download BATS if needed and run the test script `vagrant-tests/dns.bats` on both the master and the slave DNS server.
+You can run the acceptance tests on both servers with `molecule verify` or manually with
 
-```ShellSession
-$ cd vagrant-tests
-$ vagrant up
-[...]
-$ ./runtests.sh
-Testing 192.168.56.53
-✓ The `dig` command should be installed
-✓ It should return the NS record(s)
-✓ It should be able to resolve host names
-✓ It should be able to resolve IPv6 addresses
-✓ It should be able to do reverse lookups
-✓ It should be able to resolve aliases
-✓ It should return the MX record(s)
-
-6 tests, 0 failures
-Testing 192.168.56.54
-✓ The `dig` command should be installed
-✓ It should return the NS record(s)
-✓ It should be able to resolve host names
-✓ It should be able to resolve IPv6 addresses
-✓ It should be able to do reverse lookups
-✓ It should be able to resolve aliases
-✓ It should return the MX record(s)
-
-6 tests, 0 failures
+```console
+SUT_IP=172.17.0.2 bats molecule/default/files/dns.bats
 ```
 
-Running from the VM:
-
-```ShellSession
-$ vagrant ssh testbindmaster
-Last login: Sun Jun 14 18:52:35 2015 from 10.0.2.2
-Welcome to your Packer-built virtual machine.
-[vagrant@testbindmaster ~]$ /vagrant/runtests.sh
-Testing 192.168.56.53
- ✓ The `dig` command should be installed
-[...]
-```
+You need to initialise the variable `SUT_IP`, the system under test's IP address. The primary server, `ns1`, should have IP address 172.17.0.2 and the secondary server, `ns2` 172.17.0.3.
 
 ## License
 
@@ -352,24 +290,39 @@ Issues, feature requests, ideas, suggestions, etc. can be posted in the Issues s
 
 Pull requests are also very welcome. Please create a topic branch for your proposed changes. If you don't, this will create conflicts in your fork after the merge. Don't hesitate to add yourself to the contributor list below in your PR!
 
+Maintainers:
+
+- [Bert Van Vreckem](https://github.com/bertvv/)
+- [Stuart Knight](https://github.com/blofeldthefish)
+
+Contributors:
+
+- [Aido](https://github.com/aido)
 - [Angel Barrera](https://github.com/angelbarrera92)
 - [B. Verschueren](https://github.com/bverschueren)
-- [Bert Van Vreckem](https://github.com/bertvv/) (Maintainer)
+- [Boris Momčilović](https://github.com/kornrunner)
 - [Brad Durrow](https://github.com/bdurrow)
 - [Christopher Hicks](http://www.chicks.net/)
 - [David J. Haines](https://github.com/dhaines)
+- [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
 - [Guillaume Darmont](https://github.com/gdarmont)
+- [jadjay](https://github.com/jadjay)
+- [Jascha Sticher](https://github.com/itbane)
 - [Joanna Delaporte](https://github.com/jdelaporte)
-- [Jose Taas](https://github.com/josetaas)
 - [Jörg Eichhorn](https://github.com/jeichhorn)
+- [Jose Taas](https://github.com/josetaas)
+- [Lennart Weller](https://github.com/lhw)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Otto Sabart](https://github.com/seberm)
+- [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
 - [Peter Janes](https://github.com/peterjanes)
+- [psa](https://github.com/psa)
 - [Rafael Bodill](https://github.com/rafi)
+- [Rayford Johnson](https://github.com/rayfordj)
+- [Robin Ophalvens](https://github.com/RobinOphalvens)
 - [Romuald](https://github.com/rds13)
-- [Stuart Knight](https://github.com/blofeldthefish)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
-- [jadjay](https://github.com/jadjay)
