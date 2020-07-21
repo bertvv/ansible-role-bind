@@ -73,6 +73,7 @@ Variables are not required, unless specified.
 | `- mail_servers`             | `[]`                 | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                           |
 | `- name_servers`             | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                   |
 | `- name`                     | `example.com`        | The domain name                                                                                                              |
+| `- slave_only`               | `false`              | Variable that indicate that zone should be created as slave on master server.                                                |
 | `- networks`                 | `['10.0.2']`         | A list of the networks that are part of the domain                                                                           |
 | `- other_name_servers`       | `[]`                 | A list of the DNS servers outside of this domain.                                                                            |
 | `- services`                 | `[]`                 | A list of services to be advertised by SRV records                                                                           |
