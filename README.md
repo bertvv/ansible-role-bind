@@ -79,7 +79,7 @@ Variables are not required, unless specified.
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
-| `bind_zone_master_server_ip` | -                    | **(Required)** The IP address of the master DNS server.                                                                      |
+| `bind_zone_master_server_ips` | `[]`                 | **(Required)** The IP addresses of the master DNS servers server.                                                                      |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`   | `1W`                 | Time to expire field in the SOA record.                                                                                      |
 | `bind_zone_time_to_refresh`  | `1D`                 | Time to refresh field in the SOA record.                                                                                     |
@@ -90,7 +90,7 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+Even though only variable `bind_zone_master_server_ips` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
@@ -159,7 +159,9 @@ bind_zone_domains:
 ```Yaml
     bind_listen_ipv4: ['any']
     bind_allow_query: ['any']
-    bind_zone_master_server_ip: 192.168.111.222
+    bind_zone_master_server_ips:
+      - 192.168.111.221
+      - 192.168.111.222
     bind_zone_domains:
       - name: example.com
 ```

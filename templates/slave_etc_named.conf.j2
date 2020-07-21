@@ -85,7 +85,11 @@ include "{{ file }}";
 {% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 zone "{{ bind_zone.name }}" IN {
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  {% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+  {% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+  {% endif %}
   file "{{ bind_slave_dir }}/{{ bind_zone.name }}";
 {% if bind_zone.delegate is defined %}
   forwarders {};
@@ -98,7 +102,11 @@ zone "{{ bind_zone.name }}" IN {
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  {% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+  {% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+  {% endif %}
   file "{{ bind_slave_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
 };
 {% endfor %}
@@ -110,7 +118,11 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  {% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+  {% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+  {% endif %}
   file "{{ bind_slave_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 };
 {% endfor %}
