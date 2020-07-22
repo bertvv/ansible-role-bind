@@ -9,9 +9,15 @@
     - "{{ ansible_os_family }}.yml"
   tags: bind,pretask
 
+- name: Backward compatibility between bind_zone_master_server_ip and bind_zone_master_server_ips
+  set_fact:
+    bind_zone_master_server_ips: "{{ [bind_zone_master_server_ip] }}"
+  when: bind_zone_master_server_ip is defined
+
 - name: Check whether `bind_zone_master_server_ips` was set
   assert:
     that: bind_zone_master_server_ips is defined
+
 
 - name: Install BIND
   package:

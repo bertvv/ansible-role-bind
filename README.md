@@ -79,7 +79,8 @@ Variables are not required, unless specified.
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
-| `bind_zone_master_server_ips` | `[]`                 | **(Required)** The IP addresses of the master DNS servers server.                                                                      |
+| `bind_zone_master_server_ip` | -                    | Deprecated (will be removed in the future releases) The IP address of the master DNS server.                                 |
+| `bind_zone_master_server_ips`| `[]`                 | **(Required)** The IP addresses of the master DNS servers server.                                                            |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`   | `1W`                 | Time to expire field in the SOA record.                                                                                      |
 | `bind_zone_time_to_refresh`  | `1D`                 | Time to refresh field in the SOA record.                                                                                     |
