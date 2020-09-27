@@ -24,3 +24,4 @@
     mode: '0770'
     setype: named_cache_t
   become: yes
+  tags: bind

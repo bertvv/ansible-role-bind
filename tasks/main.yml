@@ -46,7 +46,6 @@
 
 # file to set keys for XFR authentication
 - name: create extra config file for authenticated XFR request
-  tags: pretask
   template:
     src: auth_transfer.j2
     dest: "{{ bind_conf_dir }}/{{ auth_file }}"
@@ -55,14 +54,17 @@
     group: "{{ bind_group }}"
   become: yes
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
+  tags: bind,pretask
 
 - name: Set up the machine as a master DNS server
   include_tasks: master.yml
   when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
+  tags: bind
 
 - name: Set up the machine as a slave DNS server
   include_tasks: slave.yml
   when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
+  tags: bind
 
 - name: Start BIND service
   service:
