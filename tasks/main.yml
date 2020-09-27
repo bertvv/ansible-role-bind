@@ -17,6 +17,7 @@
   package:
     pkg: "{{ item }}"
     state: present
+  become: yes
   with_items:
     - "{{ bind_packages }}"
   tags: bind
@@ -28,6 +29,7 @@
     owner: root
     group: "{{ bind_group }}"
     mode: 0770
+  become: yes
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
@@ -51,6 +53,7 @@
     mode: 0640
     owner: root
     group: "{{ bind_group }}"
+  become: yes
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
 
 - name: Set up the machine as a master DNS server
@@ -66,4 +69,5 @@
     name: "{{ bind_service }}"
     state: started
     enabled: true
+  become: yes
   tags: bind

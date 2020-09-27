@@ -79,6 +79,7 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
+  become: yes
   notify: reload bind
   tags: bind
 
@@ -91,6 +92,7 @@
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
     validate: 'named-checkzone -d {{ item.name }} %s'
+  become: yes
   with_items:
     - "{{ bind_zone_domains }}"
   loop_control:
@@ -108,6 +110,7 @@
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
     validate: "named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
+  become: yes
   with_subelements:
     - "{{ bind_zone_domains }}"
     - networks
@@ -128,6 +131,7 @@
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
     validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
+  become: yes
   with_subelements:
     - "{{ bind_zone_domains }}"
     - ipv6_networks

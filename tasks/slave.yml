@@ -11,6 +11,7 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
+  become: yes
   notify: reload bind
   tags: bind
 
@@ -22,3 +23,4 @@
     group: "{{ bind_group }}"
     mode: '0770'
     setype: named_cache_t
+  become: yes
