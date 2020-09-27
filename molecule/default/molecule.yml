@@ -11,7 +11,7 @@ driver:
 # a linting error.
 lint: |
   yamllint .
-  ansible-lint --exclude=molecule/default/verify.yml
+  ansible-lint --exclude=molecule/default/verify.yml -x 106
 
 platforms:
   # Set name and hostname
