@@ -114,4 +114,4 @@
               - 'some text'
               - 'more text'
   roles:
-    - role: bertvv.bind
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
