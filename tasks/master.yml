@@ -82,7 +82,7 @@
     dest: "{{ bind_config }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
-    mode: '0640'
+    mode: 0640
     setype: named_conf_t
     validate: 'named-checkconf %s'
   become: yes

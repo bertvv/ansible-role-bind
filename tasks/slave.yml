@@ -8,7 +8,7 @@
     dest: "{{ bind_config }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
-    mode: '0640'
+    mode: 0640
     setype: named_conf_t
     validate: 'named-checkconf %s'
   become: yes
@@ -21,7 +21,7 @@
     state: directory
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
-    mode: '0770'
+    mode: 0770
     setype: named_cache_t
   become: yes
   tags: bind
