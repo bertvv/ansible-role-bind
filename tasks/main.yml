@@ -13,6 +13,15 @@
   assert:
     that: bind_zone_master_server_ip is defined
 
+# Fix molecule and travis ci failures
+- name: Update package cache for Debian based distros
+  apt:
+    update_cache: yes
+  become: yes
+  changed_when: false
+  when: ansible_os_family == 'Debian'
+  tags: bind
+
 - name: Install BIND
   package:
     pkg: "{{ item }}"
