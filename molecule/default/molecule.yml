@@ -47,6 +47,9 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      interpreter_python: auto_legacy_silent
 
 # Runs the verify.yml playbook
 verifier:
