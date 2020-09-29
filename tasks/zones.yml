@@ -76,19 +76,6 @@
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
-- name: Master | Main BIND config file (master)
-  template:
-    src: master_etc_named.conf.j2
-    dest: "{{ bind_config }}"
-    owner: "{{ bind_owner }}"
-    group: "{{ bind_group }}"
-    mode: 0640
-    setype: named_conf_t
-    validate: 'named-checkconf %s'
-  become: yes
-  notify: reload bind
-  tags: bind
-
 - name: Master | Create forward lookup zone file
   template:
     src: bind_zone.j2
@@ -103,7 +90,9 @@
     - "{{ bind_zone_domains }}"
   loop_control:
     label: "{{ item.name }}"
-  when: item.create_forward_zones is not defined or item.create_forward_zones
+  when: >
+    (item.create_forward_zones is not defined or item.create_forward_zones) and
+    (item.master_server_ip in ansible_all_ipv4_addresses or item.master_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind
 
@@ -124,7 +113,9 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
-  when: item.create_reverse_zones is not defined or item.create_reverse_zones
+  when: >
+    (item.create_reverse_zones is not defined or item.create_reverse_zones) and
+    (item[0].master_server_ip in ansible_all_ipv4_addresses or item[0].master_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind
 
@@ -145,6 +136,8 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
-  when: item.create_reverse_zones is not defined or item.create_reverse_zones
+  when: >
+    (item.create_reverse_zones is not defined or item.create_reverse_zones) and
+    (item[0].master_server_ip in ansible_all_ipv4_addresses or item[0].master_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind

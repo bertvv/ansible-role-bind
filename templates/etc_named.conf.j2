@@ -12,15 +12,18 @@ acl "{{ acl.name }}" {
 
 {% endfor %}
 options {
-  listen-on port 53 { {{ bind_listen_ipv4|join(';') }}; };
-  listen-on-v6 port 53 { {{ bind_listen_ipv6|join(';') }}; };
+  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
+  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
   directory   "{{ bind_dir }}";
   dump-file   "{{ bind_dir }}/data/cache_dump.db";
   statistics-file "{{ bind_dir }}/data/named_stats.txt";
   memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
-  allow-query     { {{ bind_allow_query|join(';') }}; };
+  allow-query     { {{ bind_allow_query|join('; ') }}; };
 {% if bind_acls|length != 0 %}
   allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+{% endif %}
+{% if bind_check_names is defined %}
+  check-names  {{ bind_check_names }};
 {% endif %}
 
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
@@ -41,8 +44,8 @@ options {
 
   pid-file "{{ bind_pid_file }}";
   session-keyfile "{{ bind_session_keyfile }}";
-
 {% if bind_query_log is defined %}
+
   querylog yes;
 {% endif %}
 };
@@ -71,6 +74,17 @@ logging {
   };
   category queries { querylog; };
 {% endif %}
+{% if bind_other_logs is defined %}
+
+{% for log in bind_other_logs %}
+  channel {{ log.name }} {
+    file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    severity dynamic;
+    print-time yes;
+  };
+  category "{{ log.name }}" { "{{ log.name }}"; };
+{% endfor %}
+{% endif %}
 };
 
 {% for file in bind_default_zone_files %}
@@ -84,34 +98,76 @@ include "{{ file }}";
 {% for bind_zone in bind_zone_domains %}
 {% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 zone "{{ bind_zone.name }}" IN {
+{% if bind_zone.master_server_ip in ansible_all_ipv4_addresses or bind_zone.master_server_ip in ansible_all_ipv6_addresses %}
+  type master;
+  file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
+  notify yes;
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
+{% else %}
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  masters { {{ bind_zone.master_server_ip }}; };
   file "{{ bind_slave_dir }}/{{ bind_zone.name }}";
+{% endif %}
 {% if bind_zone.delegate is defined %}
   forwarders {};
 {% endif %}
 };
 {% endif %}
 
-{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% if bind_zone.networks is defined %}
+{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
+{% if bind_zone.master_server_ip in ansible_all_ipv4_addresses or bind_zone.master_server_ip in ansible_all_ipv6_addresses %}
+  type master;
+  file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+  notify yes;
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
+{% else %}
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  masters { {{ bind_zone.master_server_ip }}; };
   file "{{ bind_slave_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% endif %}
 };
 {% endfor %}
 {% endif %}
 {% endif %}
 
-{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% if bind_zone.ipv6_networks is defined %}
+{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+{% if bind_zone.master_server_ip in ansible_all_ipv4_addresses or bind_zone.master_server_ip in ansible_all_ipv6_addresses %}
+  type master;
+  file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  notify yes;
+{% if bind_zone.also_notify is defined %}
+  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+{% endif %}
+{% if bind_zone.allow_update is defined %}
+  allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% else %}
+  allow-update { none; };
+{% endif %}
+{% else %}
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
+  masters { {{ bind_zone.master_server_ip }}; };
   file "{{ bind_slave_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+{% endif %}
 };
 {% endfor %}
 {% endif %}

@@ -20,7 +20,6 @@
     bind_recursion: true
     bind_query_log: 'data/query.log'
     bind_check_names: 'master ignore'
-    bind_zone_master_server_ip: 172.17.0.2
     bind_zone_minimum_ttl: "2D"
     bind_zone_ttl: "2W"
     bind_zone_time_to_refresh: "2D"
@@ -28,6 +27,7 @@
     bind_zone_time_to_expire: "2W"
     bind_zone_domains:
       - name: 'example.com'
+        master_server_ip: 172.17.0.2
         networks:
           - '192.0.2'
         ipv6_networks:
@@ -52,6 +52,7 @@
           - name: mail001
             preference: 10
       - name: 'acme-inc.com'
+        master_server_ip: 172.17.0.2
         networks:
           - '172.17'
           - '10'

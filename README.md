@@ -62,6 +62,7 @@ Variables are not required, unless specified.
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
+| `- master_server_ip`         | -                    | **(Required)** The IP address of the zone master DNS server.                                                                      |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
 | `- create_forward_zones`     | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
@@ -79,7 +80,6 @@ Variables are not required, unless specified.
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
-| `bind_zone_master_server_ip` | -                    | **(Required)** The IP address of the master DNS server.                                                                      |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`   | `1W`                 | Time to expire field in the SOA record.                                                                                      |
 | `bind_zone_time_to_refresh`  | `1D`                 | Time to refresh field in the SOA record.                                                                                     |
@@ -90,11 +90,12 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+Even though only variable `master_server_ip` is required (per zone) for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
 | `bind_zone_domains`          | V      | V     |
+| `- master_server_ip`         | V      | V     |
 | `- name`                     | V      | V     |
 | `- networks`                 | V      | V     |
 | `- name_servers`             | V      | --    |
@@ -106,18 +107,24 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 
 ```Yaml
 bind_zone_domains:
-  - name: mydomain.com           # Domain name
-    create_reverse_zones: false  # Skip creation of reverse zones
+  - name: mydomain.com          # Domain name
+    create_reverse_zones: false # Skip creation of reverse zones
+    master_server_ip: 192.0.2.1 # Master server ip defined per zone
     hosts:
       - name: pub01
         ip: 192.0.2.1
         ipv6: 2001:db8::1
         aliases:
-          - ns
+          - ns1
+      - name: pub02
+        ip: 192.0.2.2
+        ipv6: 2001:db8::2
+        aliases:
+          - ns2
       - name: '@'                # Enables "http://mydomain.com/"
         ip:
-          - 192.0.2.2            # Multiple IP addresses for a single host
-          - 192.0.2.3            #   results in DNS round robin
+          - 192.0.2.3            # Multiple IP addresses for a single host
+          - 192.0.2.4            #   results in DNS round robin
         sshfp:                   # Secure shell fingerprint
           - "3 1 1262006f9a45bb36b1aa14f45f354b694b77d7c3"
           - "3 2 e5921564252fe10d2dbafeb243733ed8b1d165b8fa6d5a0e29198e5793f0623b"
@@ -159,9 +166,9 @@ bind_zone_domains:
 ```Yaml
     bind_listen_ipv4: ['any']
     bind_allow_query: ['any']
-    bind_zone_master_server_ip: 192.168.111.222
     bind_zone_domains:
       - name: example.com
+        master_server_ip: 192.0.2.1
 ```
 
 ### Hosts
@@ -307,6 +314,7 @@ Contributors:
 - [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
+- [Gregory Shulov](https://github.com/GR360RY)
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [jadjay](https://github.com/jadjay)
 - [Jascha Sticher](https://github.com/itbane)
