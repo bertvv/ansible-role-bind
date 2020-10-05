@@ -37,7 +37,7 @@
     - "{{ bind_packages }}"
   tags: bind
 
-- name: Ensure runtime directories referenced in config exist
+- name: Ensure runtime directories referenced in config
   file:
     path: "{{ item }}"
     state: directory
@@ -60,7 +60,7 @@
   tags: bind
 
 # file to set keys for XFR authentication
-- name: create extra config file for authenticated XFR request
+- name: Create extra config for authenticated XFR request
   template:
     src: auth_transfer.j2
     dest: "{{ bind_conf_dir }}/{{ auth_file }}"

@@ -14,7 +14,7 @@
     label: "{{ item.name }}"
   tags: bind
 
-- name: create dict of forward hashes
+- name: Create dict of forward hashes
   set_fact:
     forward_hashes: "{{ forward_hashes|default([]) + [ {'hash': item.stdout|default(), 'name': item.item.name} ] }}"
   with_items:
@@ -39,7 +39,7 @@
     label: "{{ item.1 }}"
   tags: bind
 
-- name: create dict of reverse hashes
+- name: Create dict of reverse hashes
   set_fact:
     reverse_hashes: "{{ reverse_hashes|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
   with_subelements:
@@ -65,7 +65,7 @@
     label: "{{ item.1 }}"
   tags: bind
 
-- name: create dict of reverse ipv6 hashes
+- name: Create dict of reverse ipv6 hashes
   set_fact:
     reverse_hashes_ipv6: "{{ reverse_hashes_ipv6|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
   with_subelements:
@@ -76,7 +76,7 @@
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
-- name: Master | Create forward lookup zone file
+- name: Create forward lookup zone file
   template:
     src: bind_zone.j2
     dest: "{{ bind_zone_dir }}/{{ item.name }}"
@@ -96,7 +96,7 @@
   notify: reload bind
   tags: bind
 
-- name: Master | Create reverse lookup zone file
+- name: Create reverse lookup zone file
   template:
     src: reverse_zone.j2
     dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
@@ -119,7 +119,7 @@
   notify: reload bind
   tags: bind
 
-- name: Master | Create reverse IPv6 lookup zone file
+- name: Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
     dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
