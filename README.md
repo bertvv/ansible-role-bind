@@ -32,6 +32,7 @@ A few remarks on supported roles that are not included in automated tests
 ## Requirements
 
 - **The package `python-ipaddr` should be installed on the management node** (since v3.7.0)
+- **The package `dnspython` should be installed on the management node** (since v3.7.0)
 
 ## Role Variables
 
@@ -248,7 +249,7 @@ This Molecule configuration will:
 - Create two Docker containers, one primary (`ns1`) and one secondary (`ns2`) DNS server
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml)
-- Run acceptance tests with [BATS](https://github.com/bats-core/bats-core/)
+- Run acceptance tests with [verify playbook](molecule/default/verify.yml)
 
 This process is repeated for the supported Linux distributions.
 
@@ -256,9 +257,9 @@ This process is repeated for the supported Linux distributions.
 
 If you want to set up a local test environment, you can use this reproducible setup based on Vagrant+VirtualBox: <https://github.com/bertvv/ansible-testenv>. Steps to install the necessary tools manually:
 
-1. Docker and BATS should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
+1. Docker should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
 2. As recommended by Molecule, create a python virtual environment
-3. Install the software tools `python3 -m pip install molecule docker netaddr yamllint ansible-lint`
+3. Install the software tools `python3 -m pip install molecule docker netaddr dnspython yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
 
 Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host HOSTNAME`.
@@ -277,13 +278,7 @@ or
 MOLECULE_DISTRO=debian9 molecule converge
 ```
 
-You can run the acceptance tests on both servers with `molecule verify` or manually with
-
-```console
-SUT_IP=172.17.0.2 bats molecule/default/files/dns.bats
-```
-
-You need to initialise the variable `SUT_IP`, the system under test's IP address. The primary server, `ns1`, should have IP address 172.17.0.2 and the secondary server, `ns2` 172.17.0.3.
+You can run the acceptance tests on both servers with `molecule verify`.
 
 ## License
 
