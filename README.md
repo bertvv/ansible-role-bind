@@ -42,10 +42,10 @@ Variables are not required, unless specified.
 | `bind_allow_recursion`      | `['any']`            | Similar to bind_allow_query, this option applies to recursive queries.                                                       |
 | `bind_check_names`          | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).       |
 | `bind_dns_keys`             | `[]`                 | A list of binding keys, which are dicts with fields `name` `algorithm` and `secret`. See below for an example.               |
+| `bind_dns64`                | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                       |
+| `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled         |
 | `bind_dnssec_enable`        | `true`               | Is DNSSEC enabled                                                                                                            |
 | `bind_dnssec_validation`    | `true`               | Is DNSSEC validation enabled                                                                                                 |
-| `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled         |
-| `bind_dns64`                | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                       |
 | `bind_extra_include_files`  | `[]`                 | A list of custom config files to be included from the main config file                                                       |
 | `bind_forward_only`         | `false`              | If `true`, BIND is set up as a caching name server                                                                           |
 | `bind_forwarders`           | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
@@ -53,33 +53,30 @@ Variables are not required, unless specified.
 | `bind_listen_ipv6`          | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                          |
 | `bind_log`                  | `data/named.run`     | Path to the log file                                                                                                         |
 | `bind_other_logs`           | -                    | A list of logging channels to configure, with a separate dict for each domain, with relevant details                         |
-| `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
-| `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                   |
-| `- delegate`                | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
 | `bind_query_log`            | -                    | A dict with fields `file` (e.g. `data/query.log`), `versions`, `size`, when defined this will turn on the query log          |
 | `bind_recursion`            | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`          | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`   | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
 | `bind_transfer_key_name`    | -                    | The name of a TSIG key that should be used to sign XFR requests from the client                                              |
 | `bind_zone_dir`             | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
-| `bind_zone_domains`         | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
-| `- primary_server_ip`       | -                    | **(Required)** The IP address of the zone primary DNS server.                                                                |
+| `bind_zones`         | n/a                  | A list of domains to configure, with a separate dict for each domain. See below this table for examples                      |
 | `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                   |
 | `- create_forward_zones`    | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
 | `- create_reverse_zones`    | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)            |
-| `- delegate`                | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
+| `- delegate`                | `[]`                 | Zone delegation.                                                                                                             |
 | `- hostmaster_email`        | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                  |
-| `- hosts`                   | `[]`                 | Host definitions. See below this table for examples.                                                                         |
+| `- hosts`                   | `[]`                 | Host definitions. Empty => secondary zone, nonempty => primary zone.                                                         |
 | `- ipv6_networks`           | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                               |
 | `- mail_servers`            | `[]`                 | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                           |
 | `- name_servers`            | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                   |
 | `- name`                    | `example.com`        | The domain name                                                                                                              |
+| `- naptr`                   | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `- networks`                | `['10.0.2']`         | A list of the networks that are part of the domain                                                                           |
 | `- other_name_servers`      | `[]`                 | A list of the DNS servers outside of this domain.                                                                            |
+| `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                 |
 | `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                           |
 | `- text`                    | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
-| `- naptr`                   | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `bind_zone_file_mode`       | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
 | `bind_zone_minimum_ttl`     | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`  | `1W`                 | Time to expire field in the SOA record.                                                                                      |
@@ -91,26 +88,31 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even though only variable `primary_server_ip` is required (per zone) for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+In order to set up an authoritative name server that is available to clients, you should at least define the following variables:
 
 | Variable              | Primary | Secondary |
 |:----------------------|:-------:|:---------:|
-| `bind_zone_domains`   |    V    |     V     |
-| `- primary_server_ip` |    V    |     V     |
+| `bind_allow_query`    |    V    |     V     |
+| `bind_listen_ipv4`    |    V    |     V     |
+| `bind_zones`   |    V    |     V     |
+| `- hosts`             |    V    |    --     |
+| `- name_servers`      |    V    |    --     |
 | `- name`              |    V    |     V     |
 | `- networks`          |    V    |     V     |
-| `- name_servers`      |    V    |    --     |
-| `- hosts`             |    V    |    --     |
-| `bind_listen_ipv4`    |    V    |     V     |
-| `bind_allow_query`    |    V    |     V     |
+| `- primaries`         |    V    |     V     |
 
 ### Domain definitions
 
 ```Yaml
-bind_zone_domains:
+bind_zones:
+  # Example of a primary zone (hosts: and name_servers: ares defined)
   - name: mydomain.com           # Domain name
     create_reverse_zones: false  # Skip creation of reverse zones
-    primary_server_ip: 192.0.2.1 # Primary server ip defined per zone
+    primaries:
+      - 192.0.2.1                # Primary server(s) for this zone
+    name_servers:
+      - pub01.mydomain.com.
+      - pub02.mydomain.com.
     hosts:
       - name: pub01
         ip: 192.0.2.1
@@ -160,16 +162,10 @@ bind_zone_domains:
         service: "SIP+D2T"
         regex: "!^.*$!sip:customer-service@example.com!"
         replacement: "_sip._tcp.example.com."
-```
-
-### Minimal secondary server configuration
-
-```Yaml
-    bind_listen_ipv4: ['any']
-    bind_allow_query: ['any']
-    bind_zone_domains:
-      - name: example.com
-        primary_server_ip: 192.0.2.1
+  # Minimal example of a secondary zone (hosts: is not defined)
+  - name: acme.com
+    primaries:
+      - 172.17.0.2
 ```
 
 ### Hosts
@@ -182,15 +178,15 @@ If you want to specify multiple IP addresses for a host, add entries to `bind_zo
 
 ### Networks
 
-As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `networks` (part of bind_zone_domains.name dict), though, or the host will not get a PTR record for reverse lookup:
+As you can see, not all hosts are in the same network. This is perfectly acceptable, and supported by this role. All networks should be specified in `networks` (part of `bind_zones` dict), though, or the host will not get a PTR record for reverse lookup.
 
 Remark that only the network part should be specified here! When specifying a class B IP address (e.g. "172.16") in a variable file, it must be quoted. Otherwise, the Yaml parser will interpret it as a float.
 
-Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index.php/2016/managing-dns-zones-with-ansible/> for the gdnsd package, the zonefiles are fully idempotent, and thus only get updated if "real" content changes.
+Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index.php/2016/managing-dns-zones-with-ansible/> for the gdnsd package, the zone files are fully idempotent, and thus only get updated if "real" content changes.
 
 ### Zone delgation
 
-To delegate a zone to a DNS, it is enough to create a `NS` record (under delegate) which is the equivalent of:
+To delegate a zone to a DNS server, it is sufficient to create a `NS` record (under delegate) which is the equivalent of:
 
 ```text
 foo IN NS 192.0.2.1

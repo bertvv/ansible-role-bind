@@ -1,34 +1,12 @@
 ---
-- name: Converge
-  hosts: all
+- name: Converge ns1
+  hosts: ns1
   vars:
-    bind_zone_dir: /var/local/named-zones
-    bind_zone_file_mode: '0660'
-    bind_allow_query:
-      - any
-    bind_listen_ipv4:
-      - any
-    bind_listen_ipv6:
-      - any
-    bind_acls:
-      - name: acl1
-        match_list:
-          - 172.17.0.0/16
-    bind_forwarders:
-      - '8.8.8.8'
-      - '8.8.4.4'
-    bind_recursion: true
-    bind_dns64: true
-    bind_query_log: 'data/query.log'
-    bind_check_names: 'master ignore'
-    bind_zone_minimum_ttl: "2D"
-    bind_zone_ttl: "2W"
-    bind_zone_time_to_refresh: "2D"
-    bind_zone_time_to_retry: "2H"
-    bind_zone_time_to_expire: "2W"
-    bind_zone_domains:
+    bind_zones:
+      # Primary server for domain example.com
       - name: 'example.com'
-        primary_server_ip: 172.17.0.2
+        primaries:
+          - 172.17.0.2
         networks:
           - '192.0.2'
         ipv6_networks:
@@ -52,8 +30,10 @@
         mail_servers:
           - name: mail001
             preference: 10
+      # Primary server for domain acme-inc.com
       - name: 'acme-inc.com'
-        primary_server_ip: 172.17.0.2
+        primaries:
+          - 172.17.0.2
         networks:
           - '172.17'
           - '10'
@@ -115,5 +95,29 @@
             text:
               - 'some text'
               - 'more text'
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+
+- name: Converge ns2
+  hosts: ns2
+  vars:
+    bind_zones:
+      # Secondary server for domain example.com
+      - name: 'example.com'
+        primaries:
+          - 172.17.0.2
+        networks:
+          - '192.0.2'
+        ipv6_networks:
+          - '2001:db9::/48'
+      # Secondary server for domain acme-inc.com
+      - name: 'acme-inc.com'
+        primaries:
+          - 172.17.0.2
+        networks:
+          - '172.17'
+          - '10'
+        ipv6_networks:
+          - '2001:db8::/48'
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"

@@ -6,14 +6,14 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: bind,pretask
+  tags: bind
 
-- name: Check whether `primary_server_ip` was set per zone
+- name: Check whether `primaries` was set for each zone
   assert:
     that:
-      - item.primary_server_ip is defined
+      - item.primaries is defined
     quiet: yes
-  loop: "{{ bind_zone_domains }}"
+  loop: "{{ bind_zones }}"
   loop_control:
     label: "{{ item.name }}"
   tags: bind
@@ -31,6 +31,7 @@
   assert:
     that: bind_dns_keys | selectattr("name",'equalto',"{{ bind_transfer_key_name }}") | list | count > 0
   when: bind_transfer_key_name is defined and bind_transfer_key_name | length > 0
+  tags: bind
 
 - name: Install BIND
   package:
@@ -84,7 +85,7 @@
     group: "{{ bind_group }}"
   become: yes
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
-  tags: bind,pretask
+  tags: bind
 
 - name: Configure zones
   include_tasks: zones.yml

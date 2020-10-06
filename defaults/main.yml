@@ -2,7 +2,7 @@
 
 bind_log: "data/named.run"
 
-bind_zone_domains:
+bind_zones:
   - name: "example.com"
     hostmaster_email: "hostmaster"
     networks:

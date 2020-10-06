@@ -6,7 +6,7 @@
   check_mode: false
   register: forward_hashes_temp
   with_items:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
   run_once: true
   loop_control:
     label: "{{ item.name }}"
@@ -28,7 +28,7 @@
   check_mode: false
   register: reverse_hashes_temp
   with_subelements:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
     - networks
     - flags:
       skip_missing: true
@@ -54,7 +54,7 @@
   check_mode: false
   register: reverse_hashes_ipv6_temp
   with_subelements:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
     - ipv6_networks
     - flags:
       skip_missing: true
@@ -85,12 +85,12 @@
     validate: 'named-checkzone -d {{ item.name }} %s'
   become: yes
   with_items:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
   loop_control:
     label: "{{ item.name }}"
   when: >
     (item.create_forward_zones is not defined or item.create_forward_zones) and
-    (item.primary_server_ip in ansible_all_ipv4_addresses or item.primary_server_ip in ansible_all_ipv6_addresses)
+    (item.hosts is defined)
   notify: reload bind
   tags: bind
 
@@ -105,7 +105,7 @@
     validate: "named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
   become: yes
   with_subelements:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
     - networks
     - flags:
       skip_missing: true
@@ -113,7 +113,7 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].primary_server_ip in ansible_all_ipv4_addresses or item[0].primary_server_ip in ansible_all_ipv6_addresses)
+    (item[0].hosts is defined)
   notify: reload bind
   tags: bind
 
@@ -128,7 +128,7 @@
     validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
   become: yes
   with_subelements:
-    - "{{ bind_zone_domains }}"
+    - "{{ bind_zones }}"
     - ipv6_networks
     - flags:
       skip_missing: true
@@ -136,6 +136,6 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].primary_server_ip in ansible_all_ipv4_addresses or item[0].primary_server_ip in ansible_all_ipv6_addresses)
+    (item[0].hosts is defined)
   notify: reload bind
   tags: bind
