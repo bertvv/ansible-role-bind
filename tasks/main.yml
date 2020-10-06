@@ -8,10 +8,10 @@
     - "{{ ansible_os_family }}.yml"
   tags: bind,pretask
 
-- name: Check whether `master_server_ip` was set per zone
+- name: Check whether `primary_server_ip` was set per zone
   assert:
     that:
-      - item.master_server_ip is defined
+      - item.primary_server_ip is defined
     quiet: yes
   loop: "{{ bind_zone_domains }}"
   loop_control:
@@ -41,11 +41,11 @@
     - "{{ bind_packages }}"
   tags: bind
 
-- name: Ensure runtime directories referenced in config
+- name: Ensure runtime directories referenced in config exist
   file:
     path: "{{ item }}"
     state: directory
-    owner: root
+    owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0770
   become: yes
@@ -53,6 +53,17 @@
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
     - "{{ bind_zone_dir }}"
+  tags: bind
+
+- name: Ensure Directory for Cached Secondary Zones exists
+  file:
+    path: "{{ bind_secondary_dir }}"
+    state: directory
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: 0770
+    setype: named_cache_t
+  become: yes
   tags: bind
 
 - name: Create serial, based on UTC UNIX time
@@ -75,19 +86,8 @@
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
   tags: bind,pretask
 
-- name: Configure Master Zones
+- name: Configure zones
   include_tasks: zones.yml
-  tags: bind
-
-- name: Ensure Directory for Cached Slaves Zones
-  file:
-    path: "{{ bind_dir }}/slaves"
-    state: directory
-    owner: "{{ bind_owner }}"
-    group: "{{ bind_group }}"
-    mode: 0770
-    setype: named_cache_t
-  become: yes
   tags: bind
 
 - name: Main BIND config file

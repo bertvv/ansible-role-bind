@@ -90,7 +90,7 @@
     label: "{{ item.name }}"
   when: >
     (item.create_forward_zones is not defined or item.create_forward_zones) and
-    (item.master_server_ip in ansible_all_ipv4_addresses or item.master_server_ip in ansible_all_ipv6_addresses)
+    (item.primary_server_ip in ansible_all_ipv4_addresses or item.primary_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind
 
@@ -113,7 +113,7 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].master_server_ip in ansible_all_ipv4_addresses or item[0].master_server_ip in ansible_all_ipv6_addresses)
+    (item[0].primary_server_ip in ansible_all_ipv4_addresses or item[0].primary_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind
 
@@ -136,6 +136,6 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].master_server_ip in ansible_all_ipv4_addresses or item[0].master_server_ip in ansible_all_ipv6_addresses)
+    (item[0].primary_server_ip in ansible_all_ipv4_addresses or item[0].primary_server_ip in ansible_all_ipv6_addresses)
   notify: reload bind
   tags: bind
