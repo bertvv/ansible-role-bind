@@ -67,3 +67,8 @@ bind_zone_minimum_ttl: "1D"
 
 # File mode for primary zone files (needs to be something like 0660 for dynamic updates)
 bind_zone_file_mode: "0640"
+
+# DNS64 support
+bind_dns64: false
+bind_dns64_clients:
+  - "any"

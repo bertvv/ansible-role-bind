@@ -48,6 +48,11 @@ options {
 
   querylog yes;
 {% endif %}
+{% if bind_dns64 %}
+  dns64 64:ff9b::/96 {
+    clients { {{ bind_dns64_clients|join('; ') }};  };
+  };
+{% endif %}
 };
 
 {% if bind_statistics_channels %}
