@@ -14,11 +14,13 @@ jobs:
     strategy:
       matrix:
         distro:
+          - centos6
           - centos7
           - centos8
           - debian8
           - debian9
           - debian10
+          - ubuntu1604
           - ubuntu1804
           - ubuntu2004
 
