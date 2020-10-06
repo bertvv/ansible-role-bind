@@ -5,3 +5,4 @@
   service:
     name: "{{ bind_service }}"
     state: reloaded
+  become: yes

@@ -32,6 +32,7 @@ A few remarks on supported roles that are not included in automated tests
 ## Requirements
 
 - **The package `python-ipaddr` should be installed on the management node** (since v3.7.0)
+- **The package `dnspython` should be installed on the management node** (since v3.7.0)
 
 ## Role Variables
 
@@ -62,6 +63,7 @@ Variables are not required, unless specified.
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
+| `- master_server_ip`         | -                    | **(Required)** The IP address of the zone master DNS server.                                                                      |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
 | `- create_forward_zones`     | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
@@ -79,7 +81,6 @@ Variables are not required, unless specified.
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
-| `bind_zone_master_server_ip` | -                    | **(Required)** The IP address of the master DNS server.                                                                      |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`   | `1W`                 | Time to expire field in the SOA record.                                                                                      |
 | `bind_zone_time_to_refresh`  | `1D`                 | Time to refresh field in the SOA record.                                                                                     |
@@ -90,11 +91,12 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+Even though only variable `master_server_ip` is required (per zone) for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
 | `bind_zone_domains`          | V      | V     |
+| `- master_server_ip`         | V      | V     |
 | `- name`                     | V      | V     |
 | `- networks`                 | V      | V     |
 | `- name_servers`             | V      | --    |
@@ -106,18 +108,24 @@ Even though only variable `bind_zone_master_server_ip` is required for the role 
 
 ```Yaml
 bind_zone_domains:
-  - name: mydomain.com           # Domain name
-    create_reverse_zones: false  # Skip creation of reverse zones
+  - name: mydomain.com          # Domain name
+    create_reverse_zones: false # Skip creation of reverse zones
+    master_server_ip: 192.0.2.1 # Master server ip defined per zone
     hosts:
       - name: pub01
         ip: 192.0.2.1
         ipv6: 2001:db8::1
         aliases:
-          - ns
+          - ns1
+      - name: pub02
+        ip: 192.0.2.2
+        ipv6: 2001:db8::2
+        aliases:
+          - ns2
       - name: '@'                # Enables "http://mydomain.com/"
         ip:
-          - 192.0.2.2            # Multiple IP addresses for a single host
-          - 192.0.2.3            #   results in DNS round robin
+          - 192.0.2.3            # Multiple IP addresses for a single host
+          - 192.0.2.4            #   results in DNS round robin
         sshfp:                   # Secure shell fingerprint
           - "3 1 1262006f9a45bb36b1aa14f45f354b694b77d7c3"
           - "3 2 e5921564252fe10d2dbafeb243733ed8b1d165b8fa6d5a0e29198e5793f0623b"
@@ -159,9 +167,9 @@ bind_zone_domains:
 ```Yaml
     bind_listen_ipv4: ['any']
     bind_allow_query: ['any']
-    bind_zone_master_server_ip: 192.168.111.222
     bind_zone_domains:
       - name: example.com
+        master_server_ip: 192.0.2.1
 ```
 
 ### Hosts
@@ -241,7 +249,7 @@ This Molecule configuration will:
 - Create two Docker containers, one primary (`ns1`) and one secondary (`ns2`) DNS server
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml)
-- Run acceptance tests with [BATS](https://github.com/bats-core/bats-core/)
+- Run acceptance tests with [verify playbook](molecule/default/verify.yml)
 
 This process is repeated for the supported Linux distributions.
 
@@ -249,9 +257,9 @@ This process is repeated for the supported Linux distributions.
 
 If you want to set up a local test environment, you can use this reproducible setup based on Vagrant+VirtualBox: <https://github.com/bertvv/ansible-testenv>. Steps to install the necessary tools manually:
 
-1. Docker and BATS should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
+1. Docker should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
 2. As recommended by Molecule, create a python virtual environment
-3. Install the software tools `python3 -m pip install molecule docker netaddr yamllint ansible-lint`
+3. Install the software tools `python3 -m pip install molecule docker netaddr dnspython yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
 
 Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host HOSTNAME`.
@@ -270,13 +278,7 @@ or
 MOLECULE_DISTRO=debian9 molecule converge
 ```
 
-You can run the acceptance tests on both servers with `molecule verify` or manually with
-
-```console
-SUT_IP=172.17.0.2 bats molecule/default/files/dns.bats
-```
-
-You need to initialise the variable `SUT_IP`, the system under test's IP address. The primary server, `ns1`, should have IP address 172.17.0.2 and the secondary server, `ns2` 172.17.0.3.
+You can run the acceptance tests on both servers with `molecule verify`.
 
 ## License
 
@@ -307,6 +309,7 @@ Contributors:
 - [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
+- [Gregory Shulov](https://github.com/GR360RY)
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [jadjay](https://github.com/jadjay)
 - [Jascha Sticher](https://github.com/itbane)

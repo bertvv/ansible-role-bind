@@ -24,20 +24,10 @@ install:
   - sudo apt-get update
   - sudo apt-get install bats curl dnsutils
   # Install dependencies for Molecule test
-  - python3 -m pip install molecule yamllint ansible-lint docker netaddr
+  - python3 -m pip install molecule yamllint ansible-lint docker netaddr dnspython
   # Check ansible and molecule version
   - ansible --version
   - molecule --version
-
-  # Create ansible.cfg with correct roles_path
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
-
-before_script:
-  # Renames ansible-role-bind to bertvv.bind to make it match with Ansible
-  # Galaxy
-  - cd ../
-  - mv ansible-role-$ROLE_NAME bertvv.$ROLE_NAME
-  - cd bertvv.$ROLE_NAME
 
 script:
   # Run molecule test
