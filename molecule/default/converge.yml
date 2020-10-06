@@ -2,6 +2,7 @@
 - name: Converge ns1
   hosts: ns1
   vars:
+    bind_statistics_host: 172.17.0.2
     bind_zones:
       # Primary server for domain example.com
       - name: 'example.com'
@@ -101,6 +102,7 @@
 - name: Converge ns2
   hosts: ns2
   vars:
+    bind_statistics_host: 172.17.0.3
     bind_zones:
       # Secondary server for domain example.com
       - name: 'example.com'
