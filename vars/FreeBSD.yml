@@ -1,4 +1,4 @@
-# roles/bind/vars/Debian.yml
+# Distro specific variables for FreeBSD
 ---
 
 bind_packages:

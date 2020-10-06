@@ -1,4 +1,3 @@
-# roles/bind/handlers/main.yml
 ---
 
 - name: reload bind

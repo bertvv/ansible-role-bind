@@ -1,4 +1,4 @@
-# roles/bind/vars/RedHat.yml
+# Distro specific variables for Arch Linux
 ---
 
 bind_packages:

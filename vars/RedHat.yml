@@ -1,4 +1,4 @@
-# roles/bind/vars/RedHat.yml
+# Distro specific variables for RedHat
 ---
 
 bind_packages:
