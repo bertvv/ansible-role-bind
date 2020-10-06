@@ -28,6 +28,11 @@
   when: ansible_os_family == 'Debian'
   tags: bind
 
+- name: Check that transfer key exists in keys list
+  assert:
+    that: bind_dns_keys | selectattr("name",'equalto',"{{bind_transfer_key_name}}") | list | count > 0
+  when: bind_transfer_key_name is defined and bind_transfer_key_name | length > 0
+
 - name: Install BIND
   package:
     pkg: "{{ item }}"
