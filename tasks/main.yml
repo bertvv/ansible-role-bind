@@ -1,4 +1,3 @@
-# roles/bind/tasks/main.yml
 ---
 
 # Initialise distribution-specific variables
@@ -9,14 +8,35 @@
     - "{{ ansible_os_family }}.yml"
   tags: bind,pretask
 
-- name: Check whether `bind_zone_master_server_ip` was set
+- name: Check whether `primary_server_ip` was set per zone
   assert:
-    that: bind_zone_master_server_ip is defined
+    that:
+      - item.primary_server_ip is defined
+    quiet: yes
+  loop: "{{ bind_zone_domains }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: bind
+
+# Fix molecule and travis ci failures
+- name: Update package cache for Debian based distros
+  apt:
+    update_cache: yes
+  become: yes
+  changed_when: false
+  when: ansible_os_family == 'Debian'
+  tags: bind
+
+- name: Check that transfer key exists in keys list
+  assert:
+    that: bind_dns_keys | selectattr("name",'equalto',"{{ bind_transfer_key_name }}") | list | count > 0
+  when: bind_transfer_key_name is defined and bind_transfer_key_name | length > 0
 
 - name: Install BIND
   package:
     pkg: "{{ item }}"
     state: present
+  become: yes
   with_items:
     - "{{ bind_packages }}"
   tags: bind
@@ -25,13 +45,25 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: root
+    owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0770
+  become: yes
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
     - "{{ bind_zone_dir }}"
+  tags: bind
+
+- name: Ensure Directory for Cached Secondary Zones exists
+  file:
+    path: "{{ bind_secondary_dir }}"
+    state: directory
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: 0770
+    setype: named_cache_t
+  become: yes
   tags: bind
 
 - name: Create serial, based on UTC UNIX time
@@ -43,27 +75,38 @@
   tags: bind
 
 # file to set keys for XFR authentication
-- name: create extra config file for authenticated XFR request
-  tags: pretask
+- name: Create extra config for authenticated XFR request
   template:
     src: auth_transfer.j2
     dest: "{{ bind_conf_dir }}/{{ auth_file }}"
     mode: 0640
     owner: root
     group: "{{ bind_group }}"
+  become: yes
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
+  tags: bind,pretask
 
-- name: Set up the machine as a master DNS server
-  include_tasks: master.yml
-  when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
+- name: Configure zones
+  include_tasks: zones.yml
+  tags: bind
 
-- name: Set up the machine as a slave DNS server
-  include_tasks: slave.yml
-  when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
+- name: Main BIND config file
+  template:
+    src: etc_named.conf.j2
+    dest: "{{ bind_config }}"
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: 0640
+    setype: named_conf_t
+    validate: 'named-checkconf %s'
+  become: yes
+  notify: reload bind
+  tags: bind
 
 - name: Start BIND service
   service:
     name: "{{ bind_service }}"
     state: started
     enabled: true
+  become: yes
   tags: bind

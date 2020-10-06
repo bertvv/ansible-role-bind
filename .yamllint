@@ -53,4 +53,5 @@ rules:
     type: unix
   trailing-spaces: enable
   truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
     level: warning

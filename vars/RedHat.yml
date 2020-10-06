@@ -1,4 +1,4 @@
-# roles/bind/vars/RedHat.yml
+# Distro specific variables for RedHat
 ---
 
 bind_packages:
@@ -29,6 +29,6 @@ bind_bindkeys_file: "/etc/named.iscdlv.key"
 bind_pid_file: "/run/named/named.pid"
 bind_session_keyfile: "/run/named/session.key"
 
-# Custom location for master zone files
+# Custom location for zone files
 bind_zone_dir: "{{ bind_dir }}"
-bind_slave_dir: "{{ bind_dir }}/slaves"
+bind_secondary_dir: "{{ bind_dir }}/secondary"

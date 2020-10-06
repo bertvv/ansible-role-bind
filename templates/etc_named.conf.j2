@@ -48,6 +48,11 @@ options {
 
   querylog yes;
 {% endif %}
+{% if bind_dns64 %}
+  dns64 64:ff9b::/96 {
+    clients { {{ bind_dns64_clients|join('; ') }};  };
+  };
+{% endif %}
 };
 
 {% if bind_statistics_channels %}
@@ -98,6 +103,7 @@ include "{{ file }}";
 {% for bind_zone in bind_zone_domains %}
 {% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
 zone "{{ bind_zone.name }}" IN {
+{% if bind_zone.primary_server_ip in ansible_all_ipv4_addresses or bind_zone.primary_server_ip in ansible_all_ipv6_addresses %}
   type master;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
   notify yes;
@@ -109,6 +115,11 @@ zone "{{ bind_zone.name }}" IN {
 {% else %}
   allow-update { none; };
 {% endif %}
+{% else %}
+  type slave;
+  masters { {{ bind_zone.primary_server_ip }}; };
+  file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
+{% endif %}
 {% if bind_zone.delegate is defined %}
   forwarders {};
 {% endif %}
@@ -119,6 +130,7 @@ zone "{{ bind_zone.name }}" IN {
 {% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
+{% if bind_zone.primary_server_ip in ansible_all_ipv4_addresses or bind_zone.primary_server_ip in ansible_all_ipv6_addresses %}
   type master;
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
   notify yes;
@@ -130,6 +142,11 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% else %}
   allow-update { none; };
 {% endif %}
+{% else %}
+  type slave;
+  masters { {{ bind_zone.primary_server_ip }}; };
+  file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% endif %}
 };
 {% endfor %}
 {% endif %}
@@ -139,6 +156,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+{% if bind_zone.primary_server_ip in ansible_all_ipv4_addresses or bind_zone.primary_server_ip in ansible_all_ipv6_addresses %}
   type master;
   file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
@@ -149,6 +167,11 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
 {% else %}
   allow-update { none; };
+{% endif %}
+{% else %}
+  type slave;
+  masters { {{ bind_zone.primary_server_ip }}; };
+  file "{{ bind_secondary_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% endif %}
 };
 {% endfor %}

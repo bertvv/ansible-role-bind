@@ -1,4 +1,9 @@
+{% if bind_transfer_key_name is defined and bind_zone_primary_server_ip not in ansible_all_ipv4_addresses %}
+server {{ bind_zone_primary_server_ip }} {
+  keys { {{ bind_transfer_key_name }}; };
+};
 
+{% endif %}
 server {{ ansible_default_ipv4.address }} {
   keys { {% for mykey in bind_dns_keys %} {{ mykey.name }}; {% endfor %} };
 };
@@ -7,6 +12,5 @@ server {{ ansible_default_ipv4.address }} {
 key {{ mykey.name }} {
   algorithm {{ mykey.algorithm }};
   secret "{{ mykey.secret }}";
-{% endfor %}
 };
-
+{% endfor %}

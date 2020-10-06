@@ -1,4 +1,3 @@
-# roles/bind/defaults/main.yml
 ---
 
 bind_log: "data/named.run"
@@ -12,9 +11,9 @@ bind_zone_domains:
 # List of acls.
 bind_acls: []
 
-# Key binding for slaves
+# Key binding for secondary servers
 bind_dns_keys: []
-#  - name: master_key
+#  - name: primary_key
 #    algorithm: hmac-sha256
 #    secret: "azertyAZERTY123456"
 
@@ -66,5 +65,10 @@ bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
 
-# File mode for master zone files (needs to be something like 0660 for dynamic updates)
+# File mode for primary zone files (needs to be something like 0660 for dynamic updates)
 bind_zone_file_mode: "0640"
+
+# DNS64 support
+bind_dns64: false
+bind_dns64_clients:
+  - "any"
