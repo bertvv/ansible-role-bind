@@ -29,7 +29,7 @@ A few remarks on supported roles that are not included in automated tests
 
 ## Requirements
 
-- **The package `python-ipaddr` and `dnspython` should be installed on the management node**
+**The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters_ipaddr.html) filter) and `dnspython` should be installed on the management node**
 
 ## Role Variables
 
