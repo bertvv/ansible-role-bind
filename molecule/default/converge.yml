@@ -1,4 +1,7 @@
 ---
+
+# Remark that common variables are defined in `group_vars/all.yml`
+
 - name: Converge ns1
   hosts: ns1
   vars:

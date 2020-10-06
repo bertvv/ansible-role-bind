@@ -4,6 +4,31 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 5.0.0 - 2020-10-07
+
+Quite a bit of breaking changes in this release, so update your playbooks!
+
+### Added
+
+- (GH-122) Support for DNS64 (credit: [Paulius Mazeika](https://github.com/pauliusm))
+- The test playbook now enables the statistics-channels. Enter <http://SERVER_IP:8053> in a webbrowser to view the server statistics.
+- Ubuntu 16.04 is now included in CI tests
+ 
+### Breaking changes
+
+- The terms `master` and `slave` were replaced by `primary` and `secondary`, respectively, in all playbooks, templates and documentation. This reflects changes in recent versions of BIND. Remark that the actual configuration files still use the "old" names, because most supported distros still have older versions of BIND in their software package repositories.
+- `bind_zone_domains` is renamed to `bind_zones`
+- `master_server_ip` is renamed to `primaries` and is now a list instead of a string. This makes it possible to specify multiple primary servers. (Inspired by GH-124 by @pavel-z1)
+- It is now possible to specify the type of each zone individually. If `bind_zones.hosts` is defined, it becomes a primary zone, if not a secondary. (Inspired by GH-125 by @pavel-z1)
+
+See the documentation in the [README](README.md) and the [test playbook](molecule/default/converge.yml) for updated examples.
+
+### Other changes
+
+
+- (GH-130) Primary and secondary server configuration is now unified (a single template instead of separate). CI tests are now executed on Github Actions. Acceptance tests are now performed using a playbook instead of BATS. (credit: [Gregory Shulov](https://github.com/GR360RY))
+- Code cleanup (linter warnings, deprecated comments, etc.)
+
 ## 4.2.0 - 2020-05-23
 
 An update that's been long overdue. Several PRs with new features were merged!
