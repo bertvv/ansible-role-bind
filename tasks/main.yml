@@ -18,7 +18,7 @@
     label: "{{ item.name }}"
   tags: bind
 
-# Fix molecule and travis ci failures
+# Fix molecule and ci failures
 - name: Update package cache for Debian based distros
   apt:
     update_cache: yes
