@@ -8,10 +8,10 @@
     - "{{ ansible_os_family }}.yml"
   tags: bind
 
-- name: Check whether `primaries` was set for each zone
+- name: Check `primaries` or `forwarders` was set for each zone
   assert:
     that:
-      - item.primaries is defined
+      - item.primaries is defined or item.forwarders
     quiet: yes
   loop: "{{ bind_zones }}"
   loop_control:

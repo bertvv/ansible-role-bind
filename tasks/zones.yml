@@ -1,4 +1,8 @@
 ---
+- name: Set list of all host IP addresses
+  set_fact:
+    host_all_addresses: "{{ ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) }}"
+  tags: bind
 
 - name: Read forward zone hashes
   shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
@@ -90,7 +94,9 @@
     label: "{{ item.name }}"
   when: >
     (item.create_forward_zones is not defined or item.create_forward_zones) and
-    (item.hosts is defined)
+    ((item.type is defined and item.type == 'primary') or
+    (item.type is not defined and item.primaries is defined and
+    (host_all_addresses | intersect(item.primaries) | length > 0)))
   notify: reload bind
   tags: bind
 
@@ -113,7 +119,9 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].hosts is defined)
+    ((item[0].type is defined and item[0].type == 'primary') or
+    (item[0].type is not defined and item[0].primaries is defined and
+    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
   notify: reload bind
   tags: bind
 
@@ -136,6 +144,8 @@
     label: "{{ item.1 }}"
   when: >
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
-    (item[0].hosts is defined)
+    ((item[0].type is defined and item[0].type == 'primary') or
+    (item[0].type is not defined and item[0].primaries is defined and
+    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
   notify: reload bind
   tags: bind

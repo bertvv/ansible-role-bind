@@ -1,0 +1,9 @@
+---
+
+# Remark that common variables are defined in `group_vars/all.yml`
+
+- name: Primary/Secondary with Shared Inventory
+  hosts: dns
+
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
