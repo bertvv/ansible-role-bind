@@ -1,5 +1,5 @@
 ---
-- name: Primary/Secondary with Shared Inventory
+- name: Verify
   hosts: all
   gather_facts: false
 
@@ -11,23 +11,23 @@
         gather_subset:
           - 'network'
 
-    - name: Set local_dns variable
+    - name: Set local_dns variable for dig
       set_fact:
         local_dns: "{{ '@' + ansible_default_ipv4.address }}"
 
     - name: IPv4 Forward lookups
       assert:
         that:
-          - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '172.17.0.2'
-          - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '172.17.0.3'
-          - lookup('dig', 'srv001.acme-inc.com', local_dns)  == '172.17.1.1'
-          - lookup('dig', 'srv002.acme-inc.com', local_dns)  == '172.17.1.2'
-          - lookup('dig', 'mail001.acme-inc.com', local_dns) == '172.17.2.1'
-          - lookup('dig', 'mail002.acme-inc.com', local_dns) == '172.17.2.2'
-          - lookup('dig', 'mail003.acme-inc.com', local_dns) == '172.17.2.3'
-          - lookup('dig', 'srv010.acme-inc.com', local_dns)  == '10.0.0.10'
-          - lookup('dig', 'srv011.acme-inc.com', local_dns)  == '10.0.0.11'
-          - lookup('dig', 'srv012.acme-inc.com', local_dns)  == '10.0.0.12'
+          - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '10.11.0.4'
+          - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '10.11.0.5'
+          - lookup('dig', 'srv001.acme-inc.com', local_dns)  == '10.11.1.1'
+          - lookup('dig', 'srv002.acme-inc.com', local_dns)  == '10.11.1.2'
+          - lookup('dig', 'mail001.acme-inc.com', local_dns) == '10.11.2.1'
+          - lookup('dig', 'mail002.acme-inc.com', local_dns) == '10.11.2.2'
+          - lookup('dig', 'mail003.acme-inc.com', local_dns) == '10.11.2.3'
+          - lookup('dig', 'srv010.acme-inc.com', local_dns)  == '10.11.0.10'
+          - lookup('dig', 'srv011.acme-inc.com', local_dns)  == '10.11.0.11'
+          - lookup('dig', 'srv012.acme-inc.com', local_dns)  == '10.11.0.12'
           - lookup('dig', 'srv001.example.com', local_dns)   == '192.0.2.1'
           - lookup('dig', 'srv002.example.com', local_dns)   == '192.0.2.2'
           - lookup('dig', 'mail001.example.com', local_dns)  == '192.0.2.10'
@@ -35,16 +35,16 @@
     - name: IPv4 Reverse lookups
       assert:
         that:
-          - lookup('dig', '172.17.0.2/PTR', local_dns) == 'ns1.acme-inc.com.'
-          - lookup('dig', '172.17.0.3/PTR', local_dns) == 'ns2.acme-inc.com.'
-          - lookup('dig', '172.17.1.1/PTR', local_dns) == 'srv001.acme-inc.com.'
-          - lookup('dig', '172.17.1.2/PTR', local_dns) == 'srv002.acme-inc.com.'
-          - lookup('dig', '172.17.2.1/PTR', local_dns) == 'mail001.acme-inc.com.'
-          - lookup('dig', '172.17.2.2/PTR', local_dns) == 'mail002.acme-inc.com.'
-          - lookup('dig', '172.17.2.3/PTR', local_dns) == 'mail003.acme-inc.com.'
-          - lookup('dig', '10.0.0.10/PTR', local_dns)  == 'srv010.acme-inc.com.'
-          - lookup('dig', '10.0.0.11/PTR', local_dns)  == 'srv011.acme-inc.com.'
-          - lookup('dig', '10.0.0.12/PTR', local_dns)  == 'srv012.acme-inc.com.'
+          - lookup('dig', '10.11.0.4/PTR', local_dns)  == 'ns1.acme-inc.com.'
+          - lookup('dig', '10.11.0.5/PTR', local_dns)  == 'ns2.acme-inc.com.'
+          - lookup('dig', '10.11.1.1/PTR', local_dns)  == 'srv001.acme-inc.com.'
+          - lookup('dig', '10.11.1.2/PTR', local_dns)  == 'srv002.acme-inc.com.'
+          - lookup('dig', '10.11.2.1/PTR', local_dns)  == 'mail001.acme-inc.com.'
+          - lookup('dig', '10.11.2.2/PTR', local_dns)  == 'mail002.acme-inc.com.'
+          - lookup('dig', '10.11.2.3/PTR', local_dns)  == 'mail003.acme-inc.com.'
+          - lookup('dig', '10.11.0.10/PTR', local_dns) == 'srv010.acme-inc.com.'
+          - lookup('dig', '10.11.0.11/PTR', local_dns) == 'srv011.acme-inc.com.'
+          - lookup('dig', '10.11.0.12/PTR', local_dns) == 'srv012.acme-inc.com.'
           - lookup('dig', '192.0.2.1/PTR', local_dns)  == 'srv001.example.com.'
           - lookup('dig', '192.0.2.2/PTR', local_dns)  == 'srv002.example.com.'
           - lookup('dig', '192.0.2.10/PTR', local_dns) == 'mail001.example.com.'
@@ -52,12 +52,12 @@
     - name: IPv4 Alias lookups
       assert:
         that:
-          - lookup('dig', 'www.acme-inc.com', local_dns)      == '172.17.1.1'
-          - lookup('dig', 'mysql.acme-inc.com', local_dns)    == '172.17.1.2'
-          - lookup('dig', 'smtp.acme-inc.com', local_dns)     == '172.17.2.1'
-          - lookup('dig', 'mail-in.acme-inc.com', local_dns)  == '172.17.2.1'
-          - lookup('dig', 'imap.acme-inc.com', local_dns)     == '172.17.2.3'
-          - lookup('dig', 'mail-out.acme-inc.com', local_dns) == '172.17.2.3'
+          - lookup('dig', 'www.acme-inc.com', local_dns)      == '10.11.1.1'
+          - lookup('dig', 'mysql.acme-inc.com', local_dns)    == '10.11.1.2'
+          - lookup('dig', 'smtp.acme-inc.com', local_dns)     == '10.11.2.1'
+          - lookup('dig', 'mail-in.acme-inc.com', local_dns)  == '10.11.2.1'
+          - lookup('dig', 'imap.acme-inc.com', local_dns)     == '10.11.2.3'
+          - lookup('dig', 'mail-out.acme-inc.com', local_dns) == '10.11.2.3'
           - lookup('dig', 'www.example.com', local_dns)       == '192.0.2.1'
 
     - name: IPv6 Forward lookups

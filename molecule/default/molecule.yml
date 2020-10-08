@@ -19,6 +19,14 @@ platforms:
     hostname: ns1
     # Specify which image should be used. Geerlingguys images are Ansible
     # compatible and have Systemd installed
+    docker_networks:
+      - name: bind
+        ipam_config:
+          - subnet: "10.11.0.0/16"
+            gateway: "10.11.0.254"
+    networks:
+      - name: bind
+        ipv4_address: "10.11.0.1"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     # Command to execute when the container starts
     command: ${MOLECULE_DOCKER_COMMAND:-""}
@@ -36,6 +44,9 @@ platforms:
 
   - name: ns2
     hostname: ns2
+    networks:
+      - name: bind
+        ipv4_address: "10.11.0.2"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
@@ -47,6 +58,9 @@ platforms:
 
   - name: ns3
     hostname: ns3
+    networks:
+      - name: bind
+        ipv4_address: "10.11.0.3"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:

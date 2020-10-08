@@ -323,7 +323,7 @@ In order to run the acceptance tests on this role locally, you can install the n
 
 Steps to install the tools manually:
 
-1. Docker should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
+1. Docker should be installed on your machine
 2. As recommended by Molecule, create a python virtual environment
 3. Install the software tools `python3 -m pip install molecule docker netaddr dnspython yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
@@ -345,6 +345,13 @@ MOLECULE_DISTRO=debian9 molecule converge
 ```
 
 You can run the acceptance tests on both servers with `molecule verify`.
+
+---
+**NOTE**
+
+* Molecule verify tests will fail if docker is running on MacOS. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670)
+---
+
 
 ## License
 
