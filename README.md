@@ -23,7 +23,7 @@ This role can be used on several platforms, see [meta/main.yml](meta/main.yml) f
 A few remarks on supported roles that are not included in automated tests
 
 - **Arch Linux** and **FreeBSD** should work, but at this time, it's not possible to test the role on these distros, since no suitable Docker images are available.
-- **CentOS 6** should work, but idempotence tests fail even if BIND is installed succesfully and acceptance tests succeed.
+- **CentOS 6** should work, but idempotence tests fail even if BIND is installed successfully and acceptance tests succeed.
 
 ## Requirements
 
@@ -197,13 +197,13 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 ### Zone types and Zone type auto-detection
 
-Zone `type` is an optional zone parameter that defines if the zone type should be of `primary`, `secondary` or `forward` type. When `type` parameter is ommited, zone type will be autodetected based on the intersection of host IP addresses and `primaries` record when configuring primary or secondary zone. When `primaries` is not defined and `forwarders` is defined, the zone type will be set to `forward`.
+Zone `type` is an optional zone parameter that defines if the zone type should be of `primary`, `secondary` or `forward` type. When `type` parameter is omitted, zone type will be autodetected based on the intersection of host IP addresses and `primaries` record when configuring primary or secondary zone. When `primaries` is not defined and `forwarders` is defined, the zone type will be set to `forward`.
 
-Zone autodetection functionality is especially usefull when deploying multi-site DNS infrastrucutre. It is convinient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook.
+Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook.
 
 See example of shared `bind_zones` in [molecule/shared_inventory/converge.yml](molecule/shared_inventory/converge.yml) and the accompanying [dns.yml](molecule/shared_inventory/group_vars/all.yml) file.
 
-This scenario can be tested by runing `molecule test --scenario-name shared_inventory`
+This scenario can be tested by running `molecule test --scenario-name shared_inventory`
 
 ---
 **NOTE**
@@ -212,20 +212,20 @@ This scenario can be tested by runing `molecule test --scenario-name shared_inve
 * When `primaries` record is updated to switch primary to secondary server roles, zones will be wiped out and recreated from template as we yet to support dynamic updates for existing zones.
 ---
 
-Zone types can be also defined explicity in per host inventory to skip autodetection:
+Zone types can be also defined explicitly in per host inventory to skip autodetection:
 
 ```Yaml
 # Primary Server
 bind_zones:
   - name: mydomain.com
-    type: master
+    type: primary
     primaries:
       - 192.0.2.1
 ...
 # Secondary Server
 bind_zones:
   - name: mydomain.com
-      type: slave
+      type: secondary
       primaries:
         - 192.0.2.1
 ...
@@ -310,10 +310,11 @@ This role is tested using [Ansible Molecule](https://molecule.readthedocs.io/). 
 This Molecule configuration will:
 
 - Run Yamllint and Ansible Lint
-- Create two Docker containers, one primary (`ns1`) and one secondary (`ns2`) DNS server
+- Create three Docker containers, one primary (`ns1`), one secondary (`ns2`) DNS server and forwarder(`ns3`) - `default` molecule scenario
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml) and check idempotence
 - Run acceptance tests with [verify playbook](molecule/default/verify.yml)
+- Create additional two Docker container, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
 
 This process is repeated for all the supported Linux distributions.
 
