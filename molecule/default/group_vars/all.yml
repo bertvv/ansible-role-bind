@@ -13,7 +13,7 @@ bind_listen_ipv6:
 bind_acls:
   - name: acl1
     match_list:
-      - 172.17.0.0/16
+      - 10.11.0.0/16
 bind_forwarders:
   - '8.8.8.8'
   - '8.8.4.4'
@@ -26,3 +26,4 @@ bind_zone_ttl: "2W"
 bind_zone_time_to_refresh: "2D"
 bind_zone_time_to_retry: "2H"
 bind_zone_time_to_expire: "2W"
+bind_statistics_host: "{{ ansible_default_ipv4.address }}"

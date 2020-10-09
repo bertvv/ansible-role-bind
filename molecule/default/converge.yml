@@ -2,15 +2,14 @@
 
 # Remark that common variables are defined in `group_vars/all.yml`
 
-- name: Converge ns1
+- name: Converge Primary
   hosts: ns1
   vars:
-    bind_statistics_host: 172.17.0.2
     bind_zones:
-      # Primary server for domain example.com
+      # Primary server for domain example.com (use zone type autodetection)
       - name: 'example.com'
         primaries:
-          - 172.17.0.2
+          - 10.11.0.1
         networks:
           - '192.0.2'
         ipv6_networks:
@@ -34,13 +33,13 @@
         mail_servers:
           - name: mail001
             preference: 10
-      # Primary server for domain acme-inc.com
+      # Primary server for domain acme-inc.com (specify zone type explicitly)
       - name: 'acme-inc.com'
+        type: primary
         primaries:
-          - 172.17.0.2
+          - 10.11.0.1
         networks:
-          - '172.17'
-          - '10'
+          - '10.11'
         ipv6_networks:
           - '2001:db8::/48'
         name_servers:
@@ -48,40 +47,40 @@
           - ns2
         hosts:
           - name: ns1
-            ip: 172.17.0.2
+            ip: 10.11.0.1
           - name: ns2
-            ip: 172.17.0.3
+            ip: 10.11.0.2
           - name: srv001
-            ip: 172.17.1.1
+            ip: 10.11.1.1
             ipv6: 2001:db8::1
             aliases:
               - www
           - name: srv002
-            ip: 172.17.1.2
+            ip: 10.11.1.2
             ipv6: 2001:db8::2
             aliases:
               - mysql
           - name: mail001
-            ip: 172.17.2.1
+            ip: 10.11.2.1
             ipv6: 2001:db8::d:1
             aliases:
               - smtp
               - mail-in
           - name: mail002
-            ip: 172.17.2.2
+            ip: 10.11.2.2
             ipv6: 2001:db8::d:2
           - name: mail003
-            ip: 172.17.2.3
+            ip: 10.11.2.3
             ipv6: 2001:db8::d:3
             aliases:
               - imap
               - mail-out
           - name: srv010
-            ip: 10.0.0.10
+            ip: 10.11.0.10
           - name: srv011
-            ip: 10.0.0.11
+            ip: 10.11.0.11
           - name: srv012
-            ip: 10.0.0.12
+            ip: 10.11.0.12
         mail_servers:
           - name: mail001
             preference: 10
@@ -102,26 +101,52 @@
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
 
-- name: Converge ns2
+- name: Converge Secondary
   hosts: ns2
   vars:
-    bind_statistics_host: 172.17.0.3
     bind_zones:
-      # Secondary server for domain example.com
+      # Secondary server for domain example.com (use zone type autodetection)
       - name: 'example.com'
         primaries:
-          - 172.17.0.2
+          - 10.11.0.1
         networks:
           - '192.0.2'
         ipv6_networks:
           - '2001:db9::/48'
-      # Secondary server for domain acme-inc.com
+      # Secondary server for domain acme-inc.com (specify zone type explicitly)
       - name: 'acme-inc.com'
+        type: secondary
         primaries:
-          - 172.17.0.2
+          - 10.11.0.1
         networks:
-          - '172.17'
-          - '10'
+          - '10.11'
+        ipv6_networks:
+          - '2001:db8::/48'
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+
+- name: Converge Forwarder
+  hosts: ns3
+  vars:
+    bind_dnssec_validation: false
+    bind_zones:
+      # Forwarder for domain example.com (use zone type autodetection)
+      - name: 'example.com'
+        forwarders:
+          - 10.11.0.1
+          - 10.11.0.2
+        networks:
+          - '192.0.2'
+        ipv6_networks:
+          - '2001:db9::/48'
+      # Forwarder server for domain acme-inc.com (specify zone type explicitly)
+      - name: 'acme-inc.com'
+        type: forward
+        forwarders:
+          - 10.11.0.1
+          - 10.11.0.2
+        networks:
+          - '10.11'
         ipv6_networks:
           - '2001:db8::/48'
   roles:

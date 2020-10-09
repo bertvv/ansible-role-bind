@@ -6,19 +6,16 @@ driver:
   # Specifies the driver that should be used. Podman should also work
   name: docker
 
-# Linting with yamllint and ansible-lint
-# verify.yml is skipped because it uses the shell: module, which would trigger
-# a linting error.
 lint: |
   yamllint .
   ansible-lint --exclude=molecule/default/verify.yml -x 106
 
 platforms:
   # Set name and hostname
-  - name: ns1
-    hostname: ns1
-    # Specify which image should be used. Geerlingguys images are Ansible
-    # compatible and have Systemd installed
+  - name: ns4
+    groups:
+      - dns
+    hostname: ns4
     docker_networks:
       - name: bind
         ipam_config:
@@ -26,27 +23,23 @@ platforms:
             gateway: "10.11.0.254"
     networks:
       - name: bind
-        ipv4_address: "10.11.0.1"
+        ipv4_address: "10.11.0.4"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
-    # Command to execute when the container starts
     command: ${MOLECULE_DOCKER_COMMAND:-""}
-    # Volumes to mount within the container. Important to enable systemd
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    # Give extended privileges to the container. Necessary for Systemd to
-    # operate within the container. DO NOT use extended privileges in a
-    # production environment!
     privileged: true
-    # Allocate pseudo-TTY
     tty: true
     environment:
       container: docker
 
-  - name: ns2
-    hostname: ns2
+  - name: ns5
+    hostname: ns5
+    groups:
+      - dns
     networks:
       - name: bind
-        ipv4_address: "10.11.0.2"
+        ipv4_address: "10.11.0.5"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
@@ -55,21 +48,6 @@ platforms:
     tty: true
     environment:
       container: docker
-
-  - name: ns3
-    hostname: ns3
-    networks:
-      - name: bind
-        ipv4_address: "10.11.0.3"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    privileged: true
-    tty: true
-    environment:
-      container: docker
-
 
 provisioner:
   name: ansible

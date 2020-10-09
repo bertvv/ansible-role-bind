@@ -18,8 +18,8 @@
     - name: IPv4 Forward lookups
       assert:
         that:
-          - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '10.11.0.1'
-          - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '10.11.0.2'
+          - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '10.11.0.4'
+          - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '10.11.0.5'
           - lookup('dig', 'srv001.acme-inc.com', local_dns)  == '10.11.1.1'
           - lookup('dig', 'srv002.acme-inc.com', local_dns)  == '10.11.1.2'
           - lookup('dig', 'mail001.acme-inc.com', local_dns) == '10.11.2.1'
@@ -35,8 +35,8 @@
     - name: IPv4 Reverse lookups
       assert:
         that:
-          - lookup('dig', '10.11.0.1/PTR', local_dns)  == 'ns1.acme-inc.com.'
-          - lookup('dig', '10.11.0.2/PTR', local_dns)  == 'ns2.acme-inc.com.'
+          - lookup('dig', '10.11.0.4/PTR', local_dns)  == 'ns1.acme-inc.com.'
+          - lookup('dig', '10.11.0.5/PTR', local_dns)  == 'ns2.acme-inc.com.'
           - lookup('dig', '10.11.1.1/PTR', local_dns)  == 'srv001.acme-inc.com.'
           - lookup('dig', '10.11.1.2/PTR', local_dns)  == 'srv002.acme-inc.com.'
           - lookup('dig', '10.11.2.1/PTR', local_dns)  == 'mail001.acme-inc.com.'

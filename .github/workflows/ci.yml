@@ -35,8 +35,15 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install molecule yamllint ansible-lint docker netaddr dnspython
 
-      - name: Run Molecule tests.
+      - name: Run Molecule Primary/Secondary/Forwarder tests
         run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: Run Molecule Shread Inventory tests
+        run: molecule test --scenario-name shared_inventory
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

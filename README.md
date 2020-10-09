@@ -5,7 +5,7 @@
 An Ansible role for setting up ISC BIND as an **authoritative-only** DNS server for multiple domains. Specifically, the responsibilities of this role are to:
 
 - install BIND
-- set up the main configuration file (primary/secondary server)
+- set up the main configuration file (primary/secondary/forwarder server)
 - set up forward and reverse lookup zone files
 
 This role supports multiple forward and reverse zones, including for IPv6. Although enabling recursion is supported (albeit *strongly* discouraged), consider using another role if you want to set up a caching or forwarding name server.
@@ -23,7 +23,7 @@ This role can be used on several platforms, see [meta/main.yml](meta/main.yml) f
 A few remarks on supported roles that are not included in automated tests
 
 - **Arch Linux** and **FreeBSD** should work, but at this time, it's not possible to test the role on these distros, since no suitable Docker images are available.
-- **CentOS 6** should work, but idempotence tests fail even if BIND is installed succesfully and acceptance tests succeed.
+- **CentOS 6** should work, but idempotence tests fail even if BIND is installed successfully and acceptance tests succeed.
 
 ## Requirements
 
@@ -64,8 +64,9 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- create_forward_zones`    | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)                    |
 | `- create_reverse_zones`    | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)                    |
 | `- delegate`                | `[]`                 | Zone delegation.                                                                                                                     |
+| `- forwarders`              | -                    | List of forwarders for for the forward type zone                                                                                     |
 | `- hostmaster_email`        | `hostmaster`         | The e-mail address of the system administrator for the zone                                                                          |
-| `- hosts`                   | `[]`                 | Host definitions. Empty => secondary zone, nonempty => primary zone.                                                                 |
+| `- hosts`                   | `[]`                 | Host definitions.                                                                                                                    |
 | `- ipv6_networks`           | `[]`                 | A list of the IPv6 networks that are part of the domain, in CIDR notation (e.g. 2001:db8::/48)                                       |
 | `- mail_servers`            | `[]`                 | A list of mappings (with keys `name:` and `preference:`) specifying the mail servers for this domain.                                |
 | `- name_servers`            | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                           |
@@ -76,6 +77,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                         |
 | `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
 | `- text`                    | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
+| `- type`                    | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
 | `bind_zone_file_mode`       | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
 | `bind_zone_minimum_ttl`     | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
 | `bind_zone_time_to_expire`  | `1W`                 | Time to expire field in the SOA record.                                                                                              |
@@ -89,16 +91,18 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 
 In order to set up an authoritative name server that is available to clients, you should at least define the following variables:
 
-| Variable           | Primary | Secondary |
-|:-------------------|:-------:|:---------:|
-| `bind_allow_query` |    V    |     V     |
-| `bind_listen_ipv4` |    V    |     V     |
-| `bind_zones`       |    V    |     V     |
-| `- hosts`          |    V    |    --     |
-| `- name_servers`   |    V    |    --     |
-| `- name`           |    V    |     V     |
-| `- networks`       |    V    |     V     |
-| `- primaries`      |    V    |     V     |
+| Variable           | Primary | Secondary | Forward |
+|:-------------------|:-------:|:---------:|:-------:|
+| `bind_allow_query` |    V    |     V     |    V    |
+| `bind_listen_ipv4` |    V    |     V     |    V    |
+| `bind_zones`       |    V    |     V     |    V    |
+| `- hosts`          |    V    |    --     |   --    |
+| `- name_servers`   |    V    |    --     |   --    |
+| `- name`           |    V    |     V     |   --    |
+| `- networks`       |    V    |     V     |    V    |
+| `- primaries`      |    V    |     V     |   --    |
+| `- forwarders`     |   --    |    --     |    V    |
+
 
 ### Domain definitions
 
@@ -161,9 +165,15 @@ bind_zones:
         service: "SIP+D2T"
         regex: "!^.*$!sip:customer-service@example.com!"
         replacement: "_sip._tcp.example.com."
-  # Minimal example of a secondary zone (hosts: is not defined)
+  # Minimal example of a secondary zone
   - name: acme.com
     primaries:
+      - 172.17.0.2
+    networks:
+      - "172.17"
+  # Minimal example of a forward zone
+  - name: acme.com
+    forwarders:
       - 172.17.0.2
     networks:
       - "172.17"
@@ -184,6 +194,48 @@ As you can see, not all hosts are in the same subnet. This role will generate su
 Remark that only the network part should be specified here! When specifying a class B IP address (e.g. "172.16") in a variable file, it must be quoted. Otherwise, the Yaml parser will interpret it as a float.
 
 Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index.php/2016/managing-dns-zones-with-ansible/> for the gdnsd package, the zone files are fully idempotent, and thus only get updated if "real" content changes.
+
+### Zone types and Zone type auto-detection
+
+Zone `type` is an optional zone parameter that defines if the zone type should be of `primary`, `secondary` or `forward` type. When `type` parameter is omitted, zone type will be autodetected based on the intersection of host IP addresses and `primaries` record when configuring primary or secondary zone. When `primaries` is not defined and `forwarders` is defined, the zone type will be set to `forward`.
+
+Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook.
+
+See example of shared `bind_zones` in [molecule/shared_inventory/converge.yml](molecule/shared_inventory/converge.yml) and the accompanying [dns.yml](molecule/shared_inventory/group_vars/all.yml) file.
+
+This scenario can be tested by running `molecule test --scenario-name shared_inventory`
+
+---
+**NOTE**
+
+* bind doesn't support automated [multi-master configuration](https://kb.isc.org/docs/managing-manual-multi-master) and `primaries` list should have a single entry only.
+* When `primaries` record is updated to switch primary to secondary server roles, zones will be wiped out and recreated from template as we yet to support dynamic updates for existing zones.
+---
+
+Zone types can be also defined explicitly in per host inventory to skip autodetection:
+
+```Yaml
+# Primary Server
+bind_zones:
+  - name: mydomain.com
+    type: primary
+    primaries:
+      - 192.0.2.1
+...
+# Secondary Server
+bind_zones:
+  - name: mydomain.com
+      type: secondary
+      primaries:
+        - 192.0.2.1
+...
+# Forwarder Server
+bind_zones:
+  - name: anotherdomain.com
+      type: forward
+      forwarders:
+        - 192.0.3.1
+```
 
 ### Zone delegation
 
@@ -244,9 +296,12 @@ A check will be performed to ensure the key is actually present in the `bind_dns
 
 No dependencies.
 
-## Example Playbook
+## Example Playbooks
 
-See the test playbook [converge.yml](molecule/default/converge.yml) and the accompanying `group_vars` file [all.yml](molecule/default/group_vars/all.yml) for an elaborate example that showcases most features.
+See the test playbooks for an elaborate example that showcases most features.:
+
+1. Standard Inventory - [converge.yml](molecule/default/converge.yml) and the accompanying `group_vars/all.yml` file [all.yml](molecule/default/group_vars/all.yml)
+2. Shared Inventory - [converge.yml](molecule/shared_inventory/converge.yml) and the accompanying `group_vars/dns.yml` file [all.yml](molecule/shared_inventory/group_vars/all.yml)
 
 ## Testing
 
@@ -255,10 +310,11 @@ This role is tested using [Ansible Molecule](https://molecule.readthedocs.io/). 
 This Molecule configuration will:
 
 - Run Yamllint and Ansible Lint
-- Create two Docker containers, one primary (`ns1`) and one secondary (`ns2`) DNS server
+- Create three Docker containers, one primary (`ns1`), one secondary (`ns2`) DNS server and forwarder(`ns3`) - `default` molecule scenario
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml) and check idempotence
 - Run acceptance tests with [verify playbook](molecule/default/verify.yml)
+- Create additional two Docker container, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
 
 This process is repeated for all the supported Linux distributions.
 
@@ -268,7 +324,7 @@ In order to run the acceptance tests on this role locally, you can install the n
 
 Steps to install the tools manually:
 
-1. Docker should be installed on your machine (assumed to run Linux). No Docker containers should be running when you start the test.
+1. Docker should be installed on your machine
 2. As recommended by Molecule, create a python virtual environment
 3. Install the software tools `python3 -m pip install molecule docker netaddr dnspython yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
@@ -290,6 +346,13 @@ MOLECULE_DISTRO=debian9 molecule converge
 ```
 
 You can run the acceptance tests on both servers with `molecule verify`.
+
+---
+**NOTE**
+
+* Molecule verify tests will fail if docker is running on MacOS. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670)
+---
+
 
 ## License
 
