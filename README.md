@@ -369,6 +369,7 @@ Pull requests are also very welcome. Please create a topic branch for your propo
 Maintainers:
 
 - [Bert Van Vreckem](https://github.com/bertvv/)
+- [Gregory Shulov](https://github.com/GR360RY)
 - [Stuart Knight](https://github.com/blofeldthefish)
 
 Contributors:
@@ -383,7 +384,6 @@ Contributors:
 - [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
 - [Greg Cockburn](https://github.com/gergnz)
-- [Gregory Shulov](https://github.com/GR360RY)
 - [Guillaume Darmont](https://github.com/gdarmont)
 - [jadjay](https://github.com/jadjay)
 - [Jascha Sticher](https://github.com/itbane)
