@@ -12,8 +12,12 @@ acl "{{ acl.name }}" {
 
 {% endfor %}
 options {
-  listen-on port 53 { {{ bind_listen_ipv4|join('; ') }}; };
-  listen-on-v6 port 53 { {{ bind_listen_ipv6|join('; ') }}; };
+{% for port, items in listen_on|groupby('port')|sort %}
+  listen-on port {{ port }} { {{ items|map(attribute='address')|sort|join('; ') }}; };
+{% endfor %}
+{% for port, items in listen_on_v6|groupby('port')|sort %}
+  listen-on-v6 port {{ port }} { {{ items|map(attribute='address')|sort|join('; ') }}; };
+{% endfor %}
   directory   "{{ bind_dir }}";
   dump-file   "{{ bind_dir }}/data/cache_dump.db";
   statistics-file "{{ bind_dir }}/data/named_stats.txt";

@@ -22,9 +22,21 @@ bind_dns_keys: []
 bind_listen_ipv4:
   - "127.0.0.1"
 
+# The list of ports to listen on for IPv4 addresses, one port for each item in
+# the bind_listen_ipv4 list. If this list is shorter than the bind_listen_ipv4
+# list, then the default port is used.
+bind_listen_ipv4_port:
+  - 53
+
 # List of IPv6 address of the network interface(s) to listen on.
 bind_listen_ipv6:
   - "::1"
+
+# The list of ports to listen on for IPv6 addresses, one port for each item in
+# the bind_listen_ipv6 list. If this list is shorter than the bind_listen_ipv6
+# list, then the default port is used.
+bind_listen_ipv6_port:
+  - 53
 
 # List of hosts that are allowed to query this DNS server.
 bind_allow_query:

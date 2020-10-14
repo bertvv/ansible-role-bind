@@ -91,6 +91,22 @@
   include_tasks: zones.yml
   tags: bind
 
+- name: Create list of listen-on statements
+  set_fact:
+    listen_on: "{{ listen_on | default([]) + [{ 'port': item.1, 'address': item.0 }] }}"
+  loop: "{{ bind_listen_ipv4 | zip_longest(bind_listen_ipv4_port, fillvalue=53) | list }}"
+  loop_control:
+    label: "{{ item.0 }}:{{ item.1 }}"
+  tags: bind
+
+- name: Create list of listen-on-v6 statements
+  set_fact:
+    listen_on_v6: "{{ listen_on_v6 | default([]) + [{ 'port': item.1, 'address': item.0 }] }}"
+  loop: "{{ bind_listen_ipv6 | zip_longest(bind_listen_ipv6_port, fillvalue=53) | list }}"
+  loop_control:
+    label: "[{{ item.0 }}]:{{ item.1 }}"
+  tags: bind
+
 - name: Main BIND config file
   template:
     src: etc_named.conf.j2

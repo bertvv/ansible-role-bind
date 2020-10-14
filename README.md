@@ -46,7 +46,9 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_forward_only`         | `false`              | If `true`, BIND is set up as a caching name server                                                                                   |
 | `bind_forwarders`           | `[]`                 | A list of name servers to forward DNS requests to.                                                                                   |
 | `bind_listen_ipv4`          | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.                     |
+| `bind_listen_ipv4_port`     | `[53]`               | A list of port numbers to listen on for IPv4 addresses, one port for each item in `bind_listen_ipv4`.                                |
 | `bind_listen_ipv6`          | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                                  |
+| `bind_listen_ipv6_port`     | `[53]`               | A list of port numbers to listen on for IPv6 addresses, one port for each item in `bind_listen_ipv6`.                                |
 | `bind_log`                  | `data/named.run`     | Path to the log file                                                                                                                 |
 | `bind_other_logs`           | -                    | A list of logging channels to configure, with a separate mapping for each zone, with relevant details                                |
 | `bind_query_log`            | -                    | A mapping with keyss `file:` (e.g. `data/query.log`), `versions:`, `size:`. When defined, this will enable the query log             |
