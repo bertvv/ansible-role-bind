@@ -335,7 +335,7 @@ Molecule automatically deletes the containers after a test. If you would like to
 
 The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`). You can use any of his images, but only the distributions mentioned in [meta/main.yml](meta/main.yml) are supported.
 
-The default config will start two Centos 7 containers (the primary supported platform at this time). Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
+The default config will start three Centos 8 containers (the primary supported platform at this time). Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
 
 ``` bash
 MOLECULE_DISTRO=debian9 molecule test
