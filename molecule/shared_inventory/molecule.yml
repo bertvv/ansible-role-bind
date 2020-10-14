@@ -29,6 +29,8 @@ platforms:
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
+      - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
     pre_build_image: true
     tty: true
@@ -46,6 +48,8 @@ platforms:
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
+      - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
     pre_build_image: true
     tty: true

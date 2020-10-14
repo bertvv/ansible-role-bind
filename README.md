@@ -316,7 +316,7 @@ This Molecule configuration will:
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml) and check idempotence
 - Run acceptance tests with [verify playbook](molecule/default/verify.yml)
-- Create additional two Docker container, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
+- Create two additional Docker containers, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
 
 This process is repeated for all the supported Linux distributions.
 
@@ -347,12 +347,26 @@ or
 MOLECULE_DISTRO=debian9 molecule converge
 ```
 
-You can run the acceptance tests on both servers with `molecule verify`.
+You can run the acceptance tests on all servers with `molecule verify`.
+
+> Verification tests are done using "dig" lookup module by quering dns records and validating responses. This requires direct network communication between Ansible controller node (your machine running Ansible) and the target docker container. 
 
 ---
 **NOTE**
 
-* Molecule verify tests will fail if docker is running on MacOS. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670)
+Molecule verify tests will fail if docker is running on MacOS, as MacOS cannot access container IP directly. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670).
+
+Workaround:
+
+1. Run molecule linter: `molecule lint`
+1. Provision containers: `molecule converge`
+2. Connect to container: `molecule login --host ns1`
+3. Go to role directory: `cd /etc/ansible/roles/bertvv.bind`
+4. Run verify playbook:
+```
+ansible-playbook -c local -i "`hostname`," -i molecule/default/inventory.ini molecule/default/verify.yml
+```
+5. Repeat steps 2-4 for `ns2` and `ns3`
 ---
 
 
