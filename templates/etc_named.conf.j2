@@ -12,11 +12,11 @@ acl "{{ acl.name }}" {
 
 {% endfor %}
 options {
-{% for port, items in listen_on|groupby('port')|sort %}
-  listen-on port {{ port }} { {{ items|map(attribute='address')|sort|join('; ') }}; };
+{% for port in bind_listen_ipv4_port %}
+  listen-on port {{ port }} { {{ bind_listen_ipv4|join('; ') }}; };
 {% endfor %}
-{% for port, items in listen_on_v6|groupby('port')|sort %}
-  listen-on-v6 port {{ port }} { {{ items|map(attribute='address')|sort|join('; ') }}; };
+{% for port in bind_listen_ipv6_port %}
+  listen-on-v6 port {{ port }} { {{ bind_listen_ipv6|join('; ') }}; };
 {% endfor %}
   directory   "{{ bind_dir }}";
   dump-file   "{{ bind_dir }}/data/cache_dump.db";
