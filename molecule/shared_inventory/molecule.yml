@@ -29,6 +29,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker
@@ -45,6 +46,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker

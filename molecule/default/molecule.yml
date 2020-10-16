@@ -37,6 +37,7 @@ platforms:
     # operate within the container. DO NOT use extended privileges in a
     # production environment!
     privileged: true
+    pre_build_image: true
     # Allocate pseudo-TTY
     tty: true
     environment:
@@ -52,6 +53,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker
@@ -66,6 +68,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker
