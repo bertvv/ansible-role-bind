@@ -328,7 +328,7 @@ Steps to install the tools manually:
 
 1. Docker should be installed on your machine
 2. As recommended by Molecule, create a python virtual environment
-3. Install the software tools `python3 -m pip install molecule docker netaddr dnspython yamllint ansible-lint`
+3. Install the software tools `python3 -m pip install molecule molecule-docker docker netaddr dnspython yamllint ansible-lint`
 4. Navigate to the root of the role directory and run `molecule test`
 
 Molecule automatically deletes the containers after a test. If you would like to check out the containers yourself, run `molecule converge` followed by `molecule login --host HOSTNAME`.

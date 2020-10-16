@@ -7,8 +7,9 @@ driver:
   name: docker
 
 lint: |
+  set -e
   yamllint .
-  ansible-lint --exclude=molecule/default/verify.yml -x 106
+  ansible-lint -x 106
 
 platforms:
   # Set name and hostname
@@ -29,6 +30,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker
@@ -45,6 +47,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     privileged: true
+    pre_build_image: true
     tty: true
     environment:
       container: docker
