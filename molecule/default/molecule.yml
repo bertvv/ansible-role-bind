@@ -10,8 +10,9 @@ driver:
 # verify.yml is skipped because it uses the shell: module, which would trigger
 # a linting error.
 lint: |
+  set -e
   yamllint .
-  ansible-lint --exclude=molecule/default/verify.yml -x 106
+  ansible-lint -x 106
 
 platforms:
   # Set name and hostname

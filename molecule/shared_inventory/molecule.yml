@@ -7,8 +7,9 @@ driver:
   name: docker
 
 lint: |
+  set -e
   yamllint .
-  ansible-lint --exclude=molecule/default/verify.yml -x 106
+  ansible-lint -x 106
 
 platforms:
   # Set name and hostname
