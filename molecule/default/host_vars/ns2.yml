@@ -1,0 +1,21 @@
+---
+# Secondary Configuration
+
+bind_zones:
+  # Secondary server for domain example.com (use zone type autodetection)
+  - name: 'example.com'
+    primaries:
+      - 10.11.0.1
+    networks:
+      - '192.0.2'
+    ipv6_networks:
+      - '2001:db9::/48'
+  # Secondary server for domain acme-inc.com (specify zone type explicitly)
+  - name: 'acme-inc.com'
+    type: secondary
+    primaries:
+      - 10.11.0.1
+    networks:
+      - '10.11'
+    ipv6_networks:
+      - '2001:db8::/48'

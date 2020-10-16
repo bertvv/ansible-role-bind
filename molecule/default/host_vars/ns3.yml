@@ -1,0 +1,24 @@
+---
+# Forwarder Configuration
+
+bind_dnssec_validation: false
+bind_zones:
+  # Forwarder for domain example.com (use zone type autodetection)
+  - name: 'example.com'
+    forwarders:
+      - 10.11.0.1
+      - 10.11.0.2
+    networks:
+      - '192.0.2'
+    ipv6_networks:
+      - '2001:db9::/48'
+  # Forwarder server for domain acme-inc.com (specify zone type explicitly)
+  - name: 'acme-inc.com'
+    type: forward
+    forwarders:
+      - 10.11.0.1
+      - 10.11.0.2
+    networks:
+      - '10.11'
+    ipv6_networks:
+      - '2001:db8::/48'

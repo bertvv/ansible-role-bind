@@ -201,11 +201,7 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 Zone `type` is an optional zone parameter that defines if the zone type should be of `primary`, `secondary` or `forward` type. When `type` parameter is omitted, zone type will be autodetected based on the intersection of host IP addresses and `primaries` record when configuring primary or secondary zone. When `primaries` is not defined and `forwarders` is defined, the zone type will be set to `forward`.
 
-Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook.
-
-See example of shared `bind_zones` in [molecule/shared_inventory/converge.yml](molecule/shared_inventory/converge.yml) and the accompanying [dns.yml](molecule/shared_inventory/group_vars/all.yml) file.
-
-This scenario can be tested by running `molecule test --scenario-name shared_inventory`
+Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook. Zone type auto-detection can be tested with "shared_inventory" molecule scenario by running: `molecule test --scenario-name shared_inventory`
 
 ---
 **NOTE**
@@ -300,10 +296,38 @@ No dependencies.
 
 ## Example Playbooks
 
-See the test playbooks for an elaborate example that showcases most features.:
+See the test playbooks and inventory for an elaborate example that showcases most features.:
 
-1. Standard Inventory - [converge.yml](molecule/default/converge.yml) and the accompanying `group_vars/all.yml` file [all.yml](molecule/default/group_vars/all.yml)
-2. Shared Inventory - [converge.yml](molecule/shared_inventory/converge.yml) and the accompanying `group_vars/dns.yml` file [all.yml](molecule/shared_inventory/group_vars/all.yml)
+### Standard Inventory
+
+* Variables common between all servers defined in [all.yml](molecule/default/group_vars/all.yml)
+* `bind_zone` variable defined on per host basis ([primary](molecule/default/host_vars/ns1.yml), [secondary](molecule/default/host_vars/ns2.yml) and [forwarder](molecule/default/host_vars/ns3.yml))
+
+```
+❯ tree --dirsfirst molecule/default
+molecule/default
+├── group_vars
+│   └── all.yml
+├── host_vars
+│   ├── ns1.yml    # Primary
+│   ├── ns2.yml    # Secondary
+│   └── ns3.yml    # Forwarder
+├── converge.yml
+...
+```
+
+### Shared Inventory
+
+* Variables common between primary and secondary servers defined in [all.yml](molecule/shared_inventory/group_vars/all.yml)
+
+```
+❯ tree --dirsfirst molecule/shared_inventory
+molecule/shared_inventory
+├── group_vars
+│   └── all.yml
+├── converge.yml
+...
+```
 
 ## Testing
 
