@@ -17,7 +17,7 @@ galaxy_info:
         - buster
     - name: FreeBSD
       versions:
-        - any
+        - 12.1
     - name: EL
       versions:
         - 6
