@@ -2,7 +2,7 @@
 ---
 
 bind_packages:
-  - py36-netaddr
+  - py37-netaddr
   - bind911
 
 bind_service: named
