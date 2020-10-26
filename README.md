@@ -201,11 +201,7 @@ Based on the idea and examples detailed at <https://linuxmonk.ch/wordpress/index
 
 Zone `type` is an optional zone parameter that defines if the zone type should be of `primary`, `secondary` or `forward` type. When `type` parameter is omitted, zone type will be autodetected based on the intersection of host IP addresses and `primaries` record when configuring primary or secondary zone. When `primaries` is not defined and `forwarders` is defined, the zone type will be set to `forward`.
 
-Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook.
-
-See example of shared `bind_zones` in [molecule/shared_inventory/converge.yml](molecule/shared_inventory/converge.yml) and the accompanying [dns.yml](molecule/shared_inventory/group_vars/all.yml) file.
-
-This scenario can be tested by running `molecule test --scenario-name shared_inventory`
+Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook. Zone type auto-detection can be tested with "shared_inventory" molecule scenario by running: `molecule test --scenario-name shared_inventory`
 
 ---
 **NOTE**
@@ -300,10 +296,38 @@ No dependencies.
 
 ## Example Playbooks
 
-See the test playbooks for an elaborate example that showcases most features.:
+See the test playbooks and inventory for an elaborate example that showcases most features.:
 
-1. Standard Inventory - [converge.yml](molecule/default/converge.yml) and the accompanying `group_vars/all.yml` file [all.yml](molecule/default/group_vars/all.yml)
-2. Shared Inventory - [converge.yml](molecule/shared_inventory/converge.yml) and the accompanying `group_vars/dns.yml` file [all.yml](molecule/shared_inventory/group_vars/all.yml)
+### Standard Inventory
+
+* Variables common between all servers defined in [all.yml](molecule/default/group_vars/all.yml)
+* `bind_zone` variable defined on per host basis ([primary](molecule/default/host_vars/ns1.yml), [secondary](molecule/default/host_vars/ns2.yml) and [forwarder](molecule/default/host_vars/ns3.yml))
+
+```
+❯ tree --dirsfirst molecule/default
+molecule/default
+├── group_vars
+│   └── all.yml
+├── host_vars
+│   ├── ns1.yml    # Primary
+│   ├── ns2.yml    # Secondary
+│   └── ns3.yml    # Forwarder
+├── converge.yml
+...
+```
+
+### Shared Inventory
+
+* Variables common between primary and secondary servers defined in [all.yml](molecule/shared_inventory/group_vars/all.yml)
+
+```
+❯ tree --dirsfirst molecule/shared_inventory
+molecule/shared_inventory
+├── group_vars
+│   └── all.yml
+├── converge.yml
+...
+```
 
 ## Testing
 
@@ -316,7 +340,7 @@ This Molecule configuration will:
 - Run a syntax check
 - Apply the role with a [test playbook](molecule/default/converge.yml) and check idempotence
 - Run acceptance tests with [verify playbook](molecule/default/verify.yml)
-- Create additional two Docker container, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
+- Create two additional Docker containers, one primary(`ns4`) and one secondary (`ns5`) and run `shared_inventory` scenario
 
 This process is repeated for all the supported Linux distributions.
 
@@ -335,7 +359,7 @@ Molecule automatically deletes the containers after a test. If you would like to
 
 The Docker containers are based on images created by [Jeff Geerling](https://hub.docker.com/u/geerlingguy), specifically for Ansible testing (look for images named `geerlingguy/docker-DISTRO-ansible`). You can use any of his images, but only the distributions mentioned in [meta/main.yml](meta/main.yml) are supported.
 
-The default config will start two Centos 7 containers (the primary supported platform at this time). Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
+The default config will start three Centos 8 containers (the primary supported platform at this time). Choose another distro by setting the `MOLECULE_DISTRO` variable with the command, e.g.:
 
 ``` bash
 MOLECULE_DISTRO=debian9 molecule test
@@ -347,12 +371,26 @@ or
 MOLECULE_DISTRO=debian9 molecule converge
 ```
 
-You can run the acceptance tests on both servers with `molecule verify`.
+You can run the acceptance tests on all servers with `molecule verify`.
+
+> Verification tests are done using "dig" lookup module by quering dns records and validating responses. This requires direct network communication between Ansible controller node (your machine running Ansible) and the target docker container. 
 
 ---
 **NOTE**
 
-* Molecule verify tests will fail if docker is running on MacOS. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670)
+Molecule verify tests will fail if docker is running on MacOS, as MacOS cannot access container IP directly. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670).
+
+Workaround:
+
+1. Run molecule linter: `molecule lint`
+1. Provision containers: `molecule converge`
+2. Connect to container: `molecule login --host ns1`
+3. Go to role directory: `cd /etc/ansible/roles/bertvv.bind`
+4. Run verify playbook:
+```
+ansible-playbook -c local -i "`hostname`," -i molecule/default/inventory.ini molecule/default/verify.yml
+```
+5. Repeat steps 2-4 for `ns2` and `ns3`
 ---
 
 

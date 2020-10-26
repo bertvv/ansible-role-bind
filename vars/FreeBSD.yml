@@ -3,6 +3,7 @@
 
 bind_packages:
   - py37-netaddr
+  - py37-dnspython
   - bind911
 
 bind_service: named
