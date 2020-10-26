@@ -3,6 +3,7 @@
 
 bind_packages:
   - python-netaddr
+  - python-dnspython
   - bind9
   - bind9utils
 

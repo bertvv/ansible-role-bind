@@ -3,6 +3,7 @@
 
 bind_packages:
   - py36-netaddr
+  - py36-dns
   - bind911
 
 bind_service: named
