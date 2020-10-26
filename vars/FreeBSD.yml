@@ -2,8 +2,8 @@
 ---
 
 bind_packages:
-  - py36-netaddr
-  - py36-dns
+  - py37-netaddr
+  - py37-dnspython
   - bind911
 
 bind_service: named
