@@ -77,6 +77,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- networks`                | `['10.0.2']`         | A list of the networks that are part of the domain                                                                                   |
 | `- other_name_servers`      | `[]`                 | A list of the DNS servers outside of this domain.                                                                                    |
 | `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                         |
+| `- rpz`                     | `false`              | Whether the zone is a reponse policy zone.                                                                                           |
 | `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
 | `- text`                    | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
 | `- type`                    | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
