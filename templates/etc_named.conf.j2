@@ -38,9 +38,9 @@ options {
 
   rrset-order { order {{ bind_rrset_order }}; };
 
-{% if bind_zones | selectattr('rpz', 'defined') | selectattr('rpz', 'equalto', true) | list | length > 0 %}
+{% if bind_zones | selectattr('response_zone', 'defined') | selectattr('response_zone', 'equalto', true) | list | length > 0 %}
   response-policy {
-{% for zone in bind_zones | selectattr('rpz', 'defined') | selectattr('rpz', 'equalto', true) | list %}
+{% for zone in bind_zones | selectattr('response_zone', 'defined') | selectattr('response_zone', 'equalto', true) | list %}
     zone "{{ zone.name }}";
 {% endfor %}
   };
