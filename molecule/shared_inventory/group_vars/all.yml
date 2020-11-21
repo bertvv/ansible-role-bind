@@ -117,3 +117,21 @@ bind_zones:
         text:
           - 'some text'
           - 'more text'
+  - name: 'rpz'
+    create_reverse_zones: false
+    primaries:
+      - '{{ ansible_default_ipv4.address }}'
+    networks:
+      - '192.0.2'
+    ipv6_networks:
+      - '2001:db9::/48'
+    name_servers:
+      - localhost.
+    hostmaster_email: admin
+    hosts:
+      - name: blackhole
+        ip: 1.2.3.4
+        ipv6: '2001:db9::99'
+      - name: blackhole.example.com
+        ip: 1.2.3.5
+        ipv6: '2001:db9::100'
