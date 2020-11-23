@@ -104,6 +104,10 @@
   notify: reload bind
   tags: bind
 
+- name: Set up dnssec-keygen
+  include_tasks: dnssec-keygen.yml
+  when: bind_dnssec_keygen | bool
+
 - name: Start BIND service
   service:
     name: "{{ bind_service }}"

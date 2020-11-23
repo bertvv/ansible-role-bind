@@ -1,0 +1,57 @@
+# tasks/dnssec-keygen.yml
+# Generate DNSSEC key, inspired by Michele Salerno (@mikysal78)
+---
+
+- name: DNSSEC keygen | Ensure keys directory is present
+  file:
+    path: "{{ bind_dnssec_key_dir }}"
+    state: directory
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: '0750'
+  tags:
+    - bind
+    - dnssec_keygen
+
+- name: DNSSEC keygen | Create key file for each zone (This may take a long time)
+  shell: >
+    dnssec-keygen -a HMAC-MD5 -b 512 -n HOST "{{ item }}"
+  args:
+    chdir: "{{ bind_dnssec_key_dir }}"
+    creates:
+      - "K{{ item }}.+[0-9][0-9][0-9].+[0-9][0-9][0-9][0-9][0-9].key"
+      - "K{{ item }}.+[0-9][0-9][0-9].+[0-9][0-9][0-9][0-9][0-9].private"
+  with_items:
+    - "{{ bind_zone_domains_dnssec }}"
+  tags:
+    - bind
+    - dnssec_keygen
+
+- name: DNSSEC keygen | Ensure proper permissions on DNSSEC keys
+  file:
+    path: "{{ item }}"
+    mode: '0640'
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+  with_fileglob:
+    - "{{ bind_dnssec_key_dir }}/K*.{key,private}"
+  tags:
+    - bind
+    - dnssec_keygen
+
+- name: DNSSEC keygen | Gather keys from key files
+  shell: >
+    set -o nounset -o pipefail -o errexit &&
+    grep 'Key:' "{{ bind_dnssec_key_dir }}/K{{ item }}".*.private | cut -d ' ' -f 2
+  args:
+    executable: /bin/bash
+  with_items: "{{ bind_zone_domains_dnssec }}"
+  register:
+    bind_dnssec_keys
+  tags:
+    - bind
+    - dnssec_keygen
+
+#- name: DNSSEC keygen | Show keys (debug)
+#  debug:
+#    var: bind_dnssec_keys

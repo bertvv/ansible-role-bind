@@ -17,6 +17,11 @@ bind_dns_keys: []
 #    algorithm: hmac-sha256
 #    secret: "azertyAZERTY123456"
 
+bind_dnssec_key_dir: /etc/bind/keys
+bind_dnssec_keygen: False
+bind_zone_domains_dnssec:
+  - example.com
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
