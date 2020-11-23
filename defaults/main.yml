@@ -9,6 +9,8 @@ bind_zone_domains:
     networks:
       - "10.0.2"
 
+bind_zone_extention: '.db'
+
 # List of acls.
 bind_acls: []
 
@@ -59,6 +61,10 @@ bind_dnssec_validation: true
 
 bind_extra_include_files: []
 
+# Authority and Additional sections of the query response will always be fully populated or not.
+# Default - "yes"
+bind_minimal_responses: false
+
 # SOA information
 bind_zone_ttl: "1W"
 bind_zone_time_to_refresh: "1D"
@@ -68,3 +74,6 @@ bind_zone_minimum_ttl: "1D"
 
 # File mode for master zone files (needs to be something like 0660 for dynamic updates)
 bind_zone_file_mode: "0640"
+
+
+bind_allow_new_zones: 'no'

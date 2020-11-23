@@ -20,7 +20,7 @@ options {
   memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
   allow-query     { {{ bind_allow_query|join(';') }}; };
 {% if bind_acls|length != 0 %}
-  allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
+  allow-transfer  { {% for acl in bind_acls %}{{ acl.name }}; {% endfor %}};
 {% endif %}
 
   recursion {% if bind_recursion %}yes{% else %}no{% endif %};
@@ -34,6 +34,8 @@ options {
   dnssec-enable {{ bind_dnssec_enable }};
   dnssec-validation {{ bind_dnssec_validation }};
 
+  minimal-responses {{ bind_minimal_responses }};
+
   /* Path to ISC DLV key */
   bindkeys-file "{{ bind_bindkeys_file }}";
 
@@ -42,6 +44,16 @@ options {
   pid-file "{{ bind_pid_file }}";
   session-keyfile "{{ bind_session_keyfile }}";
 
+  allow-new-zones {{ bind_allow_new_zones }};
+{% if bind_catalog_zones is defined %}
+  catalog-zones {
+{% for bind_catalog_zone in bind_catalog_zones %}
+{% if bind_catalog_zone.state is not defined or bind_catalog_zone.state == 'present' %}
+    zone "{{ bind_catalog_zone.name }}" {% if bind_catalog_zone.zone_directory is defined %} zone-directory "{{ bind_catalog_zone.zone_directory }}" {% endif %} default-masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+{% endif %}
+{% endfor %}
+  };
+{% endif %}
 {% if bind_query_log is defined %}
   querylog yes;
 {% endif %}
@@ -80,40 +92,77 @@ include "{{ file }}";
 include "{{ file }}";
 {% endfor %}
 
+{% if bind_catalog_zones is defined %}
+{% for bind_catalog_zone in bind_catalog_zones %}
+{% if bind_catalog_zone.state is not defined or bind_catalog_zone.state == 'present' %}
+zone "{{ bind_catalog_zone.name }}" {
+  type slave;
+  file "{{ bind_catalog_zone.name }}{{ bind_zone_extention }}";
+{% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+{% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+{% endif %}
+};
+
+{% endif %}
+{% endfor %}
+{% endif %}
+
 {% if bind_zone_domains is defined %}
 {% for bind_zone in bind_zone_domains %}
-{% if bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones %}
+{% if bind_zone.state is not defined or bind_zone.state == 'present' %}
+{% if (bind_zone.create_forward_zones is not defined or bind_zone.create_forward_zones) and bind_zone.catalog_zone is not defined %}
 zone "{{ bind_zone.name }}" IN {
+{% if bind_zone.isforward is defined and bind_zone.isforward %}
+  type forward;
+  forward only;
+  forwarders { {{ bind_zone.forwarders | join('; ') }}; };
+{% else %}
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
-  file "{{ bind_slave_dir }}/{{ bind_zone.name }}";
+{% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+{% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+{% endif %}
+  file "{{ bind_slave_dir }}/{{ bind_zone.name }}{{ bind_zone_extention }}";
 {% if bind_zone.delegate is defined %}
   forwarders {};
+{% endif %}
 {% endif %}
 };
 {% endif %}
 
-{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
+{% if (bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones) and bind_zone.catalog_zone is not defined %}
 {% if bind_zone.networks is defined %}
 {% for network in bind_zone.networks %}
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
-  file "{{ bind_slave_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+{% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+{% endif %}
+  file "{{ bind_slave_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa{{ bind_zone_extention }}";
 };
 {% endfor %}
 {% endif %}
 {% endif %}
 
-{% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
+{% if (bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones) and bind_zone.catalog_zone is not defined %}
 {% if bind_zone.ipv6_networks is defined %}
 {% for network in bind_zone.ipv6_networks %}
 zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
   type slave;
-  masters { {{ bind_zone_master_server_ip }}; };
-  file "{{ bind_slave_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+{% if bind_zone.masters is defined %}
+  masters { {{ bind_zone.masters | join('; ') }}; };
+{% else %}
+  masters { {{ bind_zone_master_server_ips | join('; ') }}; };
+{% endif %}
+  file "{{ bind_slave_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}{{ bind_zone_extention }}";
 };
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endif %}
 {% endfor %}

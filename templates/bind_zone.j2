@@ -75,7 +75,9 @@ $TTL {{ _zone_data['ttl'] }}
 
 {% if _zone_data['delegate']|length > 0 %}
 {% for host in _zone_data['delegate'] %}
-{{ host.zone.ljust(20) }}       IN  NS     {{ host.dns }}
+{% for ns in host.dns %}
+{{ host.zone.ljust(20) }}       IN  NS     {{ ns }}
+{% endfor %}
 {% endfor %}
 {% endif %}
 

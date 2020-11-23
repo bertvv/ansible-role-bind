@@ -51,6 +51,7 @@ Variables are not required, unless specified.
 | `bind_forwarders`            | `[]`                 | A list of name servers to forward DNS requests to.                                                                           |
 | `bind_listen_ipv4`           | `['127.0.0.1']`      | A list of the IPv4 address of the network interface(s) to listen on. Set to ['any'] to listen on all interfaces.             |
 | `bind_listen_ipv6`           | `['::1']`            | A list of the IPv6 address of the network interface(s) to listen on                                                          |
+| `bind_allow_new_zones`       | `no`                 | Allow dynamically add the new zones                                                                                          |
 | `bind_log`                   | `data/named.run`     | Path to the log file                                                                                                         |
 | `bind_other_logs`            | -                    | A list of logging channels to configure, with a separate dict for each domain, with relevant details                         |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
@@ -60,10 +61,15 @@ Variables are not required, unless specified.
 | `bind_recursion`             | `false`              | Determines whether requests for which the DNS server is not authoritative should be forwarded†.                              |
 | `bind_rrset_order`           | `random`             | Defines order for DNS round robin (either `random` or `cyclic`)                                                              |
 | `bind_statistcs_channels`    | `false`              | if `true`, BIND is configured with a statistics_channels clause (currently only supports a single inet)                      |
+| `bind_minimal_responses`     | `false`              | Authority and Additional sections of the query response will always be fully populated or not.                               |
 | `bind_zone_dir`              | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.             |
+| `bind_zone_extention`        | ''                   | Specify extention for zone files. Example: for value '.db' zone file will have name - /var/named/zonename.db                 |
 | `bind_zone_domains`          | n/a                  | A list of domains to configure, with a separate dict for each domain, with relevant details                                  |
+| `- isforward`                | `false`              | If defined, 'forward' zone wil be configured as forward only. Otherwise, will be used default master/slave autodetect logic. |
+| `- forwarders`               | `[]`                 | List of forwarders. Should be used together with `isforward`.                                                                |
 | `- allow_update`             | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
 | `- also_notify`              | -                    | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
+| `- notify`                   | -                    | `explicit` value - will send notifications only to IPs in also-notify, otherwise notifications will be sent to all NSs       |
 | `- create_forward_zones`     | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)            |
 | `- create_reverse_zones`     | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)            |
 | `- delegate`                 | `[]`                 | Zone delegation. See below this table for examples.                                                                          |
@@ -73,13 +79,26 @@ Variables are not required, unless specified.
 | `- mail_servers`             | `[]`                 | A list of dicts (with fields `name` and `preference`) specifying the mail servers for this domain.                           |
 | `- name_servers`             | `[ansible_hostname]` | A list of the DNS servers for this domain.                                                                                   |
 | `- name`                     | `example.com`        | The domain name                                                                                                              |
+| `- slave_only`               | `false`              | Variable that indicate that zone should be created as slave on master server.                                                |
 | `- networks`                 | `['10.0.2']`         | A list of the networks that are part of the domain                                                                           |
 | `- other_name_servers`       | `[]`                 | A list of the DNS servers outside of this domain.                                                                            |
 | `- services`                 | `[]`                 | A list of services to be advertised by SRV records                                                                           |
 | `- text`                     | `[]`                 | A list of dicts with fields `name` and `text`, specifying TXT records. `text` can be a list or string.                       |
 | `- naptr`                    | `[]`                 | A list of dicts with fields `name`, `order`, `pref`, `flags`, `service`, `regex` and `replacement` specifying NAPTR records. |
+| `- catalog_zone`             | `catalog.example.com`| If specified zone will be added to the catalog zones. In this case zone will not be added to the /etc/named.conf             |
+| `- state`                    | -                    | Zone state (present|absent). By default - present.                                                                           |
+| `bind_catalog_zones`         | n/a                  | A list of catalog zones to configure, with a separate dict for each catalog zone, with relevant details                      |
+| `- name`                     | `catalog.example.com`| Catalog zone name                                                                                                            |
+| `- zone_directory`           | -                    | Directory where will be stored catalog zone domains files                                                                    |
+| `- also_notify`              | `['none']`           | A list of servers that will receive a notification when the master zone file is reloaded.                                    |
+| `- notify`                   | -                    | `explicit` value - will send notifications only to IPs in also-notify, otherwise notifications will be sent to all NSs       | 
+| `- allow_update`             | server default ipv4  | A list of hosts that are allowed to dynamically update this DNS zone.                                                        |
+| `- allow_transfer`           | ips from `bind_acls` | A list of NSs to which will be allowed transfer of catalog zones.                                                            |
+| `- state`                    | -                    | Zone state (present|absent). By default - present.                                                                           |
+| `- bind_controls_name`       | -                    | name of Bind controls endpoint, that will be used to manage Bind zones via rndc commans.                                     |
 | `bind_zone_file_mode`        | 0640                 | The file permissions for the main config file (named.conf)                                                                   |
-| `bind_zone_master_server_ip` | -                    | **(Required)** The IP address of the master DNS server.                                                                      |
+| `bind_zone_master_server_ip` | -                    | Deprecated (will be removed in the future releases) The IP address of the master DNS server.                                 |
+| `bind_zone_master_server_ips`| `[]`                 | **(Required)** The IP addresses of the master DNS servers server.                                                            |
 | `bind_zone_minimum_ttl`      | `1D`                 | Minimum TTL field in the SOA record.                                                                                         |
 | `bind_zone_time_to_expire`   | `1W`                 | Time to expire field in the SOA record.                                                                                      |
 | `bind_zone_time_to_refresh`  | `1D`                 | Time to refresh field in the SOA record.                                                                                     |
@@ -90,7 +109,7 @@ Variables are not required, unless specified.
 
 ### Minimal variables for a working zone
 
-Even though only variable `bind_zone_master_server_ip` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
+Even though only variable `bind_zone_master_server_ips` is required for the role to run without errors, this is not sufficient to get a working zone. In order to set up an authoritative name server that is available to clients, you should also at least define the following variables:
 
 | Variable                     | Master | Slave |
 | :---                         | :---:  | :---: |
@@ -138,7 +157,9 @@ bind_zone_domains:
       - '172.16'
     delegate:
       - zone: foo
-        dns: 192.0.2.1
+        dns: 
+          - 192.0.2.1
+          - 192.0.2.2
     services:
       - name: _ldap._tcp
         weight: 100
@@ -154,15 +175,90 @@ bind_zone_domains:
         replacement: "_sip._tcp.example.com."
 ```
 
+### Example of consul forward zone configuration
+
+```Yaml
+---
+    bind_zone_domains:
+      - name: consul
+        type: 'forward'
+        isforward: True
+        forwarders:
+          - '127.0.0.1 port 8600'
+```
+
 ### Minimal slave configuration
 
 ```Yaml
     bind_listen_ipv4: ['any']
     bind_allow_query: ['any']
-    bind_zone_master_server_ip: 192.168.111.222
+    bind_zone_master_server_ips:
+      - 192.168.111.221
+      - 192.168.111.222
     bind_zone_domains:
       - name: example.com
 ```
+
+### Example of Catalog Zones configuration
+
+```Yaml
+    bind_listen_ipv4: ['any']
+    bind_allow_query:
+      - 172.16.0.0/16
+      - 127.0.0.1
+    bind_allow_new_zones: 'yes'
+
+    bind_controls:
+      - name: localhost_access
+        inet: 127.0.0.1
+        port: 9953
+        allow:
+          - 127.0.0.1
+          - any
+        rndc_keys:
+          - rndc_key
+
+    bind_dns_keys:
+      - name: rndc_key
+        algorithm: hmac-sha256
+        secret: "1234abcd8765"
+    bind_extra_include_files:
+      - "{{ bind_auth_file }}"
+
+    bind_zone_master_server_ips:
+      - 172.16.0.3
+    bind_acls:
+      - name: acl_example_nameservers
+        match_list: "{{ groups['ns_servers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list + ['127.0.0.1']}}"
+
+    bind_zone_domains:
+      - name: test.example_domain.com
+        catalog_zone: catalog.example1.com
+        create_reverse_zones: false  # Skip creation of reverse zones
+        bind_controls_name: localhost_access
+        hosts:
+          - name: priv01
+            ip: 172.16.2.1
+            ipv6: 2001:db8::1
+            aliases:
+              - ns
+
+    bind_catalog_zones:
+      - name: catalog.example1.com
+        zone_directory: "cat-zones"
+        also_notify: "{{ groups['ns_servers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+        allow_update:
+          - 127.0.0.1
+      - name: catalog.example2.com
+        zone_directory: "cat-zones"
+        also_notify: "{{ groups['ns_servers'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+        allow_update:
+          - 127.0.0.1
+```
+
+In this example, `ns_servers` ansible group - this is group with all name servers (master servers and slave servers)
+Requirements - ip address (in the example - 127.0.0.1), from wich will be available rndc access, should be added to the allow-transfer directive inside named.cond. This will allow to get catalog zone and custom zone via AXFR to verify that zones exists.
+It is enough to add 127.0.0.1 to the bind_acls, like in the example.
 
 ### Hosts
 

@@ -20,7 +20,9 @@
     bind_recursion: true
     bind_query_log: 'data/query.log'
     bind_check_names: 'master ignore'
-    bind_zone_master_server_ip: 172.17.0.2
+    bind_zone_master_server_ips:
+       - 172.17.0.1
+       - 172.17.0.2
     bind_zone_minimum_ttl: "2D"
     bind_zone_ttl: "2W"
     bind_zone_time_to_refresh: "2D"

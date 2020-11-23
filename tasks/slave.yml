@@ -11,8 +11,11 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
+    backup: yes
   notify: reload bind
-  tags: bind
+  tags: 
+    - bind
+    - bind_zones
 
 - name: Slave | ensure directory for cached slaves zones
   file:
@@ -22,3 +25,59 @@
     group: "{{ bind_group }}"
     mode: '0770'
     setype: named_cache_t
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove forward lookup zone files
+  file:
+    path: "{{ bind_slave_dir }}/{{ item.name }}{{ bind_zone_extention }}"
+    state: absent
+  with_items: 
+   - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove reverse lookup zone file
+  file:
+    path: "{{ bind_slave_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{ bind_zone_extention }}"
+    state: absent
+  with_subelements:
+    - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+    - networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove reverse IPv6 lookup zone file
+  file:
+    path: "{{ bind_slave_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}{{ bind_zone_extention }}"
+    state: absent
+  with_subelements:
+    - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove catalog zone file
+  file:
+    path: "{{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }}"
+    state: absent
+  with_items:
+    - "{{ bind_catalog_zones | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+  tags: 
+    - bind
+    - bind_zones
+

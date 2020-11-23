@@ -7,11 +7,19 @@
   with_first_found:
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
-  tags: bind,pretask
+  tags: 
+    - bind
+    - pretask
+    - bind_zones
 
-- name: Check whether `bind_zone_master_server_ip` was set
+- name: Backward compatibility between bind_zone_master_server_ip and bind_zone_master_server_ips
+  set_fact:
+    bind_zone_master_server_ips: "{{ [bind_zone_master_server_ip] }}"
+  when: bind_zone_master_server_ip is defined
+
+- name: Check whether `bind_zone_master_server_ips` was set
   assert:
-    that: bind_zone_master_server_ip is defined
+    that: bind_zone_master_server_ips is defined
 
 - name: Install BIND
   package:
@@ -31,6 +39,7 @@
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
+    - "{{ bind_dir }}/cat-zones"
     - "{{ bind_zone_dir }}"
   tags: bind
 
@@ -40,7 +49,9 @@
   changed_when: false
   run_once: true
   check_mode: false
-  tags: bind
+  tags: 
+    - bind
+    - bind_zones
 
 # file to set keys for XFR authentication
 - name: create extra config file for authenticated XFR request
@@ -53,13 +64,28 @@
     group: "{{ bind_group }}"
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
 
+- name: Safety check
+  assert:
+    that: >
+          bind_zone_domains | map(attribute='name') | list | count
+          ==
+          bind_zone_domains | map(attribute='name') | list | unique | count
+    fail_msg: "'bind_zone_domains' variable has duplicated zones. Please remove duplicate. Operation stopped."
+  tags:
+    - bind
+    - bind_zones
+
 - name: Set up the machine as a master DNS server
   include_tasks: master.yml
-  when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
+  when: ansible_all_ipv4_addresses|length > ansible_all_ipv4_addresses|difference(bind_zone_master_server_ips)|length
+  tags:
+    - bind_zones
 
 - name: Set up the machine as a slave DNS server
   include_tasks: slave.yml
-  when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
+  when: ansible_all_ipv4_addresses|length == ansible_all_ipv4_addresses|difference(bind_zone_master_server_ips)|length
+  tags:
+    - bind_zones
 
 - name: Start BIND service
   service:

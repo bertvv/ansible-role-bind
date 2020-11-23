@@ -3,7 +3,7 @@
 ---
 
 - name: Read forward zone hashes
-  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
+  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }} || true'
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -12,6 +12,11 @@
   run_once: true
   loop_control:
     label: "{{ item.name }}"
+  when:
+    - item.state is not defined or item.state != 'absent'
+    - item.slave_only is not defined or not item.slave_only
+  tags:
+    - bind_zones
 
 - name: create dict of forward hashes
   set_fact:
@@ -21,9 +26,11 @@
   run_once: true
   loop_control:
     label: "{{ item.item.name }}"
+  tags:
+    - bind_zones
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{ bind_zone_extention }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -35,6 +42,8 @@
   run_once: true
   loop_control:
     label: "{{ item.1 }}"
+  tags:
+    - bind_zones
 
 - name: create dict of reverse hashes
   set_fact:
@@ -45,9 +54,14 @@
   run_once: true
   loop_control:
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+  tags:
+    - bind_zones
+
+- debug:
+    var: reverse_hashes_temp.results
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}{{ bind_zone_extention }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -59,6 +73,8 @@
   run_once: true
   loop_control:
     label: "{{ item.1 }}"
+  tags:
+    - bind_zones
 
 - name: create dict of reverse ipv6 hashes
   set_fact:
@@ -69,6 +85,8 @@
   run_once: true
   loop_control:
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+  tags:
+    - bind_zones
 
 - name: Master | Main BIND config file (master)
   template:
@@ -79,13 +97,16 @@
     mode: '0640'
     setype: named_conf_t
     validate: 'named-checkconf %s'
+    backup: yes
   notify: reload bind
-  tags: bind
+  tags: 
+    - bind
+    - bind_zones
 
 - name: Master | Create forward lookup zone file
   template:
     src: bind_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ item.name }}"
+    dest: "{{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -95,14 +116,47 @@
     - "{{ bind_zone_domains }}"
   loop_control:
     label: "{{ item.name }}"
-  when: item.create_forward_zones is not defined or item.create_forward_zones
+  when: 
+    - item.create_forward_zones is not defined or item.create_forward_zones
+    - item.state is not defined or item.state != 'absent'
+    - item.slave_only is not defined or not item.slave_only
+    - item.isforward is undefined or item.isforward != True
   notify: reload bind
-  tags: bind
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove forward lookup zone files from bind_zone_dir
+  file:
+    path: "{{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }}"
+    state: absent
+  with_items: 
+   - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent') |list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Remove forward lookup zone files from bind slave dir
+  file:
+    path: "{{ bind_zone_dir }}/slaves/{{ item.name }}{{ bind_zone_extention }}"
+    state: absent
+  with_items: 
+   - "{{ bind_zone_domains | 
+      selectattr('state',  'defined') | selectattr('state',  'match', 'absent') |
+      selectattr('slave_only',  'defined') | selectattr('slave_only',  'equalto', True) |
+      list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: 
+    - bind
+    - bind_zones
 
 - name: Master | Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{ bind_zone_extention }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -115,14 +169,36 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
-  when: item.create_reverse_zones is not defined or item.create_reverse_zones
+  when: 
+    - item.create_reverse_zones is not defined or item.create_reverse_zones
+    - item.state is not defined or item.state != 'absent'
+    - item.slave_only is not defined or not item.slave_only
+    - item.isforward is undefined or item.isforward != true
   notify: reload bind
-  tags: bind
+  tags: 
+    - bind
+    - bind_zones
+
+
+- name: Master | Remove reverse lookup zone file
+  file:
+    path: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa{{ bind_zone_extention }}"
+    state: absent
+  with_subelements:
+    - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+    - networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  tags: 
+    - bind
+    - bind_zones
 
 - name: Master | Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}{{ bind_zone_extention }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -135,6 +211,89 @@
       skip_missing: true
   loop_control:
     label: "{{ item.1 }}"
-  when: item.create_reverse_zones is not defined or item.create_reverse_zones
+  when: 
+    - item.create_reverse_zones is not defined or item.create_reverse_zones
+    - item.state is not defined or item.state != 'absent'
+    - item.slave_only is not defined or not item.slave_only
   notify: reload bind
-  tags: bind
+  tags:
+    - bind
+    - bind_zones
+
+- name: Master | Remove reverse IPv6 lookup zone file
+  file:
+    path: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}{{ bind_zone_extention }}"
+    state: absent
+  with_subelements:
+    - "{{ bind_zone_domains | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Master | Create new catalog zone file
+  template:
+    src: catalog_zone.j2
+    dest: "{{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }}"
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: "{{ bind_zone_file_mode }}"
+    setype: named_zone_t
+    validate: 'named-checkzone -d {{ item.name }} %s'
+    force: no
+  register: tmpl_create_cat_zone
+  with_items:
+    - "{{ bind_catalog_zones }}"
+  when: 
+    - item.state is not defined or item.state == 'present'
+    - bind_catalog_zones is defined 
+    - bind_zone_domains.isforward is undefined or item.isforward != true
+  notify: reload bind
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Force restart BIND service if catalog zone was created
+  service:
+    name: "{{ bind_service }}"
+    state: restarted
+    enabled: true
+  when: tmpl_create_cat_zone.changed
+  tags:
+    - bind
+    - bind_zones
+
+- name: Master | Remove catalog zone file
+  file:
+    path: "{{ bind_zone_dir }}/{{ item.name }}{{ bind_zone_extention }}"
+    state: absent
+  with_items:
+    - "{{ bind_catalog_zones | selectattr('state',  'defined') | selectattr('state',  'match', 'absent')|list }}"
+  tags: 
+    - bind
+    - bind_zones
+
+- name: Add/Remove catalog zones
+  bind_cat_zones:
+    bind_controls_list: "{{ bind_controls }}"
+    bind_controls_name: "{{ item.bind_controls_name }}"
+    bind_dns_keys: "{{ bind_dns_keys }}"
+    zone_name: "{{ item.name }}"
+    catzone_name:  "{{ item.catalog_zone }}"
+    zone_path: "{{ bind_zone_dir }}/"
+    zone_extention: "{{ bind_zone_extention }}"
+    state: "{{ item.state |default('present') }}"
+  with_items:
+    - "{{ bind_zone_domains | selectattr('catalog_zone', 'defined')|list }}"
+  loop_control:
+    label: "{{ item.name }} |
+            {{ item.catalog_zone }} |
+            {{ item.bind_controls_name }} |
+            {{ item.state |default('present') }}"
+  tags:
+    - bind
+    - bind_zones
