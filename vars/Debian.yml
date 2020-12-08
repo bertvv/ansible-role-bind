@@ -1,9 +1,9 @@
 # Distro specific variables for Debian
 ---
-
+bind_default_python_version: '3'
 bind_packages:
-  - python-netaddr
-  - python-dnspython
+  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
+  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dnspython', 'python-dnspython' ) }}"
   - bind9
   - bind9utils
 

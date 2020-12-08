@@ -1,5 +1,7 @@
 ---
 
+bind_python_version: "{{ bind_default_python_version }}"
+
 bind_log: "data/named.run"
 
 bind_zones:
