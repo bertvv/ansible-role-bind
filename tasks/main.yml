@@ -30,7 +30,7 @@
 - name: Assert that all XFR keys exist in the key list
   assert:
     that: bind_dns_keys | selectattr("name","equalto",bind_key_mapping[item]) | list | count > 0
-  loop: "{{ bind_key_mapping.keys() }}"
+  loop: "{{ bind_key_mapping.keys() | list }}"
   when: bind_key_mapping | list | count > 0
 
 - name: Install BIND
