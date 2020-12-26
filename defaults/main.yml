@@ -40,6 +40,9 @@ bind_listen_ipv6_port:
 bind_allow_query:
   - "localhost"
 
+# A key-value list mapping server-IPs to TSIG keys for signing requests
+bind_key_mapping: {}
+
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
 bind_recursion: false

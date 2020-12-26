@@ -58,8 +58,8 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_statistics_allow`     | `['127.0.0.1']`      | A list of hosts that can access the server statistics                                                                                |
 | `bind_statistics_host`      | `127.0.0.1`          | IP address of the network interface that the statistics service should listen on                                                     |
 | `bind_statistics_port`      | 8053                 | Network port that the statistics service should listen on                                                                            |
-| `bind_transfer_key_name`    | -                    | The name of a TSIG key that should be used to sign XFR requests from the client                                                      |
 | `bind_zone_dir`             | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.                     |
+| `bind_key_mapping`      | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary |
 | `bind_zones`                | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
 | `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
 | `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
@@ -281,13 +281,14 @@ This will be set in a file *"{{ bind_auth_file }}* (e.g. /etc/bind/auth_transfer
 
 ### Using TSIG for zone transfer (XFR) authorization
 
-**Warning:** this functionality is **broken** in v5.0.0
-
-To authorize the transfer of zone between primary & secondary servers based on a TSIG key, set the name in the variable `bind_transfer_key_name`:
+To authorize the transfer of zone between primary & secondary servers based on a TSIG key, set the mapping in the variable `bind_key_mapping`:
 
 ```Yaml
-bind_transfer_key_name: primary_key
+bind_key_mapping:
+  primary_ip: TSIG-keyname
 ```
+
+Each primary can only have one key (per view).
 
 A check will be performed to ensure the key is actually present in the `bind_dns_keys` mapping. This will add a server statement for the `a` in `bind_auth_file` on a secondary server containing the specified key.
 

@@ -27,11 +27,11 @@
   when: ansible_os_family == 'Debian'
   tags: bind
 
-- name: Check that transfer key exists in keys list
+- name: Assert that all XFR keys exist in the key list
   assert:
-    that: bind_dns_keys | selectattr("name",'equalto',"{{ bind_transfer_key_name }}") | list | count > 0
-  when: bind_transfer_key_name is defined and bind_transfer_key_name | length > 0
-  tags: bind
+    that: bind_dns_keys | selectattr("name","equalto",bind_key_mapping[item]) | list | count > 0
+  loop: "{{ bind_key_mapping.keys() | list }}"
+  when: bind_key_mapping | list | count > 0
 
 - name: Install BIND
   package:
@@ -85,6 +85,7 @@
     group: "{{ bind_group }}"
   become: yes
   when: bind_dns_keys is defined and bind_dns_keys|length > 0
+  notify: reload bind
   tags: bind
 
 - name: Configure zones
