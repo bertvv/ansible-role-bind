@@ -17,3 +17,7 @@
 tests/
 vagrant-tests/
 docker-tests/
+
+# Ignore editor directories
+/.idea
+/.vscode
