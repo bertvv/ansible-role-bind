@@ -59,7 +59,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_statistics_host`      | `127.0.0.1`          | IP address of the network interface that the statistics service should listen on                                                     |
 | `bind_statistics_port`      | 8053                 | Network port that the statistics service should listen on                                                                            |
 | `bind_zone_dir`             | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.                     |
-| `bind_key_mapping`      | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary |
+| `bind_key_mapping`          | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary                                                              |
 | `bind_zones`                | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
 | `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
 | `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
@@ -86,7 +86,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_zone_time_to_refresh` | `1D`                 | Time to refresh field in the SOA record.                                                                                             |
 | `bind_zone_time_to_retry`   | `1H`                 | Time to retry field in the SOA record.                                                                                               |
 | `bind_zone_ttl`             | `1W`                 | Time to Live field in the SOA record.                                                                                                |
-| `bind_python_version`       | Depends on Distro, either `2` or `3`  |  The python version that should be used for ansible. Defaults to the OS standard |
+| `bind_python_version`       | -                    | The python version that should be used for ansible. Depends on Distro, either `2` or `3`. Defaults to the OS standard                |
 
 † Best practice for an authoritative name server is to leave recursion turned off. However, [for some cases](http://www.zytrax.com/books/dns/ch7/queries.html#allow-query-cache) it may be necessary to have recursion turned on.
 
