@@ -87,7 +87,11 @@ logging {
 
 {% for log in bind_other_logs %}
   channel {{ log.name }} {
-    file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    {% if log.file is defined %}
+      file "{{ log.file }}" versions {{ log.versions }} size {{ log.size }};
+    {% elif log.facility is defined %}
+      syslog {{ log.facility }};
+    {% endif %}
     severity dynamic;
     print-time yes;
   };
