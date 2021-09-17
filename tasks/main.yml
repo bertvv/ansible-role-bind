@@ -92,6 +92,21 @@
   notify: reload bind
   tags: bind
 
+- name: Ensure log files mentioned in config exist
+  file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ bind_owner }}"
+    group: "{{ bind_group }}"
+    mode: "0600"
+  with_items:
+    - "{{ bind_log }}"
+    - "{{ bind_query_log.file }}"
+    - "{{ bind_other_logs.file }}"
+  when: bind_log|length>0
+    or (bind_query_log.file|length>0 or bind_other_logs.file|length>0)
+  tags: bind
+
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind
