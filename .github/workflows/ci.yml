@@ -33,7 +33,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install test dependencies.
-        run: pip3 install molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
+        run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
 
       - name: Run Molecule Primary/Secondary/Forwarder tests
         run: molecule test
