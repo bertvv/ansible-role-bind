@@ -4,6 +4,27 @@ This file contains al notable changes to the bind Ansible role.
 
 This file adheres to the guidelines of [http://keepachangelog.com/](http://keepachangelog.com/). Versioning follows [Semantic Versioning](http://semver.org/).  "GH-X" refers to the X'th issue/pull request on the Github project.
 
+## 5.1.0 - 2020-09-17
+
+This release is long overdue. Apologies to all of you who have been waiting for this!
+
+### Added
+
+- (GH-132) Add support for forward type zones and zone type auto-detection (credit: [Gregory Shulov](https://github.com/GR360RY))
+- (GH-134) Add support to listen on custom port numbers (credit: [flora-five](https://github.com/flora-five))
+- (GH-151) Add switch to choose Python version (credit: [itbane](https://github.com/itbane))
+- (GH-156) Add DNS Certification Authority Authorization (CAA) (credit: [roumano](https://github.com/roumano))
+- (GH-165) Add role variable `bind_allow_transfer` to populate allow-transfer setting instead of adding all defined ACLs. **That means that from now on, you need to specify your ACLs explicitly in allow-transfer if you expect this behavior!**
+
+### Modified
+
+- (GH-131) Give nodes a consistent IP in Molecule tests (credit: [Gregory Shulov](https://github.com/GR360RY))
+- (GH-140) Replace `py36-netaddr` with `py37-netaddr` on FreeBSD (credit: [Shawn Wilsher](https://github.com/sdwilsh))
+- (GH-150) Fix config template for BIND 9.16 re: `dnssec-enable` (credit:  [itbane](https://github.com/itbane))
+- (GH-152) Configure TSIG keys for notify/update queries (credit: [itbane](https://github.com/itbane))
+- (GH-155) Fix Jinja block indent in querylog (credit:  [Miroslav Hudec](https://github.com/mihudec))
+- (GH-160) Corrected regex, so that IPv6 reverse DNS entries get created correctly (credit: [Zephyr82](https://github.com/Zephyr82))
+
 ## 5.0.0 - 2020-10-07
 
 Quite a bit of breaking changes in this release, so update your playbooks!
@@ -13,7 +34,7 @@ Quite a bit of breaking changes in this release, so update your playbooks!
 - (GH-122) Support for DNS64 (credit: [Paulius Mazeika](https://github.com/pauliusm))
 - The test playbook now enables the statistics-channels. Enter <http://SERVER_IP:8053> in a webbrowser to view the server statistics.
 - Ubuntu 16.04 is now included in CI tests
- 
+
 ### Breaking changes
 
 - The terms `master` and `slave` were replaced by `primary` and `secondary`, respectively, in all playbooks, templates and documentation. This reflects changes in recent versions of BIND. Remark that the actual configuration files still use the "old" names, because most supported distros still have older versions of BIND in their software package repositories.
@@ -24,7 +45,6 @@ Quite a bit of breaking changes in this release, so update your playbooks!
 See the documentation in the [README](README.md) and the [test playbook](molecule/default/converge.yml) for updated examples.
 
 ### Other changes
-
 
 - (GH-130) Primary and secondary server configuration is now unified (a single template instead of separate). CI tests are now executed on Github Actions. Acceptance tests are now performed using a playbook instead of BATS. (credit: [Gregory Shulov](https://github.com/GR360RY))
 - Code cleanup (linter warnings, deprecated comments, etc.)

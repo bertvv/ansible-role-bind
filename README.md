@@ -32,10 +32,11 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 ## Role Variables
 
 | Variable                    | Default              | Comments (type)                                                                                                                      |
-|:----------------------------|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| :-------------------------- | :------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
 | `bind_acls`                 | `[]`                 | A list of ACL definitions, which are mappings with keys `name:` and `match_list:`. See below for an example.                         |
 | `bind_allow_query`          | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                         |
 | `bind_allow_recursion`      | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |
+| `bind_allow_transfer`       | `[]`                 | A list of hosts that allowed to transfer (copy) the zone information from the server                                                 |
 | `bind_check_names`          | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).               |
 | `bind_dns_keys`             | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
 | `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
@@ -96,7 +97,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 In order to set up an authoritative name server that is available to clients, you should at least define the following variables:
 
 | Variable           | Primary | Secondary | Forward |
-|:-------------------|:-------:|:---------:|:-------:|
+| :----------------- | :-----: | :-------: | :-----: |
 | `bind_allow_query` |    V    |     V     |    V    |
 | `bind_listen_ipv4` |    V    |     V     |    V    |
 | `bind_zones`       |    V    |     V     |    V    |
@@ -299,7 +300,7 @@ No dependencies.
 
 ## Example Playbooks
 
-See the test playbooks and inventory for an elaborate example that showcases most features.:
+See the test playbooks and inventory for an elaborate example that showcases most features.
 
 ### Standard Inventory
 
@@ -426,8 +427,10 @@ Contributors:
 - [David J. Haines](https://github.com/dhaines)
 - [Fabio Rocha](https://github.com/frock81)
 - [Fazle Arefin](https://github.com/fazlearefin)
+- [flora-five](https://github.com/flora-five)
 - [Greg Cockburn](https://github.com/gergnz)
 - [Guillaume Darmont](https://github.com/gdarmont)
+- [itbane](https://github.com/itbane)
 - [jadjay](https://github.com/jadjay)
 - [Jascha Sticher](https://github.com/itbane)
 - [Joanna Delaporte](https://github.com/jdelaporte)
@@ -436,6 +439,7 @@ Contributors:
 - [Lennart Weller](https://github.com/lhw)
 - [Loic Dachary](http://dachary.org)
 - [Mario Ciccarelli](https://github.com/kartone)
+- [Miroslav Hudec](https://github.com/mihudec)
 - [Otto Sabart](https://github.com/seberm)
 - [Paulius Mazeika](https://github.com/pauliusm)
 - [Paulo E. Castro](https://github.com/pecastro)
@@ -445,5 +449,8 @@ Contributors:
 - [Rayford Johnson](https://github.com/rayfordj)
 - [Robin Ophalvens](https://github.com/RobinOphalvens)
 - [Romuald](https://github.com/rds13)
+- [roumano](https://github.com/roumano)
+- [Shawn Wilsher](https://github.com/sdwilsh)
 - [Tom Meinlschmidt](https://github.com/tmeinlschmidt)
 - [Jascha Sticher](https://github.com/itbane)
+- [Zephyr82](https://github.com/Zephyr82)
