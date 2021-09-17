@@ -42,9 +42,9 @@ jobs:
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
 
-      - name: Run Molecule Shread Inventory tests
-        run: molecule test --scenario-name shared_inventory
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+      # - name: Run Molecule Shread Inventory tests
+      #   run: molecule test --scenario-name shared_inventory
+      #   env:
+      #     PY_COLORS: '1'
+      #     ANSIBLE_FORCE_COLOR: '1'
+      #     MOLECULE_DISTRO: ${{ matrix.distro }}
