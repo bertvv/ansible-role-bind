@@ -1,14 +1,7 @@
 ---
 
-bind_python_version: "{{ bind_default_python_version }}"
-
-bind_log: "data/named.run"
-
-bind_zones:
-  - name: "example.com"
-    hostmaster_email: "hostmaster"
-    networks:
-      - "10.0.2"
+# List of zones for which this name server is authoritative
+bind_zones: []
 
 # List of acls.
 bind_acls: []
@@ -85,3 +78,9 @@ bind_zone_file_mode: "0640"
 bind_dns64: false
 bind_dns64_clients:
   - "any"
+
+# Set Python version
+bind_python_version: "{{ bind_default_python_version }}"
+
+# Log file
+bind_log: "data/named.run"
