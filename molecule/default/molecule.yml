@@ -12,7 +12,6 @@ driver:
 lint: |
   set -e
   yamllint .
-  ansible-lint -x 106
 
 platforms:
   # Set name and hostname
