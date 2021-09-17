@@ -7,8 +7,6 @@ driver:
   name: docker
 
 # Linting with yamllint and ansible-lint
-# verify.yml is skipped because it uses the shell: module, which would trigger
-# a linting error.
 lint: |
   set -e
   yamllint .
