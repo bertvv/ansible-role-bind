@@ -5,4 +5,4 @@
   hosts: all
 
   roles:
-    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "bertvv.bind"
