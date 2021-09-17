@@ -22,6 +22,7 @@
 {% set _ = _zone_data.update({'delegate': item.delegate|default([])}) %}
 {% set _ = _zone_data.update({'services': item.services|default([])}) %}
 {% set _ = _zone_data.update({'text': item.text|default([])}) %}
+{% set _ = _zone_data.update({'caa': item.caa|default([])}) %}
 {% set _ = _zone_data.update({'naptr': item.naptr|default([])}) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
@@ -132,6 +133,15 @@ $TTL {{ _zone_data['ttl'] }}
 {% else %}
 {%   for entry in text.text %}
 {{ text.name.ljust(20) }} IN  TXT    "{{ entry }}"
+{%   endfor %}
+{% endif %}
+{% endfor %}
+{% for caa in _zone_data['caa'] %}
+{% if caa.text is string %}
+{{ caa.name.ljust(20) }} IN  CAA    {{ caa.text }}
+{% else %}
+{%   for entry in caa.text %}
+{{ caa.name.ljust(20) }} IN  CAA    {{ entry }}
 {%   endfor %}
 {% endif %}
 {% endfor %}

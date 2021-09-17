@@ -79,6 +79,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                         |
 | `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
 | `- text`                    | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
+| `- caa`                     | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying CAA records. `text:` can be a list or string.                           |
 | `- type`                    | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
 | `bind_zone_file_mode`       | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
 | `bind_zone_minimum_ttl`     | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
