@@ -1,7 +1,10 @@
 ---
+- name: Get my public IP
+  community.general.ipify_facts:
+
 - name: Set list of all host IP addresses
   set_fact:
-    host_all_addresses: "{{ ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) }}"
+    host_all_addresses: "{{ [ ipify_public_ip ] | union(ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses)) }}"
   tags: bind
 
 - name: Read forward zone hashes
