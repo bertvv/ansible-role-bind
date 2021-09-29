@@ -23,9 +23,8 @@ options {
   statistics-file "{{ bind_dir }}/data/named_stats.txt";
   memstatistics-file "{{ bind_dir }}/data/named_mem_stats.txt";
   allow-query     { {{ bind_allow_query|join('; ') }}; };
-{% if bind_acls|length != 0 %}
-  allow-transfer  { {% for acl in bind_acls %}"{{ acl.name }}"; {% endfor %}};
-{% endif %}
+  allow-transfer { none; };
+
 {% if bind_check_names is defined %}
   check-names  {{ bind_check_names }};
 {% endif %}
@@ -122,13 +121,47 @@ include "{{ file }}";
 {% set _type = 'forward' %}
 {% endif %}
 {# End: set zone type #}
+
+{# Start: set mapped primaries for the zone #}
+{% if bind_key_mapping | length != 0 %}
+{% set _mapped_zone_primaries = bind_key_mapping.keys() | intersect(bind_zone.primaries) %}
+{% else %}
+{% set _mapped_zone_primaries = [] %}
+{% endif %}
+{# End: set mapped primaries for the zone #}
+
 zone "{{ bind_zone.name }}" IN {
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ bind_zone.name }}";
+{% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
+  allow-transfer { any; };
+{% else %}
+  notify explicit;
+  allow-transfer {
+{% if bind_acls | length != 0 %}
+{% for acl in bind_acls %}
+    {{ acl.name }};
+{% endfor %}
+{% endif %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    key {{ bind_key_mapping[primary] }};
+{% endfor %}
+  };
+{% endif %}
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+  also-notify {
+{% for secondary in bind_zone.also_notify %}
+{% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
+{% endfor %}
+{% else %}
+    {{ secondary }};
+{% endif %}
+{% endfor %}
+  };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
@@ -154,9 +187,34 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
+  allow-transfer { any; };
+{% else %}
+  notify explicit;
+  allow-transfer {
+{% if bind_acls | length != 0 %}
+{% for acl in bind_acls %}
+    {{ acl.name }};
+{% endfor %}
+{% endif %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    key {{ bind_key_mapping[primary] }};
+{% endfor %}
+  };
+{% endif %}
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+  also-notify {
+{% for secondary in bind_zone.also_notify %}
+{% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
+{% endfor %}
+{% else %}
+    {{ secondary }};
+{% endif %}
+{% endfor %}
+  };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
@@ -184,9 +242,34 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% if _type == 'primary' %}
   type master;
   file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+{% if bind_acls | length == 0 and bind_key_mapping | length == 0 %}
   notify yes;
+  allow-transfer { any; };
+{% else %}
+  notify explicit;
+  allow-transfer {
+{% if bind_acls | length != 0 %}
+{% for acl in bind_acls %}
+    {{ acl.name }};
+{% endfor %}
+{% endif %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    key {{ bind_key_mapping[primary] }};
+{% endfor %}
+  };
+{% endif %}
 {% if bind_zone.also_notify is defined %}
-  also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
+  also-notify {
+{% for secondary in bind_zone.also_notify %}
+{% if host_all_addresses | intersect(_mapped_zone_primaries) | length != 0 %}
+{% for primary in host_all_addresses | intersect(_mapped_zone_primaries) %}
+    {{ secondary }} key {{ bind_key_mapping[primary] }};
+{% endfor %}
+{% else %}
+    {{ secondary }};
+{% endif %}
+{% endfor %}
+  };
 {% endif %}
 {% if bind_zone.allow_update is defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
