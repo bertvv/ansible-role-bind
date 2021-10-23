@@ -153,7 +153,7 @@ zone "{{ bind_zone.name }}" IN {
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
 {% if _type == 'primary' %}
   type master;
-  file "{{ bind_zone_dir }}/reverse-{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa.db";
+  file "{{ bind_zone_dir }}/reverse4-{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa.db";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
@@ -166,7 +166,7 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% elif _type == 'secondary' %}
   type slave;
   masters { {{ bind_zone.primaries|join('; ') }}; };
-  file "{{ bind_secondary_dir }}/reverse-{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa.db";
+  file "{{ bind_secondary_dir }}/reverse4-{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa.db";
 {% elif _type == 'forward' %}
   type forward;
   forward only;

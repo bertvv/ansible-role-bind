@@ -29,7 +29,7 @@
   tags: bind
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/reverse-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/reverse4-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -105,7 +105,7 @@
 - name: Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_zone_dir }}/reverse-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db"
+    dest: "{{ bind_zone_dir }}/reverse4-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
