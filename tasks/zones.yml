@@ -78,6 +78,23 @@
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
+- name: Find zones which in need of flushing/dumping dynamic updates to zonefile
+  find:
+    paths: "{{ bind_zone_dir }}"
+    patterns: '*.jnl' 
+    file_type: file
+    recurse: no
+  register: zones_tosync_temp  
+  tags: bind
+
+- name: Dump/flush dynamic zone changes to disk/zone file
+  command: "rndc sync -clean {{ item.path.split('/') | last | regex_replace('^(.*)(\\.jnl)+$', '\\1') }}"
+  with_items: 
+    - "{{ zones_tosync_temp.files }}"
+  when: zones_tosync_temp is defined  
+  notify: reload bind
+  tags: bind
+
 - name: Create forward lookup zone file
   template:
     src: bind_zone.j2

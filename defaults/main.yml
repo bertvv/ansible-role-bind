@@ -12,6 +12,12 @@ bind_dns_keys: []
 #    algorithm: hmac-sha256
 #    secret: "azertyAZERTY123456"
 
+# TSIG Keys for secure/dynamic updates
+bind_tsig_keys: []
+#  - name: tsig_key
+#    algorithm: hmac-sha256
+#    secret: "azertyAZERTY123456"
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
