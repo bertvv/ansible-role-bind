@@ -2,15 +2,12 @@
 ---
 bind_default_python_version: '3'
 bind_packages:
-#  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
   - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dns', 'python-dns' ) }}"
   - bind-check
   - bind-client
   - bind-dig
   - bind-dnssec
-  - bind-host
   - bind-libs
-  - bind-nslookup
   - bind-rndc
   - bind-server
   - bind-tools
