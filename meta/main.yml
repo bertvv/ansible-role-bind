@@ -30,6 +30,8 @@ galaxy_info:
         - xenial
         - bionic
         - focal
+    - name: OpenWrt
+        - 21.02.01
   galaxy_tags:
     - dns
     - networking
