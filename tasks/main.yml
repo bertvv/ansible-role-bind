@@ -71,6 +71,32 @@
   become: yes
   tags: bind
 
+- name: Prepare bind on OpenWrt
+  block:
+    - name: "Create RFC1912 zones file"
+      copy:
+        src: "openwrt_named.rfc1912.zones" 
+        dest: "{{ bind_conf_dir }}/named.rfc1912.zones"
+        owner: "{{ bind_owner }}"
+        group: "{{ bind_group }}"
+        mode: 0770
+        setype: named_cache_t
+    
+    - name: "Create default named.conf"
+      copy:
+        dest: "{{ bind_conf_dir }}/named.conf"
+        owner: "{{ bind_owner }}"
+        group: "{{ bind_group }}"
+        mode: 0770
+        setype: named_cache_t
+        content: |
+          include "{{ bind_config }}";
+          include "/etc/bind/named-rndc.conf";
+          include "/etc/bind/named.rfc1912.zones";
+
+  when: ansible_os_family == 'OpenWrt'
+  tags: bind
+
 - name: Create serial, based on UTC UNIX time
   command: date -u +%s
   register: timestamp
