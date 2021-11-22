@@ -91,7 +91,6 @@
         setype: named_cache_t
         content: |
           include "{{ bind_config }}";
-          include "/etc/bind/named-rndc.conf";
           include "/etc/bind/named.rfc1912.zones";
 
   when: ansible_os_family == 'OpenWrt'
