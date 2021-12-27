@@ -36,6 +36,14 @@ options {
 {% if bind_forwarders|length > 0 %}forwarders { {{ bind_forwarders|join('; ') }}; };{% endif %}
   {% if bind_forward_only %}forward only;{% endif %}
 
+{% if bind_zones | selectattr('response_policy', 'defined') | selectattr('response_policy', 'equalto', true) | list | length > 0 %}
+  response-policy {
+{% for zone in bind_zones | selectattr('response_policy', 'defined') | selectattr('response_policy', 'equalto', true) | list %}
+    zone "{{ zone.name }}";
+{% endfor %}
+  };
+{% endif %}
+
   rrset-order { order {{ bind_rrset_order }}; };
 
 {% if bind_dnssec_enable %}  dnssec-enable {{ bind_dnssec_enable }};{% endif %}

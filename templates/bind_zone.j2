@@ -24,6 +24,7 @@
 {% set _ = _zone_data.update({'text': item.text|default([])}) %}
 {% set _ = _zone_data.update({'caa': item.caa|default([])}) %}
 {% set _ = _zone_data.update({'naptr': item.naptr|default([])}) %}
+{% set _rpz = true if (item.response_policy is defined and item.response_policy is sameas true) else false %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
  #  accordingly
@@ -44,7 +45,9 @@
 ; Zone file for {{ _zone_data['domain'] }}
 {{ ansible_managed | comment(decoration='; ') }}
 
+{% if _rpz is sameas false %}
 $ORIGIN {{ _zone_data['domain'] }}.
+{% endif %}
 $TTL {{ _zone_data['ttl'] }}
 
 {% if _zone_data['mname']|length > 0 %}

@@ -19,3 +19,8 @@ bind_zones:
       - '10.11'
     ipv6_networks:
       - '2001:db8::/48'
+  - name: 'rpz'
+    create_reverse_zones: false
+    response_policy: true
+    primaries:
+      - 10.11.0.1
