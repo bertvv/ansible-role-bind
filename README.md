@@ -36,7 +36,6 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_acls`                 | `[]`                 | A list of ACL definitions, which are mappings with keys `name:` and `match_list:`. See below for an example.                         |
 | `bind_allow_query`          | `['localhost']`      | A list of hosts that are allowed to query this DNS server. Set to ['any'] to allow all hosts                                         |
 | `bind_allow_recursion`      | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |
-| `bind_allow_transfer`       | `[]`                 | A list of hosts that allowed to transfer (copy) the zone information from the server                                                 |
 | `bind_check_names`          | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).               |
 | `bind_dns_keys`             | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
 | `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
@@ -207,10 +206,12 @@ Zone `type` is an optional zone parameter that defines if the zone type should b
 Zone auto-detection functionality is especially useful when deploying multi-site DNS infrastructure. It is convenient to have a "shared" `bind_zones` definitions in a single group inventory file for all dns servers ( ex. `group_vars\dns.yml`). Such an approach allows to switch between primary and secondary server(s) roles by updating `primaries` record only and rerunning the playbook. Zone type auto-detection can be tested with "shared_inventory" molecule scenario by running: `molecule test --scenario-name shared_inventory`
 
 ---
+
 **NOTE**
 
-* bind doesn't support automated [multi-master configuration](https://kb.isc.org/docs/managing-manual-multi-master) and `primaries` list should have a single entry only.
-* When `primaries` record is updated to switch primary to secondary server roles, zones will be wiped out and recreated from template as we yet to support dynamic updates for existing zones.
+- bind doesn't support automated [multi-master configuration](https://kb.isc.org/docs/managing-manual-multi-master) and `primaries` list should have a single entry only.
+- When `primaries` record is updated to switch primary to secondary server roles, zones will be wiped out and recreated from template as we yet to support dynamic updates for existing zones.
+
 ---
 
 Zone types can be also defined explicitly in per host inventory to skip autodetection:
@@ -304,10 +305,10 @@ See the test playbooks and inventory for an elaborate example that showcases mos
 
 ### Standard Inventory
 
-* Variables common between all servers defined in [all.yml](molecule/default/group_vars/all.yml)
-* `bind_zone` variable defined on per host basis ([primary](molecule/default/host_vars/ns1.yml), [secondary](molecule/default/host_vars/ns2.yml) and [forwarder](molecule/default/host_vars/ns3.yml))
+- Variables common between all servers defined in [all.yml](molecule/default/group_vars/all.yml)
+- `bind_zone` variable defined on per host basis ([primary](molecule/default/host_vars/ns1.yml), [secondary](molecule/default/host_vars/ns2.yml) and [forwarder](molecule/default/host_vars/ns3.yml))
 
-```
+```console
 ❯ tree --dirsfirst molecule/default
 molecule/default
 ├── group_vars
@@ -322,9 +323,9 @@ molecule/default
 
 ### Shared Inventory
 
-* Variables common between primary and secondary servers defined in [all.yml](molecule/shared_inventory/group_vars/all.yml)
+Variables common between primary and secondary servers defined in [all.yml](molecule/shared_inventory/group_vars/all.yml)
 
-```
+```console
 ❯ tree --dirsfirst molecule/shared_inventory
 molecule/shared_inventory
 ├── group_vars
@@ -380,6 +381,7 @@ You can run the acceptance tests on all servers with `molecule verify`.
 > Verification tests are done using "dig" lookup module by quering dns records and validating responses. This requires direct network communication between Ansible controller node (your machine running Ansible) and the target docker container. 
 
 ---
+
 **NOTE**
 
 Molecule verify tests will fail if docker is running on MacOS, as MacOS cannot access container IP directly. This is a known issue. See [#2670](https://github.com/docker/for-mac/issues/2670).
@@ -387,16 +389,18 @@ Molecule verify tests will fail if docker is running on MacOS, as MacOS cannot a
 Workaround:
 
 1. Run molecule linter: `molecule lint`
-1. Provision containers: `molecule converge`
-2. Connect to container: `molecule login --host ns1`
-3. Go to role directory: `cd /etc/ansible/roles/bertvv.bind`
-4. Run verify playbook:
-```
-ansible-playbook -c local -i "`hostname`," -i molecule/default/inventory.ini molecule/default/verify.yml
-```
-5. Repeat steps 2-4 for `ns2` and `ns3`
----
+2. Provision containers: `molecule converge`
+3. Connect to container: `molecule login --host ns1`
+4. Go to role directory: `cd /etc/ansible/roles/bertvv.bind`
+5. Run verify playbook:
 
+  ```console
+  ansible-playbook -c local -i "`hostname`," -i molecule/default/inventory.ini molecule/default/verify.yml
+  ```
+
+6. Repeat steps 2-4 for `ns2` and `ns3`
+
+---
 
 ## License
 
