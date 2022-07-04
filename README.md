@@ -107,6 +107,26 @@ In order to set up an authoritative name server that is available to clients, yo
 | `- primaries`      |    V    |     V     |   --    |
 | `- forwarders`     |   --    |    --     |    V    |
 
+### Mail Servers
+
+To configure MX (mail servers) for a zonen example:
+```Yaml
+mail_servers:
+  - name: mailserver1.mydomain.com.
+    preference: 10
+```
+
+* It*s also possiblke to add a MX for a sub-zone without creating the all subdomain :
+```Yaml
+mail_servers:
+  - name: mailserver1.mydomain.com.
+    preference: 10
+    subdomain: list
+```
+
+**NOTE**
+
+name in mail_server can be FQDN or short-name (it will add the domain name in the bind configuration)
 
 ### Domain definitions
 
