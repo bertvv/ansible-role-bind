@@ -12,6 +12,9 @@ bind_dns_keys: []
 #    algorithm: hmac-sha256
 #    secret: "azertyAZERTY123456"
 
+# Whether to include the server clause listing all keys.
+bind_dns_keys_include_server_clause: true
+
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
