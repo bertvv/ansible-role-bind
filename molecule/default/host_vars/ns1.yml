@@ -94,3 +94,16 @@ bind_zones:
         text:
           - 'some text'
           - 'more text'
+  - name: 'rpz'
+    create_reverse_zones: false
+    response_policy: true
+    primaries:
+      - 10.11.0.1
+    name_servers:
+      - ns1.acme-inc.com.
+      - ns2.acme-inc.com.
+    hostmaster_email: admin
+    hosts:
+      - name: blackhole.example2.com
+        ip: 1.2.3.5
+        ipv6: '2001:db10::100'

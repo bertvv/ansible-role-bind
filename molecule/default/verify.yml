@@ -18,19 +18,25 @@
     - name: IPv4 Forward lookups
       assert:
         that:
-          - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '10.11.0.1'
-          - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '10.11.0.2'
-          - lookup('dig', 'srv001.acme-inc.com', local_dns)  == '10.11.1.1'
-          - lookup('dig', 'srv002.acme-inc.com', local_dns)  == '10.11.1.2'
-          - lookup('dig', 'mail001.acme-inc.com', local_dns) == '10.11.2.1'
-          - lookup('dig', 'mail002.acme-inc.com', local_dns) == '10.11.2.2'
-          - lookup('dig', 'mail003.acme-inc.com', local_dns) == '10.11.2.3'
-          - lookup('dig', 'srv010.acme-inc.com', local_dns)  == '10.11.0.10'
-          - lookup('dig', 'srv011.acme-inc.com', local_dns)  == '10.11.0.11'
-          - lookup('dig', 'srv012.acme-inc.com', local_dns)  == '10.11.0.12'
-          - lookup('dig', 'srv001.example.com', local_dns)   == '192.0.2.1'
-          - lookup('dig', 'srv002.example.com', local_dns)   == '192.0.2.2'
-          - lookup('dig', 'mail001.example.com', local_dns)  == '192.0.2.10'
+          - lookup('dig', 'ns1.acme-inc.com', local_dns )      == '10.11.0.1'
+          - lookup('dig', 'ns2.acme-inc.com', local_dns)       == '10.11.0.2'
+          - lookup('dig', 'srv001.acme-inc.com', local_dns)    == '10.11.1.1'
+          - lookup('dig', 'srv002.acme-inc.com', local_dns)    == '10.11.1.2'
+          - lookup('dig', 'mail001.acme-inc.com', local_dns)   == '10.11.2.1'
+          - lookup('dig', 'mail002.acme-inc.com', local_dns)   == '10.11.2.2'
+          - lookup('dig', 'mail003.acme-inc.com', local_dns)   == '10.11.2.3'
+          - lookup('dig', 'srv010.acme-inc.com', local_dns)    == '10.11.0.10'
+          - lookup('dig', 'srv011.acme-inc.com', local_dns)    == '10.11.0.11'
+          - lookup('dig', 'srv012.acme-inc.com', local_dns)    == '10.11.0.12'
+          - lookup('dig', 'srv001.example.com', local_dns)     == '192.0.2.1'
+          - lookup('dig', 'srv002.example.com', local_dns)     == '192.0.2.2'
+          - lookup('dig', 'mail001.example.com', local_dns)    == '192.0.2.10'
+
+    - name: IPv4 Forward lookups (response policy zone)
+      assert:
+        that:
+          - lookup('dig', 'blackhole.example2.com', local_dns) == '1.2.3.5'
+      when: inventory_hostname != 'ns3'
 
     - name: IPv4 Reverse lookups
       assert:
@@ -63,12 +69,18 @@
     - name: IPv6 Forward lookups
       assert:
         that:
-          - lookup('dig', 'srv001.acme-inc.com/AAAA', local_dns)  == '2001:db8::1'
-          - lookup('dig', 'srv002.acme-inc.com/AAAA', local_dns)  == '2001:db8::2'
-          - lookup('dig', 'mail001.acme-inc.com/AAAA', local_dns) == '2001:db8::d:1'
-          - lookup('dig', 'mail002.acme-inc.com/AAAA', local_dns) == '2001:db8::d:2'
-          - lookup('dig', 'mail003.acme-inc.com/AAAA', local_dns) == '2001:db8::d:3'
-          - lookup('dig', 'srv001.example.com/AAAA', local_dns)   == '2001:db9::1'
+          - lookup('dig', 'srv001.acme-inc.com/AAAA', local_dns)    == '2001:db8::1'
+          - lookup('dig', 'srv002.acme-inc.com/AAAA', local_dns)    == '2001:db8::2'
+          - lookup('dig', 'mail001.acme-inc.com/AAAA', local_dns)   == '2001:db8::d:1'
+          - lookup('dig', 'mail002.acme-inc.com/AAAA', local_dns)   == '2001:db8::d:2'
+          - lookup('dig', 'mail003.acme-inc.com/AAAA', local_dns)   == '2001:db8::d:3'
+          - lookup('dig', 'srv001.example.com/AAAA', local_dns)     == '2001:db9::1'
+
+    - name: IPv6 Forward lookups (response policy zone)
+      assert:
+        that:
+          - lookup('dig', 'blackhole.example2.com/AAAA', local_dns) == '2001:db10::100'
+      when: inventory_hostname != 'ns3'
 
     - name: IPv6 Reverse lookups
       assert:
