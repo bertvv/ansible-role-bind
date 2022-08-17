@@ -2,10 +2,12 @@
 - name: Set list of all host IP addresses
   set_fact:
     host_all_addresses: "{{ ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) }}"
+    host_ipv4_addresses: "{{ ansible_all_ipv4_addresses }}"
+    host_ipv6_addresses: "{{ ansible_all_ipv6_addresses }}"
   tags: bind
 
 - name: Read forward zone hashes
-  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
+  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/forward-{{ item.name }}.db || true'
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -27,7 +29,7 @@
   tags: bind
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/reverse4-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_temp
@@ -53,7 +55,7 @@
   tags: bind
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/reverse6-{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}.db || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -81,7 +83,7 @@
 - name: Create forward lookup zone file
   template:
     src: bind_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ item.name }}"
+    dest: "{{ bind_zone_dir }}/forward-{{ item.name }}.db"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -103,7 +105,7 @@
 - name: Create reverse lookup zone file
   template:
     src: reverse_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+    dest: "{{ bind_zone_dir }}/reverse4-{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa.db"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -121,14 +123,14 @@
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
-    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
+    (host_ipv4_addresses | intersect(item[0].primaries) | length > 0)))
   notify: reload bind
   tags: bind
 
 - name: Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/reverse6-{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}.db"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
@@ -146,6 +148,6 @@
     (item.create_reverse_zones is not defined or item.create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
-    (host_all_addresses | intersect(item[0].primaries) | length > 0)))
+    (host_ipv6_addresses | intersect(item[0].primaries) | length > 0)))
   notify: reload bind
   tags: bind
