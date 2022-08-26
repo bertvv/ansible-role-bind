@@ -118,7 +118,7 @@
   loop_control:
     label: "{{ item.1 }}"
   when: >
-    (item.create_reverse_zones is not defined or item.create_reverse_zones) and
+    (item[0].create_reverse_zones is not defined or item[0].create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
     (host_all_addresses | intersect(item[0].primaries) | length > 0)))
@@ -143,7 +143,7 @@
   loop_control:
     label: "{{ item.1 }}"
   when: >
-    (item.create_reverse_zones is not defined or item.create_reverse_zones) and
+    (item[0].create_reverse_zones is not defined or item[0].create_reverse_zones) and
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
     (host_all_addresses | intersect(item[0].primaries) | length > 0)))
