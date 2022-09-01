@@ -4,7 +4,7 @@
  #  way the serial will only be updated if there are some content changes.
  #}
 {% set _zone_data = {} %}
-{% set _ = _zone_data.update({'ttl': bind_zone_ttl}) %}
+{% set _ = _zone_data.update({'ttl': item.ttl|default(bind_zone_ttl)}) %}
 {% set _ = _zone_data.update({'domain': item.name}) %}
 {% set _ = _zone_data.update({'mname': item.name_servers|default([])}) %}
 {% set _ = _zone_data.update({'aname': item.other_name_servers|default([])}) %}
