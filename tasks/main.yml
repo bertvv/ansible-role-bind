@@ -15,7 +15,7 @@
 - name: Check `primaries` or `forwarders` was set for each zone
   assert:
     that:
-      - item.primaries is defined or item.forwarders is defined
+      - (item.type is defined and item.type == 'primary') or item.primaries is defined or item.forwarders is defined
     quiet: yes
   loop: "{{ bind_zones }}"
   loop_control:
