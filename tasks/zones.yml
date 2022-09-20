@@ -84,6 +84,7 @@
     patterns: '*.jnl' 
     file_type: file
     recurse: no
+  when: bind_tsig_keys is defined and bind_tsig_keys|length > 0
   register: zones_tosync_temp  
   tags: bind
 
