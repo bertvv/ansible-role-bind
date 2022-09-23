@@ -78,21 +78,37 @@
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
-- name: Find zones which in need of flushing/dumping dynamic updates to zonefile
-  find:
-    paths: "{{ bind_zone_dir }}"
-    patterns: '*.jnl' 
-    file_type: file
-    recurse: no
-  when: bind_tsig_keys is defined and bind_tsig_keys|length > 0
-  register: zones_tosync_temp  
+- name: Dump/flush dynamic zone changes to disk/zone file
+  command: "rndc sync -clean {{ item.name }}"
+  with_items:
+    - "{{ bind_zones }}"
+  when: item.update_policy is defined or item.allow_update is defined 
+  notify: reload bind
   tags: bind
 
-- name: Dump/flush dynamic zone changes to disk/zone file
-  command: "rndc sync -clean {{ item.path.split('/') | last | regex_replace('^(.*)(\\.jnl)+$', '\\1') }}"
-  with_items: 
-    - "{{ zones_tosync_temp.files }}"
-  when: zones_tosync_temp is defined  
+- name: Dump/flush dynamic ipv4 reverse zone changes to disk/zone file
+  command: "rndc sync -clean {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+  with_subelements:
+    - "{{ bind_zones }}"
+    - networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  when: item.0.update_policy is defined or item.0.allow_update is defined
+  notify: reload bind
+  tags: bind
+
+- name: Dump/flush dynamic ipv6 reverse zone changes to disk/zone file
+  command: "rndc sync -clean {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+  with_subelements:
+    - "{{ bind_zones }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  when: item.0.update_policy is defined or item.0.allow_update is defined
   notify: reload bind
   tags: bind
 
