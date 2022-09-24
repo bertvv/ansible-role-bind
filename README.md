@@ -329,7 +329,7 @@ bind_zones:
       - "key {{ bind_tsig_keys[0].name }}" # For Using TSIG Key
 ```
 
-**allow_update** Example   
+**update_policy** Example   
 
 ```Yaml
 bind_zones:
