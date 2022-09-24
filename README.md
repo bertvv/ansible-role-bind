@@ -298,7 +298,7 @@ A check will be performed to ensure the key is actually present in the `bind_dns
 
 ### Using TSIG Keys for Dynamic Updates
 
-TSIG keys can be defined like this:
+TSIG keys can be defined on a variable:
 
 ```Yaml
 bind_tsig_keys:
@@ -307,10 +307,46 @@ bind_tsig_keys:
     secret: "azertyAZERTY123456"
 ```
 
-**tip**: Generate a key: *dnssec-keygen -a HMAC-SHA256 -b 256 -n HOST tsig_key.*  
+**tip**: Generate a key: *dnssec-keygen -a HMAC-SHA256 -b 256 -n HOST tsig_key.*. For newer BIND check for tsig-keygen, similar syntax.  
 
 These keys are not used with zone transfer (XFR) and are used for dynamic updates authentication. 
 
+Add to your `bind_zones`:  
+
+**allow_update**  
+
+```Yaml
+bind_zones:
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
+    primaries:
+      - 192.0.2.1                # Primary server(s) for this zone
+    name_servers:
+      - pub01.mydomain.com.
+      - pub02.mydomain.com.
+    allow_update:
+      - "192.0.2.10/32" # For IP Address
+      - "key {{ bind_tsig_keys[0].name }}" # For Using TSIG Key
+```
+
+**allow_update**  
+
+```Yaml
+bind_zones:
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
+    primaries:
+      - 192.0.2.1                # Primary server(s) for this zone
+    name_servers:
+      - pub01.mydomain.com.
+      - pub02.mydomain.com.
+    update_policy:
+      - "grant {{ bind_tsig_keys[0].name }} zonesub A""
+      - "grant {{ bind_tsig_keys[0].name }} zonesub TXT"
+      - "grant local-ddns zonesub any"
+```
+
+**tip**: Choose only one. Either `allow_update` or `update_policy`. They are mutually exclusive.  
 
 ## Dependencies
 
