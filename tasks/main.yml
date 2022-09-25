@@ -92,6 +92,19 @@
   notify: reload bind
   tags: bind
 
+# file to load tsig keys for zone authentication/dynamic/secure update
+- name: Create file for tsig keys for authenticated dynamic updates
+  template:
+    src: tsig_keys.j2
+    dest: "{{ bind_conf_dir }}/{{ tsig_file }}"
+    mode: 0640
+    owner: root
+    group: "{{ bind_group }}"
+  become: yes
+  when: bind_tsig_keys is defined and bind_tsig_keys|length > 0
+  notify: reload bind
+  tags: bind
+
 - name: Configure zones
   include_tasks: zones.yml
   tags: bind

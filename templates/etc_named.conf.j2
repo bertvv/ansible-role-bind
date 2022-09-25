@@ -102,6 +102,9 @@ include "{{ file }}";
 {% for file in bind_extra_include_files %}
 include "{{ file }}";
 {% endfor %}
+{% if bind_tsig_keys|length != 0 %}
+include "{{ bind_tsig_file }}";
+{% endif %}
 {% if bind_zones is defined %}
 {% for bind_zone in bind_zones %}
 
@@ -130,8 +133,12 @@ zone "{{ bind_zone.name }}" IN {
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
-{% if bind_zone.allow_update is defined %}
+{% if bind_zone.allow_update is defined and bind_zone.update_policy is not defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% elif bind_zone.update_policy is defined and bind_zone.allow_update is not defined %}
+  update-policy { 
+    {{ bind_zone.update_policy|join('; \n    ') }}; 
+  };
 {% else %}
   allow-update { none; };
 {% endif %}
@@ -158,8 +165,12 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
-{% if bind_zone.allow_update is defined %}
+{% if bind_zone.allow_update is defined and bind_zone.update_policy is not defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% elif bind_zone.update_policy is defined and bind_zone.allow_update is not defined %}
+  update-policy { 
+    {{ bind_zone.update_policy|join('; \n    ') }}; 
+  };
 {% else %}
   allow-update { none; };
 {% endif %}
@@ -188,8 +199,12 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
 {% endif %}
-{% if bind_zone.allow_update is defined %}
+{% if bind_zone.allow_update is defined and bind_zone.update_policy is not defined %}
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
+{% elif bind_zone.update_policy is defined and bind_zone.allow_update is not defined %}
+  update-policy { 
+    {{ bind_zone.update_policy|join('; \n    ') }}; 
+  };
 {% else %}
   allow-update { none; };
 {% endif %}

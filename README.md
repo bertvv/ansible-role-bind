@@ -38,6 +38,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_allow_recursion`      | `['any']`            | Similar to `bind_allow_query`, this option applies to recursive queries.                                                             |
 | `bind_check_names`          | `[]`                 | Check host names for compliance with RFC 952 and RFC 1123 and take the defined action (e.g. `warn`, `ignore`, `fail`).               |
 | `bind_dns_keys`             | `[]`                 | A list of binding keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
+| `bind_tsig_keys`             | `[]`                 | A list of tsig keys, which are mappings with keys `name:` `algorithm:` and `secret:`. See below for an example.                   |
 | `bind_dns64`                | `false`              | If `true`, support for [DNS64](https://www.oreilly.com/library/view/dns-and-bind/9781449308025/ch04.html) is enabled                 |
 | `bind_dns64_clients`        | `['any']`            | A list of clients which the DNS64 function applies to (can be any ACL)                                                               |
 | `bind_dnssec_enable`        | `true`               | If `true`, DNSSEC is enabled                                                                                                         |
@@ -61,7 +62,8 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `bind_zone_dir`             | -                    | When defined, sets a custom absolute path to the server directory (for zone files, etc.) instead of the default.                     |
 | `bind_key_mapping`          | []                   | `Primary: Keyname` - mapping of TSIG keys to use for a specific primary                                                              |
 | `bind_zones`                | n/a                  | A list of mappings with zone definitions. See below this table for examples                                                          |
-| `- allow_update`            | `['none']`           | A list of hosts that are allowed to dynamically update this DNS zone.                                                                |
+| `- allow_update`            | `['none']`           | A list of hosts or keys that are allowed to dynamically update this DNS zone.  Mutually exclusive with `update_policy`.                                                     |
+| `- update_policy`            | `['none']`           | A list of rules (grant/deny) that are allowed to dynamically update this DNS zone. In general a TSIG key is used. Mutually exclusive with `allow_update`. See documentation for [Dynamic Update Policies](https://bind9.readthedocs.io/en/v9_16_5/reference.html#dynamic-update-policies)          |
 | `- also_notify`             | -                    | A list of servers that will receive a notification when the primary zone file is reloaded.                                           |
 | `- create_forward_zones`    | -                    | When initialized and set to `false`, creation of forward zones will be skipped (resulting in a reverse only zone)                    |
 | `- create_reverse_zones`    | -                    | When initialized and set to `false`, creation of reverse zones will be skipped (resulting in a forward only zone)                    |
@@ -294,6 +296,57 @@ bind_key_mapping:
 Each primary can only have one key (per view).
 
 A check will be performed to ensure the key is actually present in the `bind_dns_keys` mapping. This will add a server statement for the `a` in `bind_auth_file` on a secondary server containing the specified key.
+
+### Using TSIG Keys for Dynamic Updates
+
+TSIG keys can be defined on a variable:
+
+```Yaml
+bind_tsig_keys:
+  - name: "tsig_key."
+    algorithm: hmac-sha256
+    secret: "azertyAZERTY123456"
+```
+
+**tip**: Generate a key: *dnssec-keygen -a HMAC-SHA256 -b 256 -n HOST tsig_key.*. For newer BIND check for tsig-keygen, similar syntax.  
+
+These keys are not used with zone transfer (XFR) and are used for dynamic updates authentication. 
+
+Now include to `bind_zones`:  
+
+**allow_update** Example   
+
+```Yaml
+bind_zones:
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
+    primaries:
+      - 192.0.2.1                # Primary server(s) for this zone
+    name_servers:
+      - pub01.mydomain.com.
+      - pub02.mydomain.com.
+    allow_update:
+      - "key {{ bind_tsig_keys[0].name }}" 
+```
+
+**update_policy** Example   
+
+```Yaml
+bind_zones:
+  - name: mydomain.com           # Domain name
+    create_reverse_zones: false  # Skip creation of reverse zones
+    primaries:
+      - 192.0.2.1                # Primary server(s) for this zone
+    name_servers:
+      - pub01.mydomain.com.
+      - pub02.mydomain.com.
+    update_policy:
+      - "grant {{ bind_tsig_keys[0].name }} zonesub A"
+      - "grant {{ bind_tsig_keys[0].name }} zonesub TXT"
+      - "grant local-ddns zonesub any"
+```
+
+**tip**: Choose only one. Either `allow_update` or `update_policy`. They are mutually exclusive.  
 
 ## Dependencies
 

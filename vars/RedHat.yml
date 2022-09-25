@@ -23,6 +23,10 @@ bind_conf_dir: "/etc/named"
 auth_file: "auth_transfer.conf"
 bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
 
+# tsig key file
+tsig_file: "tsig_keys.conf"
+bind_tsig_file: "{{ bind_conf_dir }}/{{ tsig_file }}"
+
 bind_owner: root
 bind_group: named
 
