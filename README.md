@@ -325,8 +325,7 @@ bind_zones:
       - pub01.mydomain.com.
       - pub02.mydomain.com.
     allow_update:
-      - "192.0.2.10/32" # For IP Address
-      - "key {{ bind_tsig_keys[0].name }}" # For Using TSIG Key
+      - "key {{ bind_tsig_keys[0].name }}" 
 ```
 
 **update_policy** Example   
