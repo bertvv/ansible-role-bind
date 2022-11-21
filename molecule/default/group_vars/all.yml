@@ -8,17 +8,30 @@ bind_allow_query:
   - any
 bind_listen_ipv4:
   - any
+bind_listen_ipv4_port:
+  - 53
+bind_listen_ipv6_port:
+  - 53
 bind_listen_ipv6:
   - any
 bind_acls:
   - name: acl1
     match_list:
       - 10.11.0.0/16
+bind_allow_recursion:
+  - any
+bind_forward_only: false
+bind_rrset_order: random
+bind_statistics_port: 8053
+bind_statistics_host: 127.0.0.1
+# DNS64 support
+bind_dns64: false
+bind_dns64_clients:
+  - any
 bind_forwarders:
   - '8.8.8.8'
   - '8.8.4.4'
 bind_recursion: true
-bind_dns64: true
 bind_query_log: 'data/query.log'
 bind_check_names: 'master ignore'
 bind_zone_minimum_ttl: "2D"
@@ -26,4 +39,10 @@ bind_zone_ttl: "2W"
 bind_zone_time_to_refresh: "2D"
 bind_zone_time_to_retry: "2H"
 bind_zone_time_to_expire: "2W"
-bind_statistics_host: "{{ ansible_default_ipv4.address }}"
+bind_key_mapping: {}
+bind_python_version: "{{ bind_default_python_version }}"
+bind_log_dir: "/var/log/{{ bind_service }}"
+bind_log: "{{ bind_log_dir }}/{{ bind_service }}"
+bind_dnssec_enable: true
+bind_dnssec_validation: true
+bind_extra_include_files: {}

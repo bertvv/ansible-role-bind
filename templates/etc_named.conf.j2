@@ -38,7 +38,13 @@ options {
 
   rrset-order { order {{ bind_rrset_order }}; };
 
-{% if bind_dnssec_enable %}  dnssec-enable {{ bind_dnssec_enable }};{% endif %}
+{%+ if ansible_distribution == "Ubuntu" and ansible_distribution_version|float >= 22.04 -%}
+  {% if bind_dnssec_enable %} dnssec-enable {{ bind_dnssec_enable }};{% endif %}
+{% elif ansible_distribution == "Debian" and ansible_distribution_version|int >= 10 -%}
+  {% if bind_dnssec_enable %} dnssec-enable {{ bind_dnssec_enable }};{% endif %}
+{% else %}
+  dnssec-enable {{ bind_dnssec_enable }};
+{% endif %}
   dnssec-validation {{ bind_dnssec_validation }};
 
   /* Path to ISC DLV key */
@@ -150,6 +156,23 @@ zone "{{ bind_zone.name }}" IN {
 {% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.networks %}
 
+{# Start: set zone type  #}
+{% set _all_addresses = ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) %}
+{% if bind_zone.type is defined and bind_zone.type == 'primary' %}
+{% set _type = 'primary' %}
+{% elif bind_zone.type is defined and bind_zone.type == 'secondary' %}
+{% set _type = 'secondary' %}
+{% elif bind_zone.type is defined and bind_zone.type == 'forward' %}
+{% set _type = 'forward' %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% set _type = 'primary' %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% set _type = 'secondary' %}
+{% elif bind_zone.type is not defined and bind_zone.forwarders is defined %}
+{% set _type = 'forward' %}
+{% endif %}
+{# End: set zone type #}
+
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {
 {% if _type == 'primary' %}
   type master;
@@ -207,4 +230,12 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% endif %}
 {% endif %}
 {% endfor %}
+{% endif %}
+
+{% if ansible_os_family == "RedHat" %}
+zone "." IN {
+        type hint;
+        file "{{ bind_dir }}/named.ca";
+};
+{% else %}
 {% endif %}

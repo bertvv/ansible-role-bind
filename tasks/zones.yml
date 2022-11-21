@@ -1,11 +1,11 @@
 ---
 - name: Set list of all host IP addresses
-  set_fact:
+  ansible.builtin.set_fact:
     host_all_addresses: "{{ ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) }}"
   tags: bind
 
 - name: Read forward zone hashes
-  shell: 'grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true'
+  ansible.builtin.shell: grep -s "^; Hash:" {{ bind_zone_dir }}/{{ item.name }} || true
   changed_when: false
   check_mode: false
   register: forward_hashes_temp
@@ -17,8 +17,8 @@
   tags: bind
 
 - name: Create dict of forward hashes
-  set_fact:
-    forward_hashes: "{{ forward_hashes|default([]) + [ {'hash': item.stdout|default(), 'name': item.item.name} ] }}"
+  ansible.builtin.set_fact:
+    forward_hashes: "{{ forward_hashes | default([]) + [{'hash': item.stdout | default(), 'name': item.item.name}] }}"
   with_items:
     - "{{ forward_hashes_temp.results }}"
   run_once: true
@@ -27,9 +27,9 @@
   tags: bind
 
 - name: Read reverse ipv4 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa || true"
   changed_when: false
   check_mode: false
+  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1 + '.', '').split('.')[:: -1])) }}.in-addr.arpa || true"
   register: reverse_hashes_temp
   with_subelements:
     - "{{ bind_zones }}"
@@ -42,18 +42,18 @@
   tags: bind
 
 - name: Create dict of reverse hashes
-  set_fact:
-    reverse_hashes: "{{ reverse_hashes|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
+  ansible.builtin.set_fact:
+    reverse_hashes: "{{ reverse_hashes | default([]) + [{'hash':item.0.stdout |default(), 'network':item.1}] }}"
   with_subelements:
     - "{{ reverse_hashes_temp.results }}"
     - item
   run_once: true
   loop_control:
-    label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+    label: "{{ item.1.name | default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  ansible.builtin.shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9 + (item.1 |regex_replace('^.*/', '')|int)//2):-1] }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -68,26 +68,26 @@
   tags: bind
 
 - name: Create dict of reverse ipv6 hashes
-  set_fact:
-    reverse_hashes_ipv6: "{{ reverse_hashes_ipv6|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
+  ansible.builtin.set_fact:
+    reverse_hashes_ipv6: "{{ reverse_hashes_ipv6 | default([]) + [{'hash':item.0.stdout |default(), 'network':item.1}] }}"
   with_subelements:
     - "{{ reverse_hashes_ipv6_temp.results }}"
     - item
   run_once: true
   loop_control:
-    label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+    label: "{{ item.1.name | default(item.0.cmd.split(' ')[4]) }}"
   tags: bind
 
 - name: Create forward lookup zone file
-  template:
+  ansible.builtin.template:
     src: bind_zone.j2
     dest: "{{ bind_zone_dir }}/{{ item.name }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
-    validate: 'named-checkzone -d {{ item.name }} %s'
-  become: yes
+    validate: named-checkzone -d {{ item.name }} %s
+  become: true
   with_items:
     - "{{ bind_zones }}"
   loop_control:
@@ -97,19 +97,19 @@
     ((item.type is defined and item.type == 'primary') or
     (item.type is not defined and item.primaries is defined and
     (host_all_addresses | intersect(item.primaries) | length > 0)))
-  notify: reload bind
+  notify: Reload bind
   tags: bind
 
 - name: Create reverse lookup zone file
-  template:
+  ansible.builtin.template:
     src: reverse_zone.j2
-    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+    dest: "{{ bind_zone_dir }}/{{ ('.'.join(item.1.replace(item.1 + '.', '').split('.')[:: -1])) }}.in-addr.arpa"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
-    validate: "named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s"
-  become: yes
+    validate: named-checkzone {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa %s
+  become: true
   with_subelements:
     - "{{ bind_zones }}"
     - networks
@@ -122,19 +122,19 @@
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
     (host_all_addresses | intersect(item[0].primaries) | length > 0)))
-  notify: reload bind
+  notify: Reload bind
   tags: bind
 
 - name: Create reverse IPv6 lookup zone file
-  template:
+  ansible.builtin.template:
     src: reverse_zone_ipv6.j2
-    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9 + (item.1 |regex_replace('^.*/', '')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
-    validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
-  become: yes
+    validate: named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1 | regex_replace('^.*/','') | int)//2):] }} %s
+  become: true
   with_subelements:
     - "{{ bind_zones }}"
     - ipv6_networks
@@ -147,5 +147,5 @@
     ((item[0].type is defined and item[0].type == 'primary') or
     (item[0].type is not defined and item[0].primaries is defined and
     (host_all_addresses | intersect(item[0].primaries) | length > 0)))
-  notify: reload bind
+  notify: Reload bind
   tags: bind

@@ -1,11 +1,8 @@
 ---
-
 # List of zones for which this name server is authoritative
 bind_zones: []
-
 # List of acls.
 bind_acls: []
-
 # Key binding for secondary servers
 bind_dns_keys: []
 #  - name: primary_key
@@ -15,7 +12,7 @@ bind_dns_keys: []
 # List of IPv4 address of the network interface(s) to listen on. Set to "any"
 # to listen on all interfaces
 bind_listen_ipv4:
-  - "127.0.0.1"
+  - 127.0.0.1
 
 # The list of ports to listen on for IPv4 addresses
 bind_listen_ipv4_port:
@@ -23,7 +20,7 @@ bind_listen_ipv4_port:
 
 # List of IPv6 address of the network interface(s) to listen on.
 bind_listen_ipv6:
-  - "::1"
+  - ::1
 
 # The list of ports to listen on for IPv6 addresses
 bind_listen_ipv6_port:
@@ -31,45 +28,42 @@ bind_listen_ipv6_port:
 
 # List of hosts that are allowed to query this DNS server.
 bind_allow_query:
-  - "localhost"
+  - localhost
 
 # A key-value list mapping server-IPs to TSIG keys for signing requests
 bind_key_mapping: {}
-
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
 bind_recursion: false
 bind_allow_recursion:
-  - "any"
+  - any
 
 # Allows BIND to be set up as a caching name server
 bind_forward_only: false
 
 # List of name servers to forward DNS requests to.
 bind_forwarders: []
-
 # DNS round robin order (random or cyclic)
-bind_rrset_order: "random"
+bind_rrset_order: random
 
 # statistics channels configuration
 bind_statistics_channels: false
 bind_statistics_port: 8053
 bind_statistics_host: 127.0.0.1
 bind_statistics_allow:
-  - "127.0.0.1"
+  - 127.0.0.1
 
 # DNSSEC configuration
 bind_dnssec_enable: true
 bind_dnssec_validation: true
 
 bind_extra_include_files: []
-
 # SOA information
-bind_zone_ttl: "1W"
-bind_zone_time_to_refresh: "1D"
-bind_zone_time_to_retry: "1H"
-bind_zone_time_to_expire: "1W"
-bind_zone_minimum_ttl: "1D"
+bind_zone_ttl: 1W
+bind_zone_time_to_refresh: 1D
+bind_zone_time_to_retry: 1H
+bind_zone_time_to_expire: 1W
+bind_zone_minimum_ttl: 1D
 
 # File mode for primary zone files (needs to be something like 0660 for dynamic updates)
 bind_zone_file_mode: "0640"
@@ -77,10 +71,12 @@ bind_zone_file_mode: "0640"
 # DNS64 support
 bind_dns64: false
 bind_dns64_clients:
-  - "any"
+  - any
 
 # Set Python version
 bind_python_version: "{{ bind_default_python_version }}"
 
 # Log file
-bind_log: "data/named.run"
+#
+bind_log_dir: /var/log/{{ bind_service }}
+bind_log: "{{ bind_log_dir }}/{{ bind_service }}"

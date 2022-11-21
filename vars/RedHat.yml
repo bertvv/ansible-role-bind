@@ -1,9 +1,9 @@
 # Distro specific variables for RedHat
 ---
-bind_default_python_version: "{{ ( ansible_distribution_major_version == '8' ) | ternary( '3', '2' ) }}"
+bind_default_python_version: "{{ (ansible_distribution_major_version == '8') | ternary('3', '2') }}"
 bind_packages:
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dns', 'python-dns' ) }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-netaddr', 'python-netaddr') }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-dns', 'python-dns') }}"
   - bind
   - bind-utils
 
@@ -19,17 +19,17 @@ bind_default_zone_files:
 
 # Directory with run-time stuff
 bind_dir: /var/named
-bind_conf_dir: "/etc/named"
-auth_file: "auth_transfer.conf"
+bind_conf_dir: /etc/named
+auth_file: auth_transfer.conf
 bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
 
 bind_owner: root
 bind_group: named
 
-bind_bindkeys_file: "/etc/named.iscdlv.key"
-bind_pid_file: "/run/named/named.pid"
-bind_session_keyfile: "/run/named/session.key"
+bind_bindkeys_file: /etc/named.iscdlv.key
+bind_pid_file: /run/named/named.pid
+bind_session_keyfile: /run/named/session.key
 
 # Custom location for zone files
-bind_zone_dir: "{{ bind_dir }}"
-bind_secondary_dir: "{{ bind_dir }}/secondary"
+bind_zone_dir: "{{ bind_dir }}/zones"
+bind_secondary_dir: "{{ bind_dir }}/slaves"

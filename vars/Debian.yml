@@ -1,9 +1,9 @@
 # Distro specific variables for Debian
 ---
-bind_default_python_version: '3'
+bind_default_python_version: "3"
 bind_packages:
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dnspython', 'python-dnspython' ) }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-netaddr', 'python-netaddr') }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-dnspython', 'python-dnspython') }}"
   - bind9
   - bind9utils
 
@@ -18,16 +18,16 @@ bind_default_zone_files:
 
 # Directory with run-time stuff
 bind_dir: /var/cache/bind
-bind_conf_dir: "/etc/bind"
-auth_file: "auth_transfer.conf"
+bind_conf_dir: /etc/bind
+auth_file: auth_transfer.conf
 bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
 
 bind_owner: root
 bind_group: bind
 
-bind_bindkeys_file: "/etc/named.iscdlv.key"
-bind_pid_file: "/run/named/named.pid"
-bind_session_keyfile: "/run/named/session.key"
+bind_bindkeys_file: /etc/named.iscdlv.key
+bind_pid_file: /run/named/named.pid
+bind_session_keyfile: /run/named/session.key
 
 # Custom location for zone files
 bind_zone_dir: "{{ bind_dir }}"

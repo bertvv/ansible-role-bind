@@ -1,8 +1,7 @@
 ---
-
 # Initialise distribution-specific variables
 - name: Source specific variables
-  include_vars: "{{ item }}"
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
@@ -13,10 +12,10 @@
   tags: bind
 
 - name: Check `primaries` or `forwarders` was set for each zone
-  assert:
+  ansible.builtin.assert:
     that:
       - item.primaries is defined or item.forwarders is defined
-    quiet: yes
+    quiet: true
   loop: "{{ bind_zones }}"
   loop_control:
     label: "{{ item.name }}"
@@ -24,55 +23,56 @@
 
 # Fix molecule and ci failures
 - name: Update package cache for Debian based distros
-  apt:
-    update_cache: yes
-  become: yes
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
   changed_when: false
   when: ansible_os_family == 'Debian'
   tags: bind
 
 - name: Assert that all XFR keys exist in the key list
-  assert:
+  ansible.builtin.assert:
     that: bind_dns_keys | selectattr("name","equalto",bind_key_mapping[item]) | list | count > 0
   loop: "{{ bind_key_mapping.keys() | list }}"
   when: bind_key_mapping | list | count > 0
 
 - name: Install BIND
-  package:
+  ansible.builtin.package:
     pkg: "{{ item }}"
     state: present
-  become: yes
+  become: true
   with_items:
     - "{{ bind_packages }}"
   tags: bind
 
 - name: Ensure runtime directories referenced in config exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0770
-  become: yes
+  become: true
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
     - "{{ bind_zone_dir }}"
+    - "{{ bind_log_dir }}"
   tags: bind
 
 - name: Ensure Directory for Cached Secondary Zones exists
-  file:
+  ansible.builtin.file:
     path: "{{ bind_secondary_dir }}"
     state: directory
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0770
     setype: named_cache_t
-  become: yes
+  become: true
   tags: bind
 
 - name: Create serial, based on UTC UNIX time
-  command: date -u +%s
+  ansible.builtin.command: date -u +%s
   register: timestamp
   changed_when: false
   run_once: true
@@ -81,38 +81,38 @@
 
 # file to set keys for XFR authentication
 - name: Create extra config for authenticated XFR request
-  template:
+  ansible.builtin.template:
     src: auth_transfer.j2
     dest: "{{ bind_conf_dir }}/{{ auth_file }}"
     mode: 0640
     owner: root
     group: "{{ bind_group }}"
-  become: yes
-  when: bind_dns_keys is defined and bind_dns_keys|length > 0
-  notify: reload bind
+  become: true
+  when: bind_dns_keys is defined and bind_dns_keys | length > 0
+  notify: Reload bind
   tags: bind
 
 - name: Configure zones
-  include_tasks: zones.yml
+  ansible.builtin.include_tasks: zones.yml
   tags: bind
 
 - name: Main BIND config file
-  template:
+  ansible.builtin.template:
     src: etc_named.conf.j2
     dest: "{{ bind_config }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0640
     setype: named_conf_t
-    validate: 'named-checkconf %s'
-  become: yes
-  notify: reload bind
+    validate: named-checkconf %s
+  become: true
+  notify: Reload bind
   tags: bind
 
 - name: Start BIND service
-  service:
+  ansible.builtin.service:
     name: "{{ bind_service }}"
     state: started
     enabled: true
-  become: yes
+  become: true
   tags: bind

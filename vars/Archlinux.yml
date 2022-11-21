@@ -1,6 +1,5 @@
 # Distro specific variables for Arch Linux
 ---
-
 bind_packages:
   - python-netaddr
   - python-dns
@@ -14,19 +13,18 @@ bind_config: /etc/named.conf
 
 # Zone files included in the installation
 bind_default_zone_files: []
-
 # Directory with run-time stuff
 bind_dir: /var/named
 bind_conf_dir: "{{ bind_dir }}"
-auth_file: "auth_transfer.conf"
+auth_file: auth_transfer.conf
 bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
 
 bind_owner: root
 bind_group: named
 
-bind_bindkeys_file: "/etc/named.iscdlv.key"
-bind_pid_file: "/run/named/named.pid"
-bind_session_keyfile: "/run/named/session.key"
+bind_bindkeys_file: /etc/named.iscdlv.key
+bind_pid_file: /run/named/named.pid
+bind_session_keyfile: /run/named/session.key
 
 # Custom location for zone files
 bind_zone_dir: "{{ bind_dir }}"

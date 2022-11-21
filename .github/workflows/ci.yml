@@ -10,17 +10,15 @@ jobs:
 
   test:
     name: Molecule
-    runs-on: ubuntu-latest
+    runs-on: ["self-hosted"]
     strategy:
       matrix:
         distro:
-          - centos7
           - centos8
-          - debian8
-          - debian9
+          - centos7
           - debian10
-          - ubuntu1604
-          - ubuntu1804
+          - debian9
+          - ubuntu2204
           - ubuntu2004
 
     steps:
@@ -35,8 +33,36 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-docker yamllint ansible-lint docker netaddr dnspython
 
-      - name: Run Molecule Primary/Secondary/Forwarder tests
-        run: molecule test
+      - name: Install galaxy role
+        run: |
+          ansible-galaxy role install -f -r requirements.yml
+          ansible-galaxy role remove udienz.bind
+
+      - name: Run Molecule Primary/Secondary/Forwarder converge
+        run: molecule converge
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: Copy artifact
+        run: |
+          mkdir ${{ github.workspace }}/${{ matrix.distro }}
+          docker cp ${{ matrix.distro }}:/etc/named.conf ${{ github.workspace }}/${{ matrix.distro }}/etc/named.conf
+          docker cp ${{ matrix.distro }}:/etc/named/ ${{ github.workspace }}/${{ matrix.distro }}/etc/named/
+          docker cp ${{ matrix.distro }}:/etc/var/named/ ${{ github.workspace }}/${{ matrix.distro }}/var/named/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Artifact for ${{ matrix.distro }}
+          path: |
+           ${{ github.workspace }}/${{ matrix.distro }}/var/named/
+           ${{ github.workspace }}/${{ matrix.distro }}/etc/named/
+           ${{ github.workspace }}/${{ matrix.distro }}/etc/named.conf
+
+      - name: Run Molecule Primary/Secondary/Forwarder destroy
+        run: molecule destroy
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
