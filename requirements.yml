@@ -1,0 +1,4 @@
+---
+- src: https://github.com/cak-cuk/ansible-role-bind
+  name: udienz.bind
+  version: development
