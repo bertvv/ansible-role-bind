@@ -1,5 +1,6 @@
 # Distro specific variables for Arch Linux
 ---
+bind_package: bind
 
 bind_packages:
   - python-netaddr
