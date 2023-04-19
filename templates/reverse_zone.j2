@@ -17,7 +17,13 @@
 {% set _ = _zone_data.update({'retry': bind_zone_time_to_retry}) %}
 {% set _ = _zone_data.update({'expire': bind_zone_time_to_expire}) %}
 {% set _ = _zone_data.update({'minimum': bind_zone_minimum_ttl}) %}
-{% set _ = _zone_data.update({'hosts': item.0.hosts|default([]) | selectattr('ip', 'defined') | selectattr('ip', 'string') | selectattr('ip', 'search', '^'+item.1) | list}) %}
+
+{% set _hosts_ip_string = item.0.hosts|default([]) | selectattr('ip', 'defined') | selectattr('ip', 'string') | selectattr('ip', 'search', '^'+item.1) | list %}
+{% set _hosts_ip_list = item.0.hosts|default([]) | selectattr('ip', 'defined') | rejectattr('ip', 'string') | selectattr('ip', 'iterable') | list %}
+{% for h in _hosts_ip_list %}
+{% set _ = h.update({'ip': h.ip | select('string') | select('search', '^'+item.1) | list }) %}
+{% endfor %}
+{% set _ = _zone_data.update({'hosts': _hosts_ip_string + _hosts_ip_list }) %}
 {% set _ = _zone_data.update({'revip': ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1]))}) %}
 {#
  #  Compare the zone file hash with the current zone data hash and set serial
@@ -85,9 +91,9 @@ $ORIGIN {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr
 {% else %}
 {% for ip in host.ip %}
 {% if ip.startswith(item.1) %}
-{{ ('.'.join(ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  PTR  {{ _zone_data['domain'] }}.
 {% if host.name == '@' %}
-{% else %}
+{{ ('.'.join(ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  PTR  {{ _zone_data['domain'] }}.
+{% elif "*" not in host.name %}
 {{ ('.'.join(ip.replace(item.1+'.','').split('.')[::-1])).ljust(16) }}{{ (host.ttl|string).rjust(6) if host.ttl is defined else ''.ljust(6) }} IN  PTR  {{ host.name }}.{{ _zone_data['domain'] }}.
 {% endif %}
 {% endif %}
