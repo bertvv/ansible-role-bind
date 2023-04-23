@@ -3,6 +3,10 @@
 # List of zones for which this name server is authoritative
 bind_zones: []
 
+# Ratelimiting
+bind_rrl_responses_per_second: 0
+bind_rrl_window: 0
+
 # List of acls.
 bind_acls: []
 

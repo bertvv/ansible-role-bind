@@ -12,6 +12,16 @@ acl "{{ acl.name }}" {
 
 {% endfor %}
 options {
+{% if bind_rrl_responses_per_second is defined or bind_rrl_window is defined %}
+  rate-limit {
+{% if bind_rrl_responses_per_second is defined %}
+    responses-per-second {{ bind_rrl_responses_per_second }};
+{% endif %}
+{% if bind_rrl_window is defined %}
+    window {{ bind_rrl_window }};
+{% endif %}
+  };
+{% endif %}
 {% for port in bind_listen_ipv4_port %}
   listen-on port {{ port }} { {{ bind_listen_ipv4|join('; ') }}; };
 {% endfor %}
