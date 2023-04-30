@@ -38,7 +38,8 @@ jobs:
     strategy:
       matrix:
         distro:
-          - debian11
+          - image: debian
+            tag: 11
 
     steps:
       - name: Check out the codebase.
@@ -54,9 +55,18 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install ansible molecule molecule-plugins[docker] docker netaddr dnspython
 
-      - name: Run Molecule tests.
-        run: molecule test --all
+      - name: Run Molecule Primary/Secondary/Forwarder tests
+        run: molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
+          image: ${{ matrix.distro.image }}
+          tag: ${{ matrix.distro.tag }}
+
+      - name: Run Molecule Shared Inventory tests
+        run: molecule test --scenario-name shared_inventory
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          image: ${{ matrix.distro.image }}
+          tag: ${{ matrix.distro.tag }}
