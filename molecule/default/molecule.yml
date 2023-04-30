@@ -6,18 +6,11 @@ driver:
   # Specifies the driver that should be used. Podman should also work
   name: docker
 
-# Linting with yamllint and ansible-lint
-lint: |
-  set -e
-  yamllint .
-  ansible-lint -x 106 .
-
 platforms:
   # Set name and hostname
-  - name: ns1
+  - &instance
+    name: ns1
     hostname: ns1
-    # Specify which image should be used. Geerlingguys images are Ansible
-    # compatible and have Systemd installed
     docker_networks:
       - name: bind
         ipam_config:
@@ -26,68 +19,50 @@ platforms:
     networks:
       - name: bind
         ipv4_address: "10.11.0.1"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos8}-ansible:latest"
-    # Command to execute when the container starts
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    image: ${image:-debian}:${tag:-latest}
+    privileged: true
+    tty: true
     # Volumes to mount within the container. Important to enable systemd
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-      - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
-      - ${PWD}/library:/root/.ansible/plugins/modules:ro
-    # Give extended privileges to the container. Necessary for Systemd to
-    # operate within the container. DO NOT use extended privileges in a
-    # production environment!
-    privileged: true
-    pre_build_image: true
-    # Allocate pseudo-TTY
-    tty: true
-    environment:
-      container: docker
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    stop_signal: "SIGRTMIN+3"
+    capabilities:
+      - SYS_ADMIN
+      - SYS_TIME
+      - LINUX_IMMUTABLE
+    command: "/lib/systemd/systemd"
 
-  - name: ns2
+  - <<: *instance
+    name: ns2
     hostname: ns2
     networks:
       - name: bind
         ipv4_address: "10.11.0.2"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos8}-ansible:latest"
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-      - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
-      - ${PWD}/library:/root/.ansible/plugins/modules:ro
-    privileged: true
-    pre_build_image: true
-    tty: true
-    environment:
-      container: docker
 
-  - name: ns3
+  - <<: *instance
+    name: ns3
     hostname: ns3
     networks:
       - name: bind
         ipv4_address: "10.11.0.3"
-    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos8}-ansible:latest"
-    command: ${MOLECULE_DOCKER_COMMAND:-""}
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-      - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
-      - ${PWD}/library:/root/.ansible/plugins/modules:ro
-    privileged: true
-    pre_build_image: true
-    tty: true
-    environment:
-      container: docker
-
 
 provisioner:
   name: ansible
+  env:
+    ANSIBLE_FORCE_COLOR: "true"
+  options:
+    v: true
   config_options:
     defaults:
       interpreter_python: auto_legacy_silent
-      callback_whitelist: profile_tasks
-    ssh_connection:
-      pipelining: true
 
 # Runs the verify.yml playbook
 verifier:
   name: ansible
+
+# Linting with yamllint and ansible-lint
+lint: |
+  set -e
+  yamllint .
+  ansible-lint

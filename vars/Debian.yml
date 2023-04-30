@@ -2,12 +2,12 @@
 ---
 bind_default_python_version: '3'
 bind_packages:
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-netaddr', 'python-netaddr' ) }}"
-  - "{{ ( bind_python_version == '3' ) | ternary( 'python3-dnspython', 'python-dnspython' ) }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-netaddr', 'python-netaddr') }}"
+  - "{{ (bind_python_version == '3') | ternary('python3-dnspython', 'python-dnspython') }}"
   - bind9
   - bind9utils
 
-bind_service: bind9
+bind_service: "{{ 'bind9' if (ansible_distribution_version | int < 11) or ((ansible_distribution == 'Ubuntu') and (ansible_distribution_version | int < 20)) else 'named' }}"
 
 # Main config file
 bind_config: /etc/bind/named.conf
