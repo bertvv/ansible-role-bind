@@ -43,7 +43,7 @@
 
 - name: Create dict of reverse hashes
   ansible.builtin.set_fact:
-    reverse_hashes: "{{ reverse_hashes|default([]) + [ {'hash': item.0.stdout|default(), 'network': item.1} ] }}"
+    reverse_hashes: "{{ reverse_hashes | default([]) + [ {'hash': item.0.stdout | default(), 'network': item.1} ] }}"
   with_subelements:
     - "{{ reverse_hashes_temp.results }}"
     - item

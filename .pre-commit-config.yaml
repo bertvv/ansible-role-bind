@@ -1,0 +1,7 @@
+---
+- repo: https://github.com/ansible-community/ansible-lint.git
+  rev: v5.1.3
+  hooks:
+    - id: ansible-lint
+      files: \.(yaml|yml)$
+      exclude: ^molecule/
