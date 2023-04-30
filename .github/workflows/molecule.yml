@@ -64,16 +64,13 @@ jobs:
         with:
           path: "${{ github.repository }}"
 
-      - name: Set up Python 3
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install test dependencies.
-        run: pip3 install ansible molecule==4.0.2 molecule-docker==1.1.0 yamllint ansible-lint docker==6.0.1 netaddr dnspython
-
       - name: molecule
-        run: molecule test --all
-        env:
+        uses: robertdebock/molecule-action@5.0.2
+        with:
+          args: |
+            bash -c "python3 -m pip install netaddr dnspython"
           image: ${{ matrix.config.image }}
+          tag: ${{ matrix.config.tag }}
+          scenario: ${{ matrix.scenario }}
+        env:
           name: ${{ matrix.config.name }}
