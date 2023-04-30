@@ -7,70 +7,39 @@ on:  # yamllint disable-line rule:truthy
       - '*'
   pull_request:
 
+
 jobs:
-  setup:
-    name: Setup scenarios matrix
-    runs-on: ubuntu-22.04
-    outputs:
-      scenarios: ${{ steps.matrix.outputs.scenarios }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: matrix
-        run: |
-          JSON="["
-
-          for s in $(find molecule -mindepth 1 -maxdepth 1 -type d -exec basename "{}" \;); do
-            JSON="${JSON}\"${s}\","
-          done
-
-          JSON="${JSON%?}"
-          JSON="$JSON]"
-
-          echo "::set-output name=scenarios::$(echo $JSON)"
-
-  lint:
-    name: Lint
-    needs:
-      - setup
-    runs-on: ubuntu-22.04
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-        with:
-          path: "${{ github.repository }}"
-      - name: molecule
-        uses: robertdebock/molecule-action@4.0.9
-        with:
-          command: lint
-          scenario: ${{ fromJson(needs.setup.outputs.scenarios)[0] }}
-
   test:
-    name: Scenario "${{ matrix.scenario }}" on ${{ matrix.config.image }}:${{ matrix.config.tag }}
-    needs:
-      - lint
-      - setup
+    name: Scenario "${{ matrix.distro }}"
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        scenario: ${{ fromJson(needs.setup.outputs.scenarios) }}
-        config:
+        distro:
           - name: debian11
-            image: "debian"
-            tag: "11"
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-        with:
-          path: "${{ github.repository }}"
 
-      - name: molecule
-        uses: robertdebock/molecule-action@5.0.2
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
         with:
-          args: |
-            bash -c "python3 -m pip install netaddr dnspython"
-          image: ${{ matrix.config.image }}
-          tag: ${{ matrix.config.tag }}
-          scenario: ${{ matrix.scenario }}
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install ansible molecule==4.0.2 molecule-plugins[docker] yamllint ansible-lint docker netaddr dnspython
+
+      - name: Run Molecule Primary/Secondary/Forwarder tests
+        run: molecule test
         env:
-          name: ${{ matrix.config.name }}
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+
+      - name: Run Molecule Shared Inventory tests
+        run: molecule test --scenario-name shared_inventory
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
