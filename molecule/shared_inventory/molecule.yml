@@ -27,6 +27,8 @@ platforms:
       - name: bind
         ipv4_address: "10.11.0.4"
     image: ${image:-debian}:${tag:-latest}
+    privileged: true
+    tty: true
     # Volumes to mount within the container. Important to enable systemd
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
