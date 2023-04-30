@@ -7,38 +7,56 @@ on:  # yamllint disable-line rule:truthy
       - '*'
   pull_request:
 
+defaults:
+  run:
+    working-directory: "${{ github.repository }}"
 
 jobs:
-  test:
-    name: Scenario "${{ matrix.distro }}"
-    runs-on: ubuntu-20.04
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+        with:
+          path: "${{ github.repository }}"
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install yamllint
+
+      - name: Lint code.
+        run: |
+          yamllint .
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         distro:
-          - name: debian11
+          - debian11
 
     steps:
       - name: Check out the codebase.
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v2
         with:
-          python-version: '3.10'
+          path: "${{ github.repository }}"
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
       - name: Install test dependencies.
-        run: pip3 install ansible molecule==4.0.2 molecule-plugins[docker] yamllint ansible-lint docker netaddr dnspython
+        run: pip3 install ansible molecule molecule-plugins[docker] docker netaddr dnspython
 
-      - name: Run Molecule Primary/Secondary/Forwarder tests
-        run: molecule test
-        env:
-          PY_COLORS: '1'
-          ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: ${{ matrix.distro }}
-
-      - name: Run Molecule Shared Inventory tests
-        run: molecule test --scenario-name shared_inventory
+      - name: Run Molecule tests.
+        run: molecule test --all
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
