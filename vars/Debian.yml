@@ -7,7 +7,7 @@ bind_packages:
   - bind9
   - bind9utils
 
-bind_service: "{{ 'bind9' if (ansible_distribution_version | int < 11 or ansible_distribution == 'Ubuntu') else 'named' }}"
+bind_service: "{{ 'bind9' if (ansible_distribution_version | int < 11) or ((ansible_distribution == 'Ubuntu') and (ansible_distribution_version | int < 20)) else 'named' }}"
 
 # Main config file
 bind_config: /etc/bind/named.conf
