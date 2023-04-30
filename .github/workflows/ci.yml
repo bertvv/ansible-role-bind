@@ -51,11 +51,11 @@ jobs:
           - image: "debian"
             tag: "8"
           - image: "ubuntu"
-            tag: "22.04"
-          - image: "ubuntu"
             tag: "20.04"
           - image: "ubuntu"
             tag: "18.04"
+          - image: "ubuntu"
+            tag: "16.04"
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v2
