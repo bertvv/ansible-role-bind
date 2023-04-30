@@ -1,0 +1,97 @@
+---
+name: Ansible Molecule
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    tags_ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  setup:
+    name: Setup scenarios matrix
+    runs-on: ubuntu-22.04
+    outputs:
+      scenarios: ${{ steps.matrix.outputs.scenarios }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: matrix
+        run: |
+          JSON="["
+
+          for s in $(find molecule -mindepth 1 -maxdepth 1 -type d -exec basename "{}" \;); do
+            JSON="${JSON}\"${s}\","
+          done
+
+          JSON="${JSON%?}"
+          JSON="$JSON]"
+
+          echo "::set-output name=scenarios::$(echo $JSON)"
+
+  lint:
+    name: Lint
+    needs:
+      - setup
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          path: "${{ github.repository }}"
+      - name: molecule
+        uses: robertdebock/molecule-action@4.0.9
+        with:
+          command: lint
+          scenario: ${{ fromJson(needs.setup.outputs.scenarios)[0] }}
+
+  test:
+    name: Scenario "${{ matrix.scenario }}" on ${{ matrix.config.image }}:${{ matrix.config.tag }}
+    needs:
+      - lint
+      - setup
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: ${{ fromJson(needs.setup.outputs.scenarios) }}
+        config:
+          - name: centos8
+            image: "quay.io/centos/centos"
+            tag: "centos8"
+          - name: centos7
+            image: "quay.io/centos/centos"
+            tag: "centos7"
+          - name: debian11
+            image: "debian"
+            tag: "11"
+          - name: "debian10"
+            image: "debian"
+            tag: "10"
+          - name: "debian9"
+            image: "debian"
+            tag: "9"
+          - name: "debian8"
+            image: "debian"
+            tag: "8"
+          - name: "ubuntu2204"
+            image: "ubuntu"
+            tag: "22.04"
+          - name: "ubuntu2004"
+            image: "ubuntu"
+            tag: "20.04"
+          - name: "ubuntu1804"
+            image: "ubuntu"
+            tag: "18.04"
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          path: "${{ github.repository }}"
+      - name: molecule
+        uses: robertdebock/molecule-action@4.0.9
+        with:
+          image: ${{ matrix.config.image }}
+          tag: ${{ matrix.config.tag }}
+          scenario: ${{ matrix.scenario }}
+        env:
+          name: ${{ matrix.config.name }}
