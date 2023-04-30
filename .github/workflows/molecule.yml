@@ -55,40 +55,23 @@ jobs:
       matrix:
         scenario: ${{ fromJson(needs.setup.outputs.scenarios) }}
         config:
-          # - name: centos8
-          #   image: "quay.io/centos/centos"
-          #   tag: "centos8"
-          # - name: centos7
-          #   image: "quay.io/centos/centos"
-          #   tag: "centos7"
           - name: debian11
             image: "debian"
             tag: "11"
-          # - name: "debian10"
-          #   image: "debian"
-          #   tag: "10"
-          # - name: "debian9"
-          #   image: "debian"
-          #   tag: "9"
-          # - name: "debian8"
-          #   image: "debian"
-          #   tag: "8"
-          # - name: "ubuntu2204"
-          #   image: "ubuntu"
-          #   tag: "22.04"
-          # - name: "ubuntu2004"
-          #   image: "ubuntu"
-          #   tag: "20.04"
-          # - name: "ubuntu1804"
-          #   image: "ubuntu"
-          #   tag: "18.04"
     steps:
       - name: checkout
         uses: actions/checkout@v3
         with:
           path: "${{ github.repository }}"
-      - name: pip
-        run: pip install netaddr dnspython
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install netaddr dnspython
+
       - name: molecule
         uses: robertdebock/molecule-action@4.0.9
         with:
