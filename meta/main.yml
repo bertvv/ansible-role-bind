@@ -17,6 +17,7 @@ galaxy_info:
         - jessie
         - stretch
         - buster
+        - bullseye
     - name: FreeBSD
       versions:
         - "12.1"
@@ -30,6 +31,7 @@ galaxy_info:
         - xenial
         - bionic
         - focal
+        - jammy
   galaxy_tags:
     - dns
     - networking
