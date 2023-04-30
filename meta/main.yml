@@ -7,11 +7,11 @@ galaxy_info:
     Sets up ISC BIND as an authoritative DNS server for one or more domains
     (primary and/or secondary).
   license: BSD
-  min_ansible_version: 2.7
+  min_ansible_version: "2.7"
   platforms:
     - name: ArchLinux
       versions:
-        - any
+        - all
     - name: Debian
       versions:
         - jessie
@@ -19,12 +19,12 @@ galaxy_info:
         - buster
     - name: FreeBSD
       versions:
-        - 12.1
+        - "12.1"
     - name: EL
       versions:
-        - 6
-        - 7
-        - 8
+        - "6"
+        - "7"
+        - "8"
     - name: Ubuntu
       versions:
         - xenial
