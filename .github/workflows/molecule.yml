@@ -88,10 +88,9 @@ jobs:
         with:
           path: "${{ github.repository }}"
       - name: pip
-        run: python3 -m pip install netaddr dnspython
+        run: pip install netaddr dnspython
       - name: molecule
         uses: robertdebock/molecule-action@4.0.9
-
         with:
           image: ${{ matrix.config.image }}
           tag: ${{ matrix.config.tag }}
