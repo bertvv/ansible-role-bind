@@ -29,7 +29,7 @@
 {%   if _hash_serial and _hash_serial[0] == _zone['hash'] %}
 {%     set _ = _zone.update({'serial': _hash_serial[1]}) %}
 {%   else %}
-{%     set _ = _zone.update({'serial': timestamp.stdout}) %}
+{%     set _ = _zone.update({'serial': _bind_timestamp.stdout}) %}
 {%   endif %}
 {% endfor %}
 {#
