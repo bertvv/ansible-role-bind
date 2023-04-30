@@ -38,8 +38,6 @@ jobs:
     strategy:
       matrix:
         distro:
-          - image: "amazonlinux"
-            tag: "latest"
           - image: "quay.io/centos/centos"
             tag: "stream8"
           - image: "quay.io/centos/centos"
