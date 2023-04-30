@@ -9,10 +9,9 @@ on:  # yamllint disable-line rule:truthy
 
 defaults:
   run:
-    working-directory: "${{ github.repository }}"
+    working-directory: "bertvv.bind"
 
 jobs:
-
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -20,7 +19,7 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: "${{ github.repository }}"
+          path: "bertvv.bind"
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
@@ -45,7 +44,7 @@ jobs:
       - name: Check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: "${{ github.repository }}"
+          path: "bertvv.bind"
 
       - name: Set up Python 3.
         uses: actions/setup-python@v2
