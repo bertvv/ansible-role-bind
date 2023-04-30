@@ -5,7 +5,6 @@ name: CI
   push:
     branches:
       - master
-      - fix/ansible_lint_errors
 
 defaults:
   run:
