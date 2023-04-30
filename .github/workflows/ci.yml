@@ -38,18 +38,16 @@ jobs:
     strategy:
       matrix:
         distro:
+          - image: "amazonlinux"
+            tag: "latest"
           - image: "quay.io/centos/centos"
-            tag: "centos8"
+            tag: "stream8"
           - image: "quay.io/centos/centos"
             tag: "centos7"
           - image: "debian"
             tag: "11"
           - image: "debian"
             tag: "10"
-          - image: "debian"
-            tag: "9"
-          - image: "debian"
-            tag: "8"
           - image: "ubuntu"
             tag: "20.04"
           - image: "ubuntu"
