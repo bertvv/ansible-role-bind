@@ -135,14 +135,23 @@ zone "{{ bind_zone.name }}" IN {
 {% else %}
   allow-update { none; };
 {% endif %}
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% elif _type == 'secondary' %}
   type slave;
   masters { {{ bind_zone.primaries|join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ bind_zone.name }}";
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% elif _type == 'forward' %}
   type forward;
   forward only;
   forwarders { {{ bind_zone.forwarders|join('; ') }}; };
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% endif %}
 };
 {% endif %}
@@ -163,14 +172,23 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% else %}
   allow-update { none; };
 {% endif %}
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% elif _type == 'secondary' %}
   type slave;
   masters { {{ bind_zone.primaries|join('; ') }}; };
   file "{{ bind_secondary_dir }}/{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa";
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% elif _type == 'forward' %}
   type forward;
   forward only;
   forwarders { {{ bind_zone.forwarders|join('; ') }}; };
+{% if bind_zone.allow_query is defined %}
+  allow-query     { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% endif %}
 };
 {% endfor %}
