@@ -135,6 +135,9 @@ zone "{{ bind_zone.name }}" IN {
 {% else %}
   allow-update { none; };
 {% endif %}
+{% if bind_zone.allow_query is defined %}
+  allow-query { {{ bind_zone.allow_query|join('; ') }}; };
+{% endif %}
 {% elif _type == 'secondary' %}
   type slave;
   masters { {{ bind_zone.primaries|join('; ') }}; };
@@ -162,6 +165,9 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
   allow-update { {{ bind_zone.allow_update|join('; ') }}; };
 {% else %}
   allow-update { none; };
+{% endif %}
+{% if bind_zone.allow_query is defined %}
+  allow-query { {{ bind_zone.allow_query|join('; ') }}; };
 {% endif %}
 {% elif _type == 'secondary' %}
   type slave;
