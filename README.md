@@ -27,7 +27,7 @@ A few remarks on supported roles that are not included in automated tests
 
 ## Requirements
 
-The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters_ipaddr.html) filter) and `dnspython` should be installed on the management node
+The packages `python-netaddr` (required for the [`ansible.utils.ipaddr`](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters_ipaddr.html) filter) and `dnspython` should be installed on the management node
 
 ## Role Variables
 
@@ -75,6 +75,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- name`                    | `example.com`        | The domain name                                                                                                                      |
 | `- naptr`                   | `[]`                 | A list of mappings with keys `name:`, `order:`, `pref:`, `flags:`, `service:`, `regex:` and `replacement:` specifying NAPTR records. |
 | `- networks`                | `['10.0.2']`         | A list of the networks that are part of the domain                                                                                   |
+| `- allow_query`             | `[]`                 | A list of the acls, networks or IPs that are allowed to do request for the zone |
 | `- other_name_servers`      | `[]`                 | A list of the DNS servers outside of this domain.                                                                                    |
 | `- primaries`               | -                    | A list of primary DNS servers for this zone.                                                                                         |
 | `- services`                | `[]`                 | A list of services to be advertised by SRV records                                                                                   |
@@ -175,6 +176,9 @@ bind_zones:
       - 172.17.0.2
     networks:
       - "172.17"
+    allow_query:
+      - acl1
+      - 10.0.0.0/8
   # Minimal example of a forward zone
   - name: acme.com
     forwarders:
