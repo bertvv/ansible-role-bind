@@ -40,7 +40,7 @@
 - name: Install BIND
   package:
     pkg: "{{ item }}"
-    state: present
+    state: latest
   become: yes
   with_items:
     - "{{ bind_packages }}"
