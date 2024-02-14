@@ -81,7 +81,7 @@ The packages `python-netaddr` (required for the [`ipaddr`](https://docs.ansible.
 | `- text`                    | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying TXT records. `text:` can be a list or string.                           |
 | `- caa`                     | `[]`                 | A list of mappings with keys `name:` and `text:`, specifying CAA records. `text:` can be a list or string.                           |
 | `- type`                    | -                    | Optional zone type. If not specified, autodetection will be used. Possible values include `primary`, `secondary` or `forward`        |
-| `bind_zone_file_mode`       | 0640                 | The file permissions for the main config file (named.conf)                                                                           |
+| `bind_zone_file_mode`       | `u=rw,g=r,o=`        | The file permissions for the main config file (named.conf)                                                                           |
 | `bind_zone_minimum_ttl`     | `1D`                 | Minimum TTL field in the SOA record.                                                                                                 |
 | `bind_zone_time_to_expire`  | `1W`                 | Time to expire field in the SOA record.                                                                                              |
 | `bind_zone_time_to_refresh` | `1D`                 | Time to refresh field in the SOA record.                                                                                             |

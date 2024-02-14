@@ -3,7 +3,7 @@ bind_statistics_channels: true
 bind_statistics_allow:
   - any
 bind_zone_dir: /var/local/named-zones
-bind_zone_file_mode: '0660'
+bind_zone_file_mode: ug=rw,o=
 bind_allow_query:
   - any
 bind_listen_ipv4:

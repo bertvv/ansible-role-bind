@@ -7,16 +7,16 @@
 
     # Only collect network facts to reduce setup time
     - name: Gathering Facts
-      setup:
+      ansible.builtin.setup:
         gather_subset:
           - 'network'
 
     - name: Set local_dns variable for dig
-      set_fact:
+      ansible.builtin.set_fact:
         local_dns: "{{ '@' + ansible_default_ipv4.address }}"
 
     - name: IPv4 Forward lookups
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', 'ns1.acme-inc.com', local_dns )    == '10.11.0.4'
           - lookup('dig', 'ns2.acme-inc.com', local_dns)     == '10.11.0.5'
@@ -33,7 +33,7 @@
           - lookup('dig', 'mail001.example.com', local_dns)  == '192.0.2.10'
 
     - name: IPv4 Reverse lookups
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', '10.11.0.4/PTR', local_dns)  == 'ns1.acme-inc.com.'
           - lookup('dig', '10.11.0.5/PTR', local_dns)  == 'ns2.acme-inc.com.'
@@ -50,7 +50,7 @@
           - lookup('dig', '192.0.2.10/PTR', local_dns) == 'mail001.example.com.'
 
     - name: IPv4 Alias lookups
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', 'www.acme-inc.com', local_dns)      == '10.11.1.1'
           - lookup('dig', 'mysql.acme-inc.com', local_dns)    == '10.11.1.2'
@@ -61,7 +61,7 @@
           - lookup('dig', 'www.example.com', local_dns)       == '192.0.2.1'
 
     - name: IPv6 Forward lookups
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', 'srv001.acme-inc.com/AAAA', local_dns)  == '2001:db8::1'
           - lookup('dig', 'srv002.acme-inc.com/AAAA', local_dns)  == '2001:db8::2'
@@ -71,7 +71,7 @@
           - lookup('dig', 'srv001.example.com/AAAA', local_dns)   == '2001:db9::1'
 
     - name: IPv6 Reverse lookups
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', '2001:db8::1/PTR', local_dns)   == 'srv001.acme-inc.com.'
           - lookup('dig', '2001:db8::2/PTR', local_dns)   == 'srv002.acme-inc.com.'
@@ -82,24 +82,24 @@
           - lookup('dig', '2001:db9::1/PTR', local_dns)   == 'srv001.example.com.'
 
     - name: NS records lookup
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', 'acme-inc.com/NS', local_dns).split(',') | sort | join(',') == 'ns1.acme-inc.com.,ns2.acme-inc.com.'
           - lookup('dig', 'example.com/NS', local_dns).split(',')  | sort | join(',') == 'ns1.acme-inc.com.,ns2.acme-inc.com.'
 
     - name: MX records lookup
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', 'acme-inc.com/MX', local_dns).split(',') | sort | join(',') == '10 mail001.acme-inc.com.,20 mail002.acme-inc.com.'
           - lookup('dig', 'example.com/MX', local_dns).split(',')  | sort | join(',') == '10 mail001.example.com.'
 
     - name: Service records lookup
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', '_ldap._tcp.acme-inc.com/SRV', local_dns) == '0 100 88 srv010.acme-inc.com.'
 
     - name: TXT records lookup
-      assert:
+      ansible.builtin.assert:
         that:
           - lookup('dig', '_kerberos.acme-inc.com/TXT', local_dns) == 'KERBEROS.ACME-INC.COM'
           - lookup('dig', 'acme-inc.com/TXT', local_dns).split(',') | sort | join(',') == 'more text,some text'

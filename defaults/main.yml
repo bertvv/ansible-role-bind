@@ -71,8 +71,8 @@ bind_zone_time_to_retry: "1H"
 bind_zone_time_to_expire: "1W"
 bind_zone_minimum_ttl: "1D"
 
-# File mode for primary zone files (needs to be something like 0660 for dynamic updates)
-bind_zone_file_mode: "0640"
+# File mode for primary zone files (needs to be something like 0660 ug=rw,o= for dynamic updates)
+bind_zone_file_mode: u=rw,g=r,o=
 
 # DNS64 support
 bind_dns64: false
