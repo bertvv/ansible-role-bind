@@ -39,7 +39,7 @@
 
 - name: Install BIND
   package:
-    pkg: "{{ item }}"
+    name: "{{ item }}"
     state: present
   become: yes
   with_items:

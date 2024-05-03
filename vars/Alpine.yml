@@ -1,0 +1,30 @@
+# Distro specific variables for Alpine
+---
+bind_default_python_version: '3'
+bind_packages:
+  - py3-netaddr
+  - py3-dnspython
+  - bind
+  - bind-tools
+
+bind_service: named
+
+# Main config file
+bind_config: /etc/bind/named.conf
+
+# Directory with run-time stuff
+bind_dir: /var/bind
+bind_conf_dir: /etc/bind
+auth_file: auth_transfer.conf
+bind_auth_file: "{{ bind_conf_dir }}/{{ auth_file }}"
+
+bind_owner: named
+bind_group: named
+
+bind_bindkeys_file: "/etc/named/managed-keys.bind"
+bind_pid_file: "/run/named/named.pid"
+bind_session_keyfile: "/run/named/session.key"
+
+# Custom location for zone files
+bind_zone_dir: "{{ bind_dir }}"
+bind_secondary_dir: "{{ bind_dir }}"

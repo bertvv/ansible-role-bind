@@ -96,9 +96,11 @@ logging {
 {% endif %}
 };
 
+{% if bind_default_zone_files is defined %}
 {% for file in bind_default_zone_files %}
 include "{{ file }}";
 {% endfor %}
+{% endif %}
 {% for file in bind_extra_include_files %}
 include "{{ file }}";
 {% endfor %}
