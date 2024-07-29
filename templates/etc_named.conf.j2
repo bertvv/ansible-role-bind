@@ -148,6 +148,22 @@ zone "{{ bind_zone.name }}" IN {
 {% endif %}
 {% if bind_zone.networks is defined %}
 {% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
+{# Start: set zone type  #}
+{% set _all_addresses = ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) %}
+{% if bind_zone.type is defined and bind_zone.type == 'primary' %}
+{% set _type = 'primary' %}
+{% elif bind_zone.type is defined and bind_zone.type == 'secondary' %}
+{% set _type = 'secondary' %}
+{% elif bind_zone.type is defined and bind_zone.type == 'forward' %}
+{% set _type = 'forward' %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and (_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% set _type = 'primary' %}
+{% elif bind_zone.type is not defined and bind_zone.primaries is defined and not (_all_addresses|intersect(bind_zone.primaries)|length > 0) %}
+{% set _type = 'secondary' %}
+{% elif bind_zone.type is not defined and bind_zone.forwarders is defined %}
+{% set _type = 'forward' %}
+{% endif %}
+{# End: set zone type #}
 {% for network in bind_zone.networks %}
 
 zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr.arpa" IN {

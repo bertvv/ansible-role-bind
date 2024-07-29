@@ -38,6 +38,7 @@ platforms:
     # operate within the container. DO NOT use extended privileges in a
     # production environment!
     privileged: true
+    cgroupns_mode: host
     pre_build_image: true
     # Allocate pseudo-TTY
     tty: true
@@ -56,6 +57,7 @@ platforms:
       - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
       - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
+    cgroupns_mode: host
     pre_build_image: true
     tty: true
     environment:
@@ -73,6 +75,7 @@ platforms:
       - ${PWD}:/etc/ansible/roles/bertvv.bind:ro
       - ${PWD}/library:/root/.ansible/plugins/modules:ro
     privileged: true
+    cgroupns_mode: host
     pre_build_image: true
     tty: true
     environment:
