@@ -26,7 +26,7 @@
 - name: Update package cache for Debian based distros
   apt:
     update_cache: yes
-  become: yes
+  become: true
   changed_when: false
   when: ansible_os_family == 'Debian'
   tags: bind
@@ -41,10 +41,25 @@
   package:
     pkg: "{{ item }}"
     state: present
-  become: yes
+  become: true
   with_items:
     - "{{ bind_packages }}"
   tags: bind
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+
+- name: Extract installed bind version
+  set_fact:
+    bind_ver_installed: "{{ ansible_facts.packages[bind_package]
+       | map(attribute='version') | first
+       | regex_search('^(.*:)*([0-9]+\\.[0-9]+)\\.(.*)$', '\\2') | first }}"
+
+- name: Discard bind_dnssec_enable for bind >= 9.16
+  set_fact:
+    bind_dnssec_enable: false
+  when: bind_ver_installed is version('9.16', '>=')
 
 - name: Ensure runtime directories referenced in config exist
   file:
@@ -53,7 +68,7 @@
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: 0770
-  become: yes
+  become: true
   with_items:
     - "{{ bind_dir }}/dynamic"
     - "{{ bind_dir }}/data"
@@ -68,7 +83,7 @@
     group: "{{ bind_group }}"
     mode: 0770
     setype: named_cache_t
-  become: yes
+  become: true
   tags: bind
 
 - name: Create serial, based on UTC UNIX time
@@ -105,7 +120,7 @@
     mode: 0640
     setype: named_conf_t
     validate: 'named-checkconf %s'
-  become: yes
+  become: true
   notify: reload bind
   tags: bind
 
@@ -114,5 +129,5 @@
     name: "{{ bind_service }}"
     state: started
     enabled: true
-  become: yes
+  become: true
   tags: bind
