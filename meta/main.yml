@@ -1,11 +1,11 @@
 ---
 galaxy_info:
   role_name: bind
-  namespace: bertvv
-  author: Bert Van Vreckem
+  namespace: brunobenchimol
+  author: Bruno Benchimol
   description: >
-    Sets up ISC BIND as an authoritative DNS server for one or more domains
-    (primary and/or secondary).
+    Fork from bertvv (Bert Van Vreckem). Adds dynamic dns updates support and others features.
+    Sets up ISC BIND as an authoritative DNS server for one or more domains (primary and/or secondary).
   license: BSD
   min_ansible_version: 2.7
   platforms:
@@ -17,6 +17,8 @@ galaxy_info:
         - jessie
         - stretch
         - buster
+        - bullseye
+        - trixie
     - name: FreeBSD
       versions:
         - 12.1

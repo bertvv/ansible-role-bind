@@ -53,7 +53,7 @@
   tags: bind
 
 - name: Read reverse ipv6 zone hashes
-  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
+  shell: "grep -s \"^; Hash:\" {{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }} || true"
   changed_when: false
   check_mode: false
   register: reverse_hashes_ipv6_temp
@@ -76,6 +76,40 @@
   run_once: true
   loop_control:
     label: "{{ item.1.name |default(item.0.cmd.split(' ')[4]) }}"
+  tags: bind
+
+- name: Dump/flush dynamic zone changes to disk/zone file
+  command: "rndc sync -clean {{ item.name }}"
+  with_items:
+    - "{{ bind_zones }}"
+  when: item.update_policy is defined or item.allow_update is defined 
+  notify: reload bind
+  tags: bind
+
+- name: Dump/flush dynamic ipv4 reverse zone changes to disk/zone file
+  command: "rndc sync -clean {{ ('.'.join(item.1.replace(item.1+'.','').split('.')[::-1])) }}.in-addr.arpa"
+  with_subelements:
+    - "{{ bind_zones }}"
+    - networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  when: item.0.update_policy is defined or item.0.allow_update is defined
+  notify: reload bind
+  tags: bind
+
+- name: Dump/flush dynamic ipv6 reverse zone changes to disk/zone file
+  command: "rndc sync -clean {{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+  with_subelements:
+    - "{{ bind_zones }}"
+    - ipv6_networks
+    - flags:
+      skip_missing: true
+  loop_control:
+    label: "{{ item.1 }}"
+  when: item.0.update_policy is defined or item.0.allow_update is defined
+  notify: reload bind
   tags: bind
 
 - name: Create forward lookup zone file
@@ -128,12 +162,12 @@
 - name: Create reverse IPv6 lookup zone file
   template:
     src: reverse_zone_ipv6.j2
-    dest: "{{ bind_zone_dir }}/{{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
+    dest: "{{ bind_zone_dir }}/{{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):-1] }}"
     owner: "{{ bind_owner }}"
     group: "{{ bind_group }}"
     mode: "{{ bind_zone_file_mode }}"
     setype: named_zone_t
-    validate: "named-checkzone {{ (item.1 | ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
+    validate: "named-checkzone {{ (item.1 | ansible.utils.ipaddr('revdns'))[-(9+(item.1|regex_replace('^.*/','')|int)//2):] }} %s"
   become: yes
   with_subelements:
     - "{{ bind_zones }}"
