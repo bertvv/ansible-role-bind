@@ -30,6 +30,12 @@ galaxy_info:
         - xenial
         - bionic
         - focal
+    - name: SLES
+      versions:
+        - all
+    - name: openSUSE
+      versions:
+        - all
   galaxy_tags:
     - dns
     - networking
