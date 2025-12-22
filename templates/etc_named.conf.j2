@@ -180,10 +180,10 @@ zone "{{ ('.'.join(network.replace(network+'.','').split('.')[::-1])) }}.in-addr
 {% if bind_zone.create_reverse_zones is not defined or bind_zone.create_reverse_zones %}
 {% for network in bind_zone.ipv6_networks %}
 
-zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
+zone "{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):] }}" IN {
 {% if _type == 'primary' %}
   type master;
-  file "{{ bind_zone_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  file "{{ bind_zone_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
   notify yes;
 {% if bind_zone.also_notify is defined %}
   also-notify  { {{ bind_zone.also_notify|join('; ') }}; };
@@ -196,7 +196,7 @@ zone "{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)
 {% elif _type == 'secondary' %}
   type slave;
   masters { {{ bind_zone.primaries|join('; ') }}; };
-  file "{{ bind_secondary_dir }}/{{ (network | ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
+  file "{{ bind_secondary_dir }}/{{ (network | ansible.utils.ipaddr('revdns'))[-(9+(network|regex_replace('^.*/','')|int)//2):-1] }}";
 {% elif _type == 'forward' %}
   type forward;
   forward only;
