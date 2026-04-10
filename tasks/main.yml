@@ -21,7 +21,6 @@
     label: "{{ item.name }}"
   tags: bind
 
-# Fix molecule and ci failures
 - name: Update package cache for Debian based distros
   ansible.builtin.apt:
     update_cache: true
